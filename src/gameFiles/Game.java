@@ -1,6 +1,6 @@
 package gameFiles;
 import gui.GUI;
-import io.TextIO;
+import gui.TextIO;
 
 import java.io.File;
 import java.io.IOException;
