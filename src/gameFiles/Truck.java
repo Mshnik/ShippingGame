@@ -19,7 +19,7 @@ public class Truck implements MapElement, Runnable{
 
 	private static final int WAIT_TIME = 5;
 	protected static final int NUMB_DEFAULT_TRAVEL_DIRECTIONS = 200;
-	
+
 	private String name;
 	private Circle circle;
 	private Color color = Circle.DEFAULT_TRUCK_COLOR;
@@ -36,18 +36,18 @@ public class Truck implements MapElement, Runnable{
 	private Status status;
 
 	private long lastTravelTime;    //System time (ms) when this truck last finished travel
-	
+
 	public static final int MAX_SPEED = 10; //Max value for truck's speed
 	public static final int EFFICIENT_SPEED = 4; //Speed at which the travel is most efficient
 	public static final int MIN_SPEED = 1;  //Min value for truck's speed
-	
+
 	private int speed; //The number of units this moves per frame when traveling. Must be between min and max
 	private Semaphore speedLock; //Lock for getting/changing speed
-	
+
 	private Object userData;
 
 	private final Game game;
-	
+
 	/** Constructor for the Truck Class. Uses a default color
 	 * @param g - the Game this Truck belongs to
 	 * @param name - The name of this truck
@@ -71,10 +71,10 @@ public class Truck implements MapElement, Runnable{
 		this.name = name;
 		this.game = g;
 		this.gui = g.getGUI();
-		
+
 		speed = Truck.EFFICIENT_SPEED;
 		speedLock = new Semaphore(1);
-		
+
 		location = startLocation;
 		travelingTo = null;
 		goingTo = null;
@@ -82,7 +82,7 @@ public class Truck implements MapElement, Runnable{
 		travel = new LinkedList<Edge>();
 		color = c;
 		circle = new Circle(this, 0, 0, (int)((double)Circle.DEFAULT_DIAMETER * 0.8), c, false);
-		
+
 	}
 
 	@Override
@@ -120,7 +120,7 @@ public class Truck implements MapElement, Runnable{
 		//Deduct final waiting points
 		fixLastTravelTime();
 	}
-	
+
 	/** Updates the waitTime to now, and deducts correct number of points for doing this */
 	private void fixLastTravelTime(){
 		long now = System.currentTimeMillis();
@@ -244,7 +244,7 @@ public class Truck implements MapElement, Runnable{
 		color = c;
 		circle.setColor(c);
 	}
-	
+
 	/** Returns the speed this truck will/is traveling 
 	 * @throws InterruptedException */
 	public int getSpeed() throws InterruptedException{
@@ -253,7 +253,7 @@ public class Truck implements MapElement, Runnable{
 		speedLock.release();
 		return i;
 	}
-	
+
 	/** Sets this trucks speed */
 	public void setSpeed(int newSpeed) throws InterruptedException{
 		speedLock.acquire();
@@ -406,8 +406,8 @@ public class Truck implements MapElement, Runnable{
 			setTravelingTo(r.getOther(location));
 			travelingAlong = r;
 
-			location.setTruckHere(false);
-			travelingAlong.setTruckHere(true);
+			location.setTruckHere(this, false);
+			travelingAlong.setTruckHere(this, true);
 
 			location.getCircle().updateColor();
 			travelingAlong.getLine().updateToColorPolicy();
@@ -452,8 +452,8 @@ public class Truck implements MapElement, Runnable{
 			setLocation(travelingTo);
 
 			updateGUILocation(location.getCircle().getX1(), location.getCircle().getY1());
-			travelingAlong.setTruckHere(false);
-			location.setTruckHere(true);
+			travelingAlong.setTruckHere(this, false);
+			location.setTruckHere(this, true);
 
 			location.getCircle().updateColor();
 			travelingAlong.getLine().updateToColorPolicy();
@@ -503,18 +503,35 @@ public class Truck implements MapElement, Runnable{
 
 	@Override
 	public int getRelativeY() {
-		return Circle.DEFAULT_DIAMETER;
+		return Circle.DEFAULT_DIAMETER;			
 	}
 
 	@Override
-	/** Always returns true, because a truck is always "at" itself */
-	public boolean isTruckHere() {
-		return true;
+	/** Always returns for this, always return false for other trucks, 
+	 * because a truck is always "at" itself */
+	public boolean isTruckHere(Truck t) {
+		return (this == t);
+	}
+
+	@Override
+	/** Always returns 1 - there is always one truck at itself */
+	public int trucksHere(){
+		return 1;
 	}
 
 	/** Called by the Game when the game is done. Causes this thread to die 
 	 * @throws InterruptedException  - if this Truck thread is currently interrupted*/
 	protected void gameOver() throws InterruptedException{
 		clearTravel();
+	}
+	
+	@Override
+	/** Returns a JSON String of this truck.
+	 * Just the basic truck info pertaining to map creation - location and load not included.
+	 */	
+	public String toJSONString() {
+		return "{\n" + Main.addQuotes(MapElement.NAME_TOKEN) + ":" + Main.addQuotes(name) + "," +
+				"\n" + Main.addQuotes(MapElement.COLOR_TOKEN) + ":" + color.getRGB() + 
+				"\n}";
 	}
 }

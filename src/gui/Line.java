@@ -128,7 +128,7 @@ public class Line  extends JPanel{
 		case COLOR_POLICY_HIGHLIGHT_TRAVEL:
 			boolean b = false;
 			try{
-				b = represents.isTruckHere();
+				b = represents.trucksHere() > 0;
 			}catch(InterruptedException e){}
 			if(b)
 				color = TRAVELING_COLOR;

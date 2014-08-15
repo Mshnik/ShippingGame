@@ -90,4 +90,9 @@ public class Main {
 		return f;
 	}
 	
+	/** Returns the given string with quotes added around it */
+	public static String addQuotes(String s){
+		return "\"" + s + "\"";
+	}
+	
 }

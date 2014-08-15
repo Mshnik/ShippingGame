@@ -7,6 +7,9 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashSet;
 
+import org.json.JSONObject;
+import org.json.JSONString;
+
 /** The Game Class is the controlling class for the ShippingGame Project.
  * Each game contains a collection of Parcels that need to be delivered from their
  * starting Node to their desired destination node. In order to do this, each game
@@ -20,7 +23,7 @@ import java.util.HashSet;
  * @author MPatashnik
  *
  */
-public class Game {
+public class Game implements JSONString{
 
 	private static final int DEFAULT_NUMB_ROADS = 19;
 	private static final int DEFAULT_MIN_ROAD_LENGTH = 2;
@@ -47,7 +50,14 @@ public class Game {
 		map = new Map(this, DEFAULT_NODES, DEFAULT_NUMB_ROADS, DEFAULT_MIN_ROAD_LENGTH, DEFAULT_AVG_ROAD_LENGTH, DEFAULT_MAX_ROAD_LENGTH);
 		trucks = new ArrayList<Truck>(DEFAULT_TRUCKS.length);
 		for(int i = 0; i < DEFAULT_TRUCKS.length; i++){
-			trucks.add(new Truck(this, DEFAULT_TRUCKS[i], map.getTruckHome(), Score.getRandomColor()));
+			Truck t = new Truck(this, DEFAULT_TRUCKS[i], map.getTruckHome(), Score.getRandomColor());
+			try {
+				map.getTruckHome().setTruckHere(t, true);
+			} catch (InterruptedException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+			trucks.add(t);
 		}
 
 		parcels = new HashSet<Parcel>();
@@ -271,6 +281,32 @@ public class Game {
 		}
 	}
 	
+	private static final String MAP_TOKEN = "map";
+	private static final String TRUCK_TOKEN = "truck-";
+	private static final String PARCEL_TOKEN = "parcel-";
+	
+	@Override
+	/** Returns a JSON representation of this game.
+	 * Specifically JSON-ifies the parts needed to recreate it later.
+	 * JSONs the map, the parcels, and the trucks.
+	 */
+	public String toJSONString() {
+		String s = "{\n" + Main.addQuotes(MAP_TOKEN) + ":" + map.toJSONString() + ",";
+		int i = 0;
+		for(Truck t : trucks){
+			s += "\n" + Main.addQuotes(TRUCK_TOKEN + i) + ":" + t.toJSONString() + ",";
+			i++;
+		}
+		i = 0;
+		for(Parcel p : parcels){
+			s += "\n" + Main.addQuotes(PARCEL_TOKEN + i) + ":" + p.toJSONString();
+			if(i < parcels.size() - 1)
+				s += ",";
+			i++;
+		}	
+		return s + "\n}";
+	}
+	
 	/** Reads the Game in File f, creates it, and returns it.
 	 * Also sets the trucks and parcels of this game while reading the map
 	 * @param g - the Game this map will belong to
@@ -281,7 +317,10 @@ public class Game {
 		trucks = new ArrayList<Truck>();
 		parcels = new HashSet<Parcel>();
 		
-		String[] text = TextIO.read(f);
+		JSONObject obj = new JSONObject(TextIO.read(f));
+		System.out.println(obj);
+		
+		String[] text = TextIO.readToArray(f);
 
 		int endMap = -1;
 		for(int i = 0; i < text.length; i++){
@@ -388,21 +427,9 @@ public class Game {
 	public void writeGame(String fileName) throws IOException, RuntimeException{
 		if(isRunning())
 			throw new RuntimeException("Can't Write Game File if the game is running.");
+	
 		
-		String gameOutput = map.toString() + "\n" + Map.END_NODE_IDENTIFIER + "\n";
-		
-		for(Truck t : getTrucks()){
-			gameOutput += t.getTruckName() + "\t" + t.getColor() + "\n";
-		}
-		
-		gameOutput += Map.END_TRUCK_IDENTIFIER + "\n";
-		
-		for(Parcel p : getParcels()){
-			gameOutput += p.getStart() + "\t" + p.getDestination() + "\t" + p.getColor() + "\n";
-		}
-		
-		gameOutput += Map.END_PARCEL_IDENTIFIER;
-		
-		TextIO.write(Map.MAP_DIRECTORY + fileName + ".txt", gameOutput);
+		String n = Map.MAP_DIRECTORY + fileName + ".txt";
+		TextIO.write(n, toJSONString());
 	}
 }

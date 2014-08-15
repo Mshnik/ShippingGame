@@ -38,10 +38,38 @@ public class TextIO {
 	
 	/** Reads File f as a text file.
 	 * @param f - the File to read
+	 * @return - a String of text
+	 * @throws IOException - if the file reading goes bad.
+	 */
+	public static String read(File f) throws IOException {
+		FileReader fr = null;
+		BufferedReader br = null;
+		try {
+			fr = new FileReader(f);
+			br = new BufferedReader(fr);
+		} catch (FileNotFoundException e) {
+			e.printStackTrace();
+		}
+		
+		String s = "";
+		String line = null;
+		do{
+			line = br.readLine();
+			if(line != null){
+				s+=line;
+			}
+		}while(line != null);
+		
+		br.close();
+		return s;
+	}
+	
+	/** Reads File f as a text file.
+	 * @param f - the File to read
 	 * @return - a String[], each entry of which is a line of text in f
 	 * @throws IOException - if the file reading goes bad.
 	 */
-	public static String[] read(File f) throws IOException {
+	public static String[] readToArray(File f) throws IOException {
 		FileReader fr = null;
 		BufferedReader br = null;
 		try {

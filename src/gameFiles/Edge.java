@@ -2,6 +2,7 @@ package gameFiles;
 import gui.Line;
 
 import java.awt.Color;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.concurrent.Semaphore;
 
@@ -40,10 +41,12 @@ public class Edge implements MapElement{
 
 	private Semaphore truckLock; //Lock that trucks must acquire in order to make changes to this edge.
 
+	private int truckHereCount; 			   //A count of the trucks here (mappings in truckHere to true)
+	private HashMap<Truck, Boolean> truckHere; //Maps truck -> is here
+	
 	private Object userData;
 
 	private Line line;
-	private boolean truckHere;
 
 	/** Constructor. Accepts a non-null Node array of length 2 to be exits and an integer length
 	 * lengthOfRoad must be positive and non-zero
@@ -85,6 +88,9 @@ public class Edge implements MapElement{
 		exits[1] = secondExit;
 		
 		truckLock = new Semaphore(1);
+		
+		truckHere = new HashMap<Truck, Boolean>();
+		truckHereCount = 0;
 
 		length = lengthOfRoad;
 		updateMinMaxLength();
@@ -259,12 +265,25 @@ public class Edge implements MapElement{
 	public String toString(){
 		return exits[0].getName() + " to " + exits[1].getName(); 
 	}
+	
+	@Override
+	/** Returns exits of this and the length for its JSON string */
+	public String toJSONString(){
+		return "{\n" + Main.addQuotes(MapElement.LOCATION_TOKEN) + ":[" 
+				     + Main.addQuotes(exits[0].getName()) + "," + Main.addQuotes(exits[1].getName()) + "]," +
+				"\n" + Main.addQuotes(MapElement.LENGTH_TOKEN) + ":" + length + 
+				"\n}";
+	}
 
-	/** Tells the edge whether or not a Truck is currently on it. Requires truck lock. 
-	 * @throws InterruptedException */
-	protected void setTruckHere(boolean truckHere) throws InterruptedException{
+	/** Tells the node if a Truck is currently on it or not. 
+	 * Gets its truckLock to prevent Truck thread collision */
+	protected void setTruckHere(Truck t, Boolean isHere) throws InterruptedException{
 		truckLock.acquire();
-		this.truckHere = truckHere;
+		if(truckHere.containsKey(t) && ! truckHere.get(t) && isHere)
+			truckHereCount++;
+		else if(! truckHere.containsKey(t) || truckHere.get(t) && ! isHere)
+			truckHereCount--;
+		truckHere.put(t, isHere);
 		truckLock.release();
 	}
 
@@ -287,11 +306,22 @@ public class Edge implements MapElement{
 	}
 
 	@Override
-	/** Returns true if a Truck is currently on this Edge, false otherwise. */
-	public boolean isTruckHere() throws InterruptedException {
+	/** Returns true if a truck is currently at this node, false otherwise */
+	public boolean isTruckHere(Truck t) throws InterruptedException{
 		truckLock.acquire();
-		boolean b = truckHere;
+		Boolean b = truckHere.get(t);
+		if(b == null)
+			b = false;
 		truckLock.release();
 		return b;
+	}
+	
+	@Override
+	/** Returns the number of trucks here */
+	public int trucksHere() throws InterruptedException{
+		truckLock.acquire();
+		int i = truckHereCount;
+		truckLock.release();
+		return i;
 	}
 }

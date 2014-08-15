@@ -9,6 +9,8 @@ import javax.swing.JFrame;
 import javax.swing.JPanel;
 import java.awt.BorderLayout;
 import java.awt.Dimension;
+import java.awt.Point;
+
 import javax.swing.JLabel;
 
 import java.awt.Color;
@@ -45,7 +47,7 @@ public class GUI extends JFrame{
 
 	private static final int NODE_BUFFER_SIZE = Circle.DEFAULT_DIAMETER*3;
 
-	private static final int MAX_NEIGHBOR_DISTANCE = Circle.DEFAULT_DIAMETER * 15;
+	private static final int MAX_NEIGHBOR_DISTANCE = Circle.DEFAULT_DIAMETER * 5;
 
 	private static final Dimension MAIN_WINDOW_SIZE = new Dimension(1000, 800);
 
@@ -216,6 +218,14 @@ public class GUI extends JFrame{
 			}
 		});
 		mnMap.add(mntmRearrangeMap);
+		
+		JMenuItem mntmPrintJSON = new JMenuItem("Print Game JSON");
+		mntmPrintJSON.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				System.out.println(self.game.toJSONString());
+			}
+		});
+		mnMap.add(mntmPrintJSON);
 
 		setVisible(true);
 		pack();
@@ -232,6 +242,16 @@ public class GUI extends JFrame{
 	//		
 	//	}
 
+	class MapUserData{
+		Point loc;
+		double neighborsPlaced;
+
+		MapUserData(){
+			loc = null;
+			neighborsPlaced = 0;
+		}
+	}
+
 	/** Draws all elements of the game on the threads. Used when the game is started */
 	private void drawMap(){
 		int maxX = drawingPanel.getBounds().width - NODE_BUFFER_SIZE*2;
@@ -245,7 +265,7 @@ public class GUI extends JFrame{
 
 		//Put an integer in the object field. For map purposes.
 		for(Node n : game.getMap().getNodes()){
-			n.setUserData(new Integer(0));
+			n.setUserData(new MapUserData());
 		}
 
 		//Nodes that have successfully been put on map
@@ -253,56 +273,76 @@ public class GUI extends JFrame{
 		HashSet<Node> placed = new HashSet<Node>();
 		toPlace.add(game.getMap().getNodes().iterator().next()); //Make an arbitrary node the first to place.
 		boolean first = true;
-		//Move the nodes around randomly
 		while(! toPlace.isEmpty()){
 			Node n = toPlace.poll();
-			Circle c = n.getCircle();
-			if(first){
-				c.setX1(maxX/2 + NODE_BUFFER_SIZE);
-				c.setY1(maxY/2 + NODE_BUFFER_SIZE);
-				first = false;
-			}
-			else{
-				Node neighbor = null;
-				for(Node possibleNeighbor : placed){
-					if(possibleNeighbor.isConnectedTo(n))
-						neighbor = possibleNeighbor;
-				}
-				if(neighbor == null){
-					c.setX1((int)(Math.random()*maxX) + NODE_BUFFER_SIZE);
-					c.setY1((int)(Math.random()*maxY) + NODE_BUFFER_SIZE); 
+			if(! placed.contains(n)){
+				MapUserData nData = (MapUserData)n.getUserData();
+				Circle c = n.getCircle();
+				if(first){
+					c.setX1(maxX/2 + NODE_BUFFER_SIZE);
+					c.setY1(maxY/2 + NODE_BUFFER_SIZE);
+					nData.loc = new Point(c.getX1(), c.getY1());
+					first = false;
 				}
 				else{
-					c.setX1((int)(Math.random()*MAX_NEIGHBOR_DISTANCE) - MAX_NEIGHBOR_DISTANCE/2 + neighbor.getCircle().getX1());
-					c.setY1((int)(Math.random()*MAX_NEIGHBOR_DISTANCE) - MAX_NEIGHBOR_DISTANCE/2 + neighbor.getCircle().getY1());
+					Node neighbor = null;
+					for(Node possibleNeighbor : placed){
+						if(possibleNeighbor.isConnectedTo(n))
+							neighbor = possibleNeighbor;
+					}
+					if(neighbor == null){
+						throw new RuntimeException("Disjoint graph?");
+					}
+					else{
+						MapUserData neighborData = (MapUserData)neighbor.getUserData();
+						boolean flag = false;
+						int loopCount = 0;
+						do{
+							flag = false;
+							double rot = (loopCount / 4) * 0.25;
+							c.setX1(neighborData.loc.x + (int)(Math.cos(Math.PI/2.0 * (neighborData.neighborsPlaced + rot)) * MAX_NEIGHBOR_DISTANCE));
+							c.setY1(neighborData.loc.y + (int)(Math.sin(Math.PI/2.0 * (neighborData.neighborsPlaced + rot)) * MAX_NEIGHBOR_DISTANCE));
+							nData.loc = new Point(c.getX1(), c.getY1());
+							for(Node each : placed){
+								if(each.getCircle().getX1() == c.getX1() && each.getCircle().getY1() == c.getY1()){
+									neighborData.neighborsPlaced++;
+									flag = true;
+									break;
+								}
+
+							}
+							loopCount++;
+						}while(flag);
+						neighborData.neighborsPlaced++;
+					}
 				}
-			}
-			c.setBounds(drawingPanel.getBounds());
-			drawingPanel.remove(c);
-			drawingPanel.add(c);
-			placed.add(n);
-			for(Edge e : n.getExits()){
-				if(! placed.contains(e.getOther(n)))
-					toPlace.add(e.getOther(n));
+				c.setBounds(drawingPanel.getBounds());
+				drawingPanel.remove(c);
+				drawingPanel.add(c);
+				placed.add(n);
+				for(Edge e : n.getExits()){
+					if(! placed.contains(e.getOther(n)))
+						toPlace.add(e.getOther(n));
+				}
 			}
 		}
 
-		//		//Extend nodes for distance and buffer area
-		//		boolean flag = true;
-		//		while(flag){
-		//			flag = false;
-		//			for(Node n : game.getMap().getNodes()){
-		//				for(Node n2 : game.getMap().getNodes()){
-		//					Circle c = n.getCircle();
-		//					Circle c2 = n2.getCircle();
-		//					if(!c.equals(c2) && (c.getDistance(c2) < Circle.BUFFER_RADUIS)){
-		//						c.setX1((int)(Math.random()*maxX) + NODE_BUFFER_SIZE);
-		//						c.setY1((int)(Math.random()*maxY) + NODE_BUFFER_SIZE);
-		//						flag = true;
-		//					}
-		//				}
-		//			}
-		//		}
+				//Extend nodes for distance and buffer area
+				boolean flag = true;
+				while(flag){
+					flag = false;
+					for(Node n : game.getMap().getNodes()){
+						for(Node n2 : game.getMap().getNodes()){
+							Circle c = n.getCircle();
+							Circle c2 = n2.getCircle();
+							if(!c.equals(c2) && (c.getDistance(c2) < Circle.BUFFER_RADUIS)){
+								c.setX1((int)(Math.random()*maxX) + NODE_BUFFER_SIZE);
+								c.setY1((int)(Math.random()*maxY) + NODE_BUFFER_SIZE);
+								flag = true;
+							}
+						}
+					}
+				}
 
 		for(Edge r : game.getMap().getEdges()){
 			Line l = r.getLine();
@@ -312,6 +352,30 @@ public class GUI extends JFrame{
 			l.updateToColorPolicy();
 			drawingPanel.remove(l);
 			drawingPanel.add(l);
+		}
+		
+		//Shift map to move it to center screen
+		int shiftX = 0;
+		int shiftY = 0;
+		
+		for(Node n : game.getMap().getNodes()){
+			if(n.getCircle().getX1() < NODE_BUFFER_SIZE){
+				shiftX = NODE_BUFFER_SIZE - n.getCircle().getX1();
+			}
+			if(n.getCircle().getX1() > maxX - NODE_BUFFER_SIZE){
+				shiftX = (maxX - NODE_BUFFER_SIZE) - n.getCircle().getX1();
+			}
+			if(n.getCircle().getY1() < NODE_BUFFER_SIZE){
+				shiftY = NODE_BUFFER_SIZE - n.getCircle().getY1();
+			}
+			if(n.getCircle().getY1() > maxY - NODE_BUFFER_SIZE){
+				shiftY = (maxY - NODE_BUFFER_SIZE) - n.getCircle().getY1();
+			}
+		}
+		
+		for(Node n : game.getMap().getNodes()){
+			n.getCircle().setX1(n.getCircle().getX1() + shiftX);
+			n.getCircle().setY1(n.getCircle().getY1() + shiftY);
 		}
 
 		//		//Move lines and nodes to untangle

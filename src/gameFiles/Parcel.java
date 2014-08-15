@@ -186,6 +186,15 @@ public class Parcel implements MapElement{
 	public String getMappedName() {
 		return "";
 	}
+	
+	@Override
+	/** Returns this' start location and its color for JSON string */
+	public String toJSONString(){
+		return "{\n" + Main.addQuotes(MapElement.LOCATION_TOKEN) + ":" + Main.addQuotes(location.getName()) + "," +
+				"\n" + Main.addQuotes(MapElement.DESTINATION_TOKEN) + ":" + Main.addQuotes(destination.getName()) + "," +
+				"\n" + Main.addQuotes(MapElement.COLOR_TOKEN) + ":" + color.getRGB() + 
+				"\n}";
+	}
 
 	@Override
 	public int getRelativeX() {
@@ -199,8 +208,16 @@ public class Parcel implements MapElement{
 
 	@Override
 	/** Returns true if a truck is currently holding this Parcel, false otherwise */
-	public boolean isTruckHere() {
-		return holder != null;
+	public boolean isTruckHere(Truck t) {
+		return holder == t;
+	}
+	
+	@Override
+	/** Returns 1 if there is a holder, 0 otherwise */
+	public int trucksHere(){
+		if(holder == null)
+			return 0;
+		return 1;
 	}
 	
 }

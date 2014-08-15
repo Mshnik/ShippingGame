@@ -6,15 +6,17 @@ import java.util.Collections;
 import java.util.HashSet;
 import java.util.Iterator;
 
+import org.json.JSONString;
+
 
 /** The Map Class is a container for the HashSets of Edges and Nodes that make up
  * the playing field of the game. It also allows for easy access to random nodes and edges.
  * @author MPatashnik
  *
  */
-public class Map{
+public class Map implements JSONString{
 
-	protected static final String MAP_DIRECTORY = "//Users/MPatashnik/Documents/Eclipse Projects/ShippingGame/Maps/";
+	protected static final String MAP_DIRECTORY = "Maps/";
 	protected static final File MAP_1 = new File(MAP_DIRECTORY + "Map1.txt");
 	protected static final String END_NODE_IDENTIFIER = "End Of Map";
 	protected static final String END_TRUCK_IDENTIFIER = "End of Trucks";
@@ -208,5 +210,27 @@ public class Map{
 				output += "\n";
 		}
 		return output;
+	}
+
+	private static final String NODE_TOKEN = "node-";
+	private static final String EDGE_TOKEN = "edge-";
+	
+	@Override
+	/** Returns a JSON-compliant version of toString() */
+	public String toJSONString() {
+		String s = "{";
+		int i = 0;
+		for(Node n : nodes){
+			s += "\n" + Main.addQuotes(NODE_TOKEN + i) + ":" + n.toJSONString() + ",";
+			i++;
+		}
+		i = 0;
+		for(Edge e : edges){
+			s += "\n" + Main.addQuotes(EDGE_TOKEN + i) + ":" + e.toJSONString();
+			if(i < edges.size() - 1)
+				s += ",";
+			i++;
+		}	
+		return s + "\n}";
 	}
 }

@@ -4,6 +4,7 @@ import gui.Circle;
 import java.awt.Color;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.concurrent.Semaphore;
 
@@ -20,6 +21,9 @@ public class Node implements MapElement{
 	
 	private Semaphore truckLock; //Lock that trucks must acquire in order to make changes to this edge.
 
+	private int truckHereCount; 			   //A count of the trucks here (mappings in truckHere to true)
+	private HashMap<Truck, Boolean> truckHere; //Maps truck -> is here
+	
 	private String name;
 	private HashSet<Edge> exits = new HashSet<Edge>();
 	private HashSet<Parcel> parcels = new HashSet<Parcel>();
@@ -27,7 +31,6 @@ public class Node implements MapElement{
 	private Object userData;
 	
 	private Circle circle;
-	private boolean truckHere;
 
 	/** Constructor for the Dummy Instance. Sets name to DUMMY_NAME. Sets game to Game g. Sets circle to a Default sized circle
 	 * with a default color */
@@ -63,6 +66,9 @@ public class Node implements MapElement{
 		if(exits != null)
 		  this.exits.addAll(exits);
 		circle = c;
+		
+		truckHereCount = 0;
+		truckHere = new HashMap<Truck, Boolean>();
 		
 		parcelLock = new Semaphore(1);
 		truckLock = new Semaphore(1);
@@ -240,9 +246,13 @@ public class Node implements MapElement{
 	}
 	
 	/** Tells the node if a Truck is currently on it or not. Gets its truckLock to prevent Truck thread collision */
-	protected void setTruckHere(boolean truckHere) throws InterruptedException{
+	protected void setTruckHere(Truck t, Boolean isHere) throws InterruptedException{
 		truckLock.acquire();
-		this.truckHere = truckHere;
+		if(truckHere.containsKey(t) && ! truckHere.get(t) && isHere)
+			truckHereCount++;
+		else if(! truckHere.containsKey(t) || truckHere.get(t) && ! isHere)
+			truckHereCount--;
+		truckHere.put(t, isHere);
 		truckLock.release();
 	}
 	
@@ -265,11 +275,22 @@ public class Node implements MapElement{
 	
 	@Override
 	/** Returns true if a truck is currently at this node, false otherwise */
-	public boolean isTruckHere() throws InterruptedException{
+	public boolean isTruckHere(Truck t) throws InterruptedException{
 		truckLock.acquire();
-		boolean b = truckHere;
+		Boolean b = truckHere.get(t);
+		if(b == null)
+			b = false;
 		truckLock.release();
 		return b;
+	}
+	
+	@Override
+	/** Returns the number of trucks here */
+	public int trucksHere() throws InterruptedException{
+		truckLock.acquire();
+		int i = truckHereCount;
+		truckLock.release();
+		return i;
 	}
 
 	/** Returns true if any truck is traveling towards this node, false otherwise */
@@ -309,6 +330,14 @@ public class Node implements MapElement{
 	/** Returns y location that this Node's string is mapped relative to its top right coordinate */
 	public int getRelativeY() {
 		return -(Circle.DEFAULT_DIAMETER);
+	}
+	
+	@Override
+	/** Returns just this' name for the JSONString - relies on JSONs of Edges and parcels
+	 * to take care of themselves
+	 */
+	public String toJSONString(){
+		return "{\n" + Main.addQuotes(MapElement.NAME_TOKEN) + ":" + Main.addQuotes(name) + "\n}";
 	}
 
 }
