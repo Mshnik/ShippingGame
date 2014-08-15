@@ -16,7 +16,7 @@ import java.util.HashSet;
  * @author MPatashnik
  *
  */
-public abstract class Manager extends Thread{
+public abstract class Manager implements Runnable{
 
 	private Game game;
 

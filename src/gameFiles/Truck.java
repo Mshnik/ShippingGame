@@ -7,7 +7,7 @@ import java.util.LinkedList;
 import java.util.Queue;
 import java.util.concurrent.Semaphore;
 
-public class Truck extends Thread implements MapElement{
+public class Truck implements MapElement, Runnable{
 
 	/** The Two States that a Truck can be in at any time - either Waiting (staying on its location
 	 * and awaiting further travel instructions) or Traveling (currently moving from node to node
@@ -35,6 +35,8 @@ public class Truck extends Thread implements MapElement{
 
 	private Status status;
 
+	private long lastTravelTime;    //System time (ms) when this truck last finished travel
+	
 	public static final int MAX_SPEED = 10; //Max value for truck's speed
 	public static final int EFFICIENT_SPEED = 4; //Speed at which the travel is most efficient
 	public static final int MIN_SPEED = 1;  //Min value for truck's speed
@@ -66,7 +68,6 @@ public class Truck extends Thread implements MapElement{
 	 * Speed defaults to EFFICIENT_SPEED
 	 */
 	protected Truck(Game g, String name, Node startLocation, Color c){
-		super.setName(name);
 		this.name = name;
 		this.game = g;
 		this.gui = g.getGUI();
@@ -81,6 +82,7 @@ public class Truck extends Thread implements MapElement{
 		travel = new LinkedList<Edge>();
 		color = c;
 		circle = new Circle(this, 0, 0, (int)((double)Circle.DEFAULT_DIAMETER * 0.8), c, false);
+		
 	}
 
 	@Override
@@ -89,6 +91,7 @@ public class Truck extends Thread implements MapElement{
 	 * are not empty, pops off the next travel direction 
 	 */
 	public void run(){
+		lastTravelTime = System.currentTimeMillis();
 		while(game.isRunning()){
 
 			setGoingTo(null);
@@ -102,7 +105,7 @@ public class Truck extends Thread implements MapElement{
 				}
 
 				setStatus(Status.WAITING);
-				game.getScore().changeScore(Score.WAIT_COST);
+				fixLastTravelTime();
 			}
 			while(!travel.isEmpty() && game.isRunning()){
 				Edge r = getTravel();
@@ -111,8 +114,19 @@ public class Truck extends Thread implements MapElement{
 				} catch (InterruptedException e) {
 					e.printStackTrace();
 				}
+				fixLastTravelTime();
 			}
 		}
+		//Deduct final waiting points
+		fixLastTravelTime();
+	}
+	
+	/** Updates the waitTime to now, and deducts correct number of points for doing this */
+	private void fixLastTravelTime(){
+		long now = System.currentTimeMillis();
+		long diff = now - lastTravelTime;
+		game.getScore().changeScore(Score.WAIT_COST * (int)(diff / WAIT_TIME));
+		lastTravelTime = now;
 	}
 
 	/** Returns the name of this Truck */
@@ -120,9 +134,8 @@ public class Truck extends Thread implements MapElement{
 		return name;
 	}
 
-	/** Sets the name of this Truck, and the Thread */
+	/** Sets the name of this Truck*/
 	public void setTruckName(String newName){
-		super.setName(newName);
 		name = newName;
 	}
 
@@ -403,6 +416,7 @@ public class Truck extends Thread implements MapElement{
 			Circle there = r.getOther(location).getCircle();
 
 			int progress = 0;
+			long startTravelTime = System.currentTimeMillis();
 			while(progress < r.getLength()){
 				Thread.sleep(gui.getGameSpeed());
 
@@ -427,6 +441,8 @@ public class Truck extends Thread implements MapElement{
 				updateGUILocation( (int) (percent * there.getX1() + (1-percent) * here.getX1()), 
 						(int) (percent * there.getY1() + (1-percent) * here.getY1()));
 			}
+			long finishTravelTime = System.currentTimeMillis();
+			lastTravelTime += (finishTravelTime - startTravelTime); //Discount the time spent traveling
 
 			status = Status.WAITING;
 			//Change the status without firing an update.
@@ -500,6 +516,5 @@ public class Truck extends Thread implements MapElement{
 	 * @throws InterruptedException  - if this Truck thread is currently interrupted*/
 	protected void gameOver() throws InterruptedException{
 		clearTravel();
-		join();
 	}
 }

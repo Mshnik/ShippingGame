@@ -32,6 +32,7 @@ public class MyManager extends Manager {
 		switch(message){
 		case(Manager.PARCEL_AT_NODE): 
 			if(t.getLoad() == null){
+				
 				game.setUpdateMessage("Parcel Picked Up");
 				Parcel p = null;
 				try {
@@ -48,6 +49,14 @@ public class MyManager extends Manager {
 					t.addToTravel(t.getLocation().getRandomExit());
 				else
 					t.addToTravel(t.getGoingTo().getRandomExit());
+				
+				//Do some calculation or something
+				try {
+					Thread.sleep(10000);
+				} catch (InterruptedException e1) {
+					// TODO Auto-generated catch block
+					e1.printStackTrace();
+				}
 			}
 			break;
 		case(Manager.LOCATION_CHANGED): 

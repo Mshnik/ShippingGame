@@ -148,6 +148,8 @@ public class GUI extends JFrame{
 		JMenuItem mntmNew = new JMenuItem("New");
 		mntmNew.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
+				boolean paused = self.isPaused();
+				self.getCheckBoxPaused().setSelected(true);
 				int returnVal = JOptionPane.YES_OPTION;
 				if(game != null){
 					returnVal = JOptionPane.showConfirmDialog(null, "Are You Sure You Want to Start a New Game?");
@@ -163,7 +165,7 @@ public class GUI extends JFrame{
 
 					drawMap();
 				}
-
+				self.getCheckBoxPaused().setSelected(paused);
 			}
 		});
 		mnGame.add(mntmNew);
@@ -171,10 +173,13 @@ public class GUI extends JFrame{
 		JMenuItem mntmQuit = new JMenuItem("Quit");
 		mntmQuit.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
+				boolean paused = self.isPaused();
+				self.getCheckBoxPaused().setSelected(true);
 				int returnVal = JOptionPane.showConfirmDialog(null, "Are You Sure You Want to Quit?");
 				if(returnVal == JOptionPane.YES_OPTION){
 					System.exit(0);
 				}
+				self.getCheckBoxPaused().setSelected(paused);
 			}
 		});
 		mnGame.add(mntmQuit);
@@ -185,6 +190,8 @@ public class GUI extends JFrame{
 		JMenuItem mntmSaveMap = new JMenuItem("Save Map");
 		mntmSaveMap.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
+				boolean paused = self.isPaused();
+				self.getCheckBoxPaused().setSelected(true);
 				if(game != null && !game.isRunning()){
 					String mapName = JOptionPane.showInputDialog("Enter New Map Name");
 					if(mapName != null && !mapName.equals("")){
@@ -196,6 +203,7 @@ public class GUI extends JFrame{
 						}
 					}
 				}
+				self.getCheckBoxPaused().setSelected(paused);
 			}
 		});
 		mnMap.add(mntmSaveMap);
@@ -375,7 +383,7 @@ public class GUI extends JFrame{
 	}
 
 	/** Returns true if the GUI is currently paused false otherwise */
-	public boolean getPaused(){
+	public boolean isPaused(){
 		return chckBoxPaused.isSelected();
 	}
 

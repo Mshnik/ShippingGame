@@ -91,7 +91,7 @@ public class Game {
 	
 	/** Returns true if this game is currently paused, false otherwise */
 	public boolean isPaused(){
-		return gui.getPaused();
+		return gui.isPaused();
 	}
 	
 	/** Sets the map to map m */
@@ -162,10 +162,13 @@ public class Game {
 	public void start(){
 		if(! running){
 			running = true;
-			for(Truck t : trucks)
-				t.start();
+			for(Truck t : trucks){
+				Thread th = new Thread(t);
+				th.start();
+			}
 	
-			manager.start();
+			Thread m = new Thread(manager);
+			m.start();
 		}
 	}
 
