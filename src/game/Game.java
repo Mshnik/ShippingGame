@@ -350,7 +350,7 @@ public class Game implements JSONString{
 		for(String key : mapJSON.keySet()){
 			if(key.startsWith(Map.NODE_TOKEN)){
 				JSONObject nodeJSON = mapJSON.getJSONObject(key);
-				Node n = new Node(this, nodeJSON.getString(MapElement.NAME_TOKEN));
+				Node n = new Node(this, nodeJSON.getString(MapElement.NAME_TOKEN), null);
 				map.getNodes().add(n);
 				if(n.getName().equals(Map.TRUCK_HOME_NAME))
 					map.setTruckHome(n);

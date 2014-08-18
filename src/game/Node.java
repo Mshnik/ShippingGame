@@ -1,5 +1,6 @@
 package game;
 import gui.Circle;
+import gui.DraggableCircle;
 
 import java.awt.Color;
 import java.util.ArrayList;
@@ -11,8 +12,6 @@ import java.util.concurrent.Semaphore;
 
 /** A node (vertex) on the graph. */
 public class Node implements MapElement{
-
-	private static final String DUMMY_NAME = "NO_NAME";
 	
 	private final Game game;
 	
@@ -32,26 +31,11 @@ public class Node implements MapElement{
 	
 	private Circle circle;
 
-	/** Constructor for the Dummy Instance. Sets name to DUMMY_NAME. Sets game to Game g. Sets circle to a Default sized circle
-	 * with a default color */
-	protected Node(Game g){
-		this(g, DUMMY_NAME);
-	}
-
-	/** Constructor for a named Node with no starting exits and no specific circle drawing
-	 * @param g - the Game this Node belongs to
-	 * @param name - the name of this Node
-	 * */
-	protected Node(Game g, String name){
-		this(g, name, null);
-		circle = new Circle(this, 0, 0, Circle.DEFAULT_DIAMETER);
-	}
-
 	/** Constructor for a named Node with no starting exits but with a specific circle drawing
 	 * @param g - the Game this Node belongs to
 	 * @param name - the name of this Node
-	 * @param circle - The circle object to draw for this Node*/
-	protected Node(Game g, String name, Circle c){
+	 * @param circle - The (draggable) circle object to draw for this Node*/
+	protected Node(Game g, String name, DraggableCircle c){
 		this(g, name, c, null);
 	}
 
@@ -60,12 +44,16 @@ public class Node implements MapElement{
 	 * @param name - the name of this Node
 	 * @param exits - the exits of this node
 	 */
-	protected Node(Game g, String name, Circle c, Collection<Edge> exits){
+	protected Node(Game g, String name, DraggableCircle c, Collection<Edge> exits){
 		this.game = g;
 		this.name = name;
 		if(exits != null)
 		  this.exits.addAll(exits);
-		circle = c;
+		
+		if(c == null)
+			circle = new DraggableCircle(this, 0, 0, Circle.DEFAULT_DIAMETER);
+		else
+			circle = c;
 		
 		truckHereCount = 0;
 		truckHere = new HashMap<Truck, Boolean>();
@@ -256,6 +244,31 @@ public class Node implements MapElement{
 		truckLock.release();
 	}
 	
+	/** Updates the circle graphic that represents this truck on the GUI.
+	 * Does nothing if threads is null.
+	 * Also updates the location of the load if this truck is carrying one 
+	 * @param x - the new X location of this Truck in the GUI
+	 * @param y - the new Y location of this Truck in the GUI
+	 * */
+	public void updateGUILocation(int x, int y){
+		circle.setX1(x);
+		circle.setY1(y);
+		circle.repaint();
+		for(Edge e : exits){
+			e.updateGUILocation(x, y);
+		}
+		for(Parcel p : parcels){
+			p.updateGUILocation(x, y);
+		}
+		for(Truck t : game.getTrucks()){
+			try {
+				if(t.getLocation() == this)
+				t.updateGUILocation(x, y);
+			} catch (InterruptedException e1) {}
+		}
+			
+	}
+	
 	@Override
 	/** Two Nodes are equal if they have the same name */
 	public boolean equals(Object n){
@@ -329,7 +342,7 @@ public class Node implements MapElement{
 	@Override
 	/** Returns y location that this Node's string is mapped relative to its top right coordinate */
 	public int getRelativeY() {
-		return -(Circle.DEFAULT_DIAMETER);
+		return 0;
 	}
 	
 	@Override

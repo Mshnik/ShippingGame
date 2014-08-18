@@ -40,12 +40,12 @@ public class Map implements JSONString{
 
 		ArrayList<Node> tempNodes = new ArrayList<Node>(nodeNames.length);
 
-		truckHome = new Node(g, TRUCK_HOME_NAME);
+		truckHome = new Node(g, TRUCK_HOME_NAME, null);
 
 		tempNodes.add(truckHome);
 
 		for(String name : nodeNames)
-			tempNodes.add(new Node(g, name));
+			tempNodes.add(new Node(g, name, null));
 
 		for(int i = 0; i < tempNodes.size() -1; i++){
 			tempNodes.get(i).connectTo(tempNodes.get(i+1), Edge.DUMMY_LENGTH);

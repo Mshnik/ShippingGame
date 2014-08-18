@@ -542,15 +542,13 @@ public class Truck implements MapElement, Runnable, Colorable{
 	 * @param x - the new X location of this Truck in the GUI
 	 * @param y - the new Y location of this Truck in the GUI
 	 * */
-	private void updateGUILocation(int x, int y){
+	public void updateGUILocation(int x, int y){
 		if(gui != null){
 			circle.setX1(x);
 			circle.setY1(y);
 			circle.repaint();
 			if(load != null){
-				load.getCircle().setX1(x);
-				load.getCircle().setY1(y);
-				load.getCircle().repaint();
+				load.updateGUILocation(x, y);
 			}
 		}
 	}
@@ -573,7 +571,7 @@ public class Truck implements MapElement, Runnable, Colorable{
 
 	@Override
 	public int getRelativeY() {
-		return Circle.DEFAULT_DIAMETER;			
+		return Circle.DEFAULT_DIAMETER + 10;			
 	}
 
 	@Override

@@ -229,4 +229,13 @@ public class Parcel implements MapElement, Colorable{
 		return 1;
 	}
 
+	@Override
+	/** Relies on circle for painting. Parcels have no dependents */
+	public void updateGUILocation(int x, int y) {
+		Circle c = getCircle();
+		c.setX1(x);
+		c.setY1(y);
+		c.repaint();
+	}
+
 }

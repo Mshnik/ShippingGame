@@ -4,6 +4,7 @@ import gui.Line;
 import java.awt.Color;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Map.Entry;
 import java.util.concurrent.Semaphore;
 
 /** The Edge Class in ShippingGame allows creation of the connections between Nodes that Trucks can Travel along
@@ -323,5 +324,11 @@ public class Edge implements MapElement{
 		int i = truckHereCount;
 		truckLock.release();
 		return i;
+	}
+
+	@Override
+	/** Repaints itself. Values of x and y unused. */
+	public void updateGUILocation(int x, int y) {
+		getLine().repaint();
 	}
 }

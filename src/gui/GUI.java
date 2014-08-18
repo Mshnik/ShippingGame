@@ -237,10 +237,6 @@ public class GUI extends JFrame{
 		this();
 		setGame(g);
 	}
-	//
-	//	private static Game showCreateNewGame(){
-	//		
-	//	}
 
 	class MapUserData{
 		Point loc;
@@ -316,7 +312,7 @@ public class GUI extends JFrame{
 						neighborData.neighborsPlaced++;
 					}
 				}
-				c.setBounds(drawingPanel.getBounds());
+				//c.setBounds(drawingPanel.getBounds());
 				drawingPanel.remove(c);
 				drawingPanel.add(c);
 				placed.add(n);
@@ -403,7 +399,7 @@ public class GUI extends JFrame{
 		for(Parcel p : game.getParcels()){
 			p.getCircle().setX1(p.getLocation().getCircle().getX1());
 			p.getCircle().setY1(p.getLocation().getCircle().getY1());
-			p.getCircle().setBounds(drawingPanel.getBounds());
+			//p.getCircle().setBounds(drawingPanel.getBounds());
 			drawingPanel.remove(p.getCircle());
 			drawingPanel.add(p.getCircle());
 			repaint();

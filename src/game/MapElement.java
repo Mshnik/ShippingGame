@@ -44,4 +44,7 @@ public interface MapElement extends JSONString{
 	/** Returns the Color of this MapElement */
 	public Color getColor();
 	
+	/** Update the location of this on the gui */
+	public void updateGUILocation(int x, int y);
+	
 }
