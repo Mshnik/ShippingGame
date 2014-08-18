@@ -27,8 +27,8 @@ import org.json.JSONString;
  */
 public class Game implements JSONString{
 
-	protected static final String MAP_DIRECTORY = "Maps/";
-	protected static final String MAP_EXTENSION = ".txt";
+	public static final String MAP_DIRECTORY = "Maps/";
+	public static final String MAP_EXTENSION = ".txt";
 	
 	private static final int DEFAULT_NUMB_ROADS = 19;
 	private static final int DEFAULT_MIN_ROAD_LENGTH = 2;
@@ -49,7 +49,7 @@ public class Game implements JSONString{
 	private ArrayList<Truck> trucks;
 
 	/** Creates a default (test) game instance. Uses default values for all fields */
-	protected Game(Manager m){
+	public Game(Manager m){
 		manager = m;
 		score = new Score(this);
 		map = new Map(this, DEFAULT_NODES, DEFAULT_NUMB_ROADS, DEFAULT_MIN_ROAD_LENGTH, DEFAULT_AVG_ROAD_LENGTH, DEFAULT_MAX_ROAD_LENGTH);
@@ -87,7 +87,7 @@ public class Game implements JSONString{
 	}
 	
 	/** Creates a game instance with a set Map, read from File f. Uses Default for all other fields */
-	protected Game(Manager m, File f){
+	public Game(Manager m, File f){
 		manager = m;
 		score = new Score(this);
 		try {

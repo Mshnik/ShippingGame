@@ -17,12 +17,14 @@ import java.awt.Color;
 import javax.swing.border.LineBorder;
 import javax.swing.AbstractButton;
 import javax.swing.ButtonGroup;
+import javax.swing.JFileChooser;
 import javax.swing.JMenuBar;
 import javax.swing.JMenu;
 import javax.swing.JOptionPane;
 import javax.swing.JMenuItem;
 import java.awt.event.ActionListener;
 import java.awt.event.ActionEvent;
+import java.io.File;
 import java.io.IOException;
 import java.util.Enumeration;
 import java.util.HashMap;
@@ -33,6 +35,8 @@ import javax.swing.BoxLayout;
 import java.awt.SystemColor;
 import javax.swing.JRadioButton;
 import javax.swing.JCheckBox;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
 
 /** The GUI Class creates the JFrame that shows the game.
  * The user and the manager have no interaction with the GUI class.
@@ -145,6 +149,34 @@ public class GUI extends JFrame{
 					game.start();
 			}
 		});
+		
+		JMenuItem mntmLoadGame = new JMenuItem("Load Game");
+		mntmLoadGame.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				boolean paused = self.isPaused();
+				self.getCheckBoxPaused().setSelected(true);
+				if(game == null || !game.isRunning()){
+					JFileChooser f = new JFileChooser(new File(Game.MAP_DIRECTORY));
+					f.setDialogTitle("Select Game to Load");
+					f.setDialogType(JFileChooser.OPEN_DIALOG);
+					f.setFileSelectionMode(JFileChooser.FILES_ONLY);
+					f.showOpenDialog(null);
+					File fil = f.getSelectedFile();
+					if(fil != null && fil.exists()){
+						Game oldGame =  game;
+						game = new Game(oldGame.getManager(), fil);
+						oldGame.kill();
+						game.setGUI(self);
+						oldGame.getManager().setGame(game);
+						drawingPanel.removeAll();
+						drawMap();
+					}
+				}
+				self.getCheckBoxPaused().setSelected(paused);
+			}
+		});
+		mnGame.add(mntmLoadGame);
 		mnGame.add(mntmStart);
 
 		JMenuItem mntmNew = new JMenuItem("New");
@@ -407,7 +439,6 @@ public class GUI extends JFrame{
 
 
 		for(Truck t : game.getTrucks()){
-			t.setGUI(this);
 			Circle c = t.getCircle();
 			c.setBounds(drawingPanel.getBounds());
 			boolean unset = true;

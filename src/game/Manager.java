@@ -88,7 +88,7 @@ public abstract class Manager implements Runnable{
 	 * based on game.isRunning()
 	 */
 	public abstract void truckNotification(Truck t, int message);
-
+	
 	/** Returns the Game this Manager belongs to */
 	public Game getGame(){
 		return game;
@@ -110,7 +110,7 @@ public abstract class Manager implements Runnable{
 	}
 
 	/** Sets the game this manager is watching to g */
-	protected final void setGame(Game g){
+	public final void setGame(Game g){
 		game = g;
 	}
 

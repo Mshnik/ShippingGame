@@ -23,7 +23,6 @@ public class Truck implements MapElement, Runnable, Colorable{
 	private String name;
 	private Circle circle;
 	private Color color = Circle.DEFAULT_TRUCK_COLOR;
-	private GUI gui;	//The threads this Truck belongs to
 
 	private Queue<Edge> travel;
 
@@ -73,7 +72,6 @@ public class Truck implements MapElement, Runnable, Colorable{
 	protected Truck(Game g, String name, Node startLocation, Color c){
 		this.name = name;
 		this.game = g;
-		this.gui = g.getGUI();
 
 		speed = Truck.EFFICIENT_SPEED;
 		speedLock = new Semaphore(1);
@@ -450,11 +448,6 @@ public class Truck implements MapElement, Runnable, Colorable{
 		}
 	}
 
-	/** Sets the GUI this truck is on */
-	public void setGUI(GUI gui){
-		this.gui = gui;
-	}
-
 	/** Tells the Truck to travel along the given edge.
 	 * The Truck will only begin to travel if its status is WAITING.
 	 * If status is TRAVELING, the Truck will ignore this call. 
@@ -486,10 +479,10 @@ public class Truck implements MapElement, Runnable, Colorable{
 			int progress = 0;
 			long startTravelTime = System.currentTimeMillis();
 			while(progress < r.getLength()){
-				Thread.sleep(gui.getGameSpeed());
+				Thread.sleep(game.getGUI().getGameSpeed());
 
 				while(game.isPaused()){
-					Thread.sleep(gui.getGameSpeed());
+					Thread.sleep(game.getGUI().getGameSpeed());
 				}
 				//Get the speed lock, begin speed and cost computations
 				speedLock.acquire();
@@ -543,7 +536,7 @@ public class Truck implements MapElement, Runnable, Colorable{
 	 * @param y - the new Y location of this Truck in the GUI
 	 * */
 	public void updateGUILocation(int x, int y){
-		if(gui != null){
+		if(game.getGUI() != null){
 			circle.setX1(x);
 			circle.setY1(y);
 			circle.repaint();
