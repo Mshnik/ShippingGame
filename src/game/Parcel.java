@@ -5,7 +5,7 @@ import java.awt.Color;
 import java.util.concurrent.Semaphore;
 
 
-public class Parcel implements MapElement{
+public class Parcel implements MapElement, Colorable{
 
 	/** The game this Parcel belongs to */
 	private final Game game;
@@ -120,7 +120,7 @@ public class Parcel implements MapElement{
 
 	/** Sets the color of this Parcel. Must be a color in Score.COLOR 
 	 * @throws IllegalArguemntException if color is not in Score.COLOR*/
-	protected void setColor(Color color) {
+	protected void setColor(Color color) throws IllegalArgumentException{
 		if(!Score.colorContains(color))
 			throw new IllegalArgumentException("Illegal Color (" + color.toString() +") passed in");
 

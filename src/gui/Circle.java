@@ -50,8 +50,8 @@ public class Circle extends JPanel{
 
 	/** Constructor for the Circle class. The circle is colored black.
 	 * @param represents - the Object this circle represents
-	 * @param x1 - x1 coordinate of center
-	 * @param y1 - y1 coordinate of center
+	 * @param x - x coordinate of center
+	 * @param y - y coordinate of center
 	 * @param diameter - the diameter of the circle
 	 */
 	public Circle(MapElement represents, int x, int y, int diameter){
@@ -63,8 +63,8 @@ public class Circle extends JPanel{
 	}
 
 	/** Constructor for the Circle class. The circle is colored black.
-	 * @param x1 - x1 coordinate of center
-	 * @param y1 - y1 coordinate of center
+	 * @param x - x coordinate of center
+	 * @param y - y coordinate of center
 	 * @param diameter - the diameter of the circle
 	 * @param color - the Color of this circle
 	 * @param filled - whether or not this circle is filled when it is drawn

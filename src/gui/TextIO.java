@@ -93,7 +93,7 @@ public class TextIO {
 	
 	/**
 	 * Take in a string and divide it into an array list of strings, broken up by the tab markers
-	 * @param line: the string to parse
+	 * @param line - the string to parse
 	 * @return an array of strings. Each string should have no whitespace in it.
 	 */
 	public static String[] parseToArray(String line){
