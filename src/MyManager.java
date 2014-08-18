@@ -15,7 +15,11 @@ public class MyManager extends Manager {
 		trucks = game.getTrucks();
 		int i = Truck.MIN_SPEED;
 		for(Truck t : trucks){
-			t.addToTravel(t.getLocation().getRandomExit());
+			try {
+				t.addToTravel(t.getLocation().getRandomExit());
+			} catch (InterruptedException e1) {
+				e1.printStackTrace();
+			}
 			try {
 				t.setSpeed(i);
 			} catch (InterruptedException e) {
@@ -32,7 +36,7 @@ public class MyManager extends Manager {
 		switch(message){
 		case(Manager.PARCEL_AT_NODE): 
 			if(t.getLoad() == null){
-				
+
 				game.setUpdateMessage("Parcel Picked Up");
 				Parcel p = null;
 				try {
@@ -42,14 +46,18 @@ public class MyManager extends Manager {
 					e.printStackTrace();
 				}
 				try{
-				  t.loadUnloadParcel(p, Truck.LOAD);
+					t.loadUnloadParcel(p, Truck.LOAD);
 				} catch(Exception e){}
-				t.clearTravel();
-				if(t.getGoingTo() == null)
-					t.addToTravel(t.getLocation().getRandomExit());
-				else
-					t.addToTravel(t.getGoingTo().getRandomExit());
-				
+				try{
+					t.clearTravel();
+					if(t.getGoingTo() == null)
+						t.addToTravel(t.getLocation().getRandomExit());
+					else
+						t.addToTravel(t.getGoingTo().getRandomExit());
+				} catch(InterruptedException e){
+
+				}
+
 				//Do some calculation or something
 				try {
 					Thread.sleep(10000);
@@ -58,27 +66,36 @@ public class MyManager extends Manager {
 					e1.printStackTrace();
 				}
 			}
-			break;
+		break;
 		case(Manager.LOCATION_CHANGED): 
+			try{
 			if(t.getLocation().equals(game.getMap().getTruckHome()) && game.getParcels().isEmpty())
 				break;
-			
-			if(t.getLoad() != null && t.getLoad().getDestination().equals(t.getLocation()))
-				try{
-				    t.loadUnloadParcel(t.getLoad(), Truck.UNLOAD);
-				} catch(Exception e){}
+			} catch(InterruptedException e){ break; }
 
+			try {
+				if(t.getLoad() != null && t.getLoad().getDestination().equals(t.getLocation()))
+					try{
+						t.loadUnloadParcel(t.getLoad(), Truck.UNLOAD);
+					} catch(Exception e){}
+			} catch (InterruptedException e1) {
+				// TODO Auto-generated catch block
+				e1.printStackTrace();
+			}
+
+		try{
 			if(t.getGoingTo() == null)
 				t.addToTravel(t.getLocation().getRandomExit());
 			else
 				t.addToTravel(t.getGoingTo().getRandomExit());
-			break;
+		} catch(InterruptedException e){}
+		break;
 		default:
 			break;
 		}
 	}
-	
-//	private static final int PICK_DROP = 0;
+
+	//	private static final int PICK_DROP = 0;
 	//	private static final int PICK_TO_DESTINATION = 1;
 
 	//	/** Picks up and drops off parcels according to the given behavior

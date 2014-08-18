@@ -43,7 +43,10 @@ public class Truck implements MapElement, Runnable{
 
 	private int speed; //The number of units this moves per frame when traveling. Must be between min and max
 	private Semaphore speedLock; //Lock for getting/changing speed
-
+	private Semaphore locLock;   // A lock associated with the changing of locaiton, travelingTo, goingTo, etc.
+	                             //Lock should be released before any notifications are fired.
+	private Semaphore statusLock; //A Lock for the status of this truck.
+	
 	private Object userData;
 
 	private final Game game;
@@ -74,6 +77,8 @@ public class Truck implements MapElement, Runnable{
 
 		speed = Truck.EFFICIENT_SPEED;
 		speedLock = new Semaphore(1);
+		locLock = new Semaphore(1);
+		statusLock = new Semaphore(1);
 
 		location = startLocation;
 		travelingTo = null;
@@ -94,7 +99,18 @@ public class Truck implements MapElement, Runnable{
 		lastTravelTime = System.currentTimeMillis();
 		while(game.isRunning()){
 
-			setGoingTo(null);
+			boolean unset = true;
+			while(unset){
+				try {
+					setGoingTo(null);
+					unset = false;
+				} catch (InterruptedException e1) {
+					unset = true; //Try to setGoingTo again.
+					try {
+						Thread.sleep(5);
+					} catch (InterruptedException e) {}
+				}
+			}
 
 			while(travel.isEmpty() && game.isRunning()){
 				try{
@@ -103,8 +119,18 @@ public class Truck implements MapElement, Runnable{
 				catch (InterruptedException e){
 					e.printStackTrace();
 				}
-
-				setStatus(Status.WAITING);
+				unset = true;
+				while(unset){
+					try {
+						setGoingTo(null);
+						unset = false;
+					} catch (InterruptedException e1) {
+						unset = true; //Try to setstatus again.
+						try {
+							Thread.sleep(5);
+						} catch (InterruptedException e) {}
+					}
+				}
 				fixLastTravelTime();
 			}
 			while(!travel.isEmpty() && game.isRunning()){
@@ -139,84 +165,124 @@ public class Truck implements MapElement, Runnable{
 		name = newName;
 	}
 
-	/** Returns the Truck's current location. If this.status.equals(Status.TRAVELING), returns null */
-	public Node getLocation(){
+	/** Returns the Truck's current location. If this.status.equals(Status.TRAVELING), returns null 
+	 * @throws InterruptedException */
+	public Node getLocation() throws InterruptedException{
 		if(status.equals(Status.TRAVELING))
 			return null;
 
-		return location;
+		locLock.acquire();
+		Node n = location;
+		locLock.release();
+		
+		return n;
 	}
 
 	/** Sets this Truck's location to Node l and fires a Manager Notification.
-	 * Does not fire a Manager Notification if l.equals(location) */
-	private void setLocation(Node l){
+	 * Does not fire a Manager Notification if l.equals(location) 
+	 * @throws InterruptedException */
+	private void setLocation(Node l) throws InterruptedException{
 		if(!l.equals(location)){
+			locLock.acquire();
 			location = l;
+			locLock.release();
 			game.getManager().truckNotification(this, Manager.LOCATION_CHANGED);
 		}
 	}
 
-	/** Returns the Truck's current destination. If this.status.equals(Status.WAITING), returns null */
-	public Node getTravelingTo(){
+	/** Returns the Truck's current destination. If this.status.equals(Status.WAITING), returns null 
+	 * @throws InterruptedException */
+	public Node getTravelingTo() throws InterruptedException{
 		if(status.equals(Status.WAITING))
 			return null;
 
-		return travelingTo;
+		locLock.acquire();
+		Node n = travelingTo;
+		locLock.release();
+		
+		return n;
 	}
 
 	/** Sets this Truck's travelingTo to Node t and fires a Manager Notification.
-	 * Does not fire a Manager Notification if travelingTo.equals(t) */
-	private void setTravelingTo(Node t){
+	 * Does not fire a Manager Notification if travelingTo.equals(t) 
+	 * @throws InterruptedException */
+	private void setTravelingTo(Node t) throws InterruptedException{
 		if(travelingTo == null || !travelingTo.equals(t)){
+			locLock.acquire();
 			travelingTo = t;
+			locLock.release();
 			game.getManager().truckNotification(this, Manager.TRAVELING_TO_CHANGED);
 		}
 	}
 
-	/** Returns the edge this Truck is traveling along. Returns null if status.equals(Status.WAITING) */
-	public Edge getTravelingAlong(){
-		return travelingAlong;
+	/** Returns the edge this Truck is traveling along. Returns null if status.equals(Status.WAITING) 
+	 * @throws InterruptedException */
+	public Edge getTravelingAlong() throws InterruptedException{
+		locLock.acquire();
+		Edge e = travelingAlong;
+		locLock.release();
+		return e;
 	}
 
 	/** Returns the node this truck is coming from, the rear exit of the edge it is currently on.
 	 * Returns null if status.equals(Status.WAITING)
+	 * @throws InterruptedException 
 	 */
-	public Node getComingFrom(){
+	public Node getComingFrom() throws InterruptedException{
 		if(status.equals(Status.WAITING))
 			return null;
 
-		return travelingAlong.getOther(travelingTo);
+		locLock.acquire();
+		Node n = travelingAlong.getOther(travelingTo);
+		locLock.release();
+		
+		return n;
 	}
 
 	/** Returns the Truck's eventual destination; the Node this Truck will be at when the current travel
 	 * queue is empty. If this.status.equals(Status.WAITING), returns null
+	 * @throws InterruptedException 
 	 */
-	public Node getGoingTo(){
+	public Node getGoingTo() throws InterruptedException{
 		if(status.equals(Status.WAITING))
 			return null;
 
-		return goingTo;
+		locLock.acquire();
+		Node n = goingTo;
+		locLock.release();
+		
+		return n;
 	}
 
 	/** Sets this Truck's goingTo to Node g and fires a Manager Notification.
-	 * Does not fire a Manager Notification if goingTo.equals(g)*/
-	private void setGoingTo(Node g){
+	 * Does not fire a Manager Notification if goingTo.equals(g)
+	 * @throws InterruptedException */
+	private void setGoingTo(Node g) throws InterruptedException{
 		if(goingTo == null || !goingTo.equals(g)){
+			locLock.acquire();
 			goingTo = g;
+			locLock.release();
 			game.getManager().truckNotification(this, Manager.GOING_TO_CHANGED);
 		}
 	}
 
-	/** Returns the current status of this Truck, either TRAVELING or WAITING */
-	public Truck.Status getStatus(){
-		return status;
+	/** Returns the current status of this Truck, either TRAVELING or WAITING 
+	 * @throws InterruptedException */
+	public Truck.Status getStatus() throws InterruptedException{
+		statusLock.acquire();
+		Truck.Status s = status;
+		statusLock.release();
+		return s;
 	}
 
 	/** Sets the current status of this Truck to status s and fires a Manager Notification.
-	 * Does not fire a Manager Notification if status.equals(s)*/
-	protected void setStatus(Truck.Status s){
+	 * Does not fire a Manager Notification if status.equals(s)
+	 * @throws InterruptedException */
+	protected void setStatus(Truck.Status s) throws InterruptedException{
 		if(!status.equals(s)){
+			statusLock.acquire();
 			status = s;
+			statusLock.release();
 			game.getManager().truckNotification(this, Manager.STATUS_CHANGED);
 		}
 	}
@@ -285,7 +351,7 @@ public class Truck implements MapElement, Runnable{
 	 * @throws InterruptedException 
 	 */
 	public void loadUnloadParcel(Parcel p, boolean state) throws RuntimeException, InterruptedException{
-		if(status == Status.TRAVELING)
+		if(getStatus() == Status.TRAVELING)
 			return;
 		if(state == LOAD)
 			pickupLoad(p);
@@ -334,8 +400,9 @@ public class Truck implements MapElement, Runnable{
 	private static final int ADD_TO_TRAVEL = 1;
 	private static final int CLEAR_TRAVEL = 2;
 
-	/** Adds the road r to this Truck's travel plans, in a fashion that prevents thread collision */
-	public void addToTravel(Edge r){
+	/** Adds the road r to this Truck's travel plans, in a fashion that prevents thread collision 
+	 * @throws InterruptedException */
+	public void addToTravel(Edge r) throws InterruptedException{
 		if(goingTo == null)
 			setGoingTo(r.getOther(location));
 		else
@@ -352,8 +419,9 @@ public class Truck implements MapElement, Runnable{
 
 	/** Clears the Truck's travel plans, in a fashion that prevents thread collision.
 	 * Resets goingTo (The Node the Truck will eventually end up at) to the value of the travelingTo field
-	 * (The Node the Truck is currently traveling towards) */
-	public void clearTravel(){
+	 * (The Node the Truck is currently traveling towards) 
+	 * @throws InterruptedException */
+	public void clearTravel() throws InterruptedException{
 		setGoingTo(travelingTo);
 		changeTravelQueue(null, CLEAR_TRAVEL);
 	}
@@ -396,7 +464,7 @@ public class Truck implements MapElement, Runnable{
 	 * 		is not one of the exits for Edge r
 	 */
 	private final void travel(Edge r) throws InterruptedException, IllegalArgumentException{
-		if(status.equals(Status.WAITING)){
+		if(getStatus().equals(Status.WAITING)){
 			if(! r.isExit(location))
 				throw new IllegalArgumentException("Truck is not adjacent and cannot travel Edge " + r);
 
@@ -444,7 +512,9 @@ public class Truck implements MapElement, Runnable{
 			long finishTravelTime = System.currentTimeMillis();
 			lastTravelTime += (finishTravelTime - startTravelTime); //Discount the time spent traveling
 
+			statusLock.acquire();
 			status = Status.WAITING;
+			statusLock.release();
 			//Change the status without firing an update.
 			//Status update on waiting should only come when the truck
 			//Out of travel directions entirely, which occurs in the run() method.

@@ -293,13 +293,13 @@ public class Node implements MapElement{
 		return i;
 	}
 
-	/** Returns true if any truck is traveling towards this node, false otherwise */
-	public boolean isTruckTravelingHere(){
+	/** Returns true if any truck is traveling towards this node, false otherwise 
+	 * @throws InterruptedException */
+	public boolean isTruckTravelingHere() throws InterruptedException{
 		for(Truck t : game.getTrucks()){
 			if(t.getTravelingTo() != null && t.getTravelingTo().equals(this))
 				return true;
 		}
-		
 		return false;
 	}
 	

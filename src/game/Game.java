@@ -127,8 +127,9 @@ public class Game implements JSONString{
 		return trucks;
 	}
 
-	/** Returns the trucks in this game that are currently on the Truck Home node */
-	public ArrayList<Truck> getTrucksHome(){
+	/** Returns the trucks in this game that are currently on the Truck Home node 
+	 * @throws InterruptedException */
+	public ArrayList<Truck> getTrucksHome() throws InterruptedException{
 		ArrayList<Truck> homeTrucks = new ArrayList<Truck>();
 		for(Truck t : trucks)
 			if(t.getLocation() != null && t.getLocation().equals(map.getTruckHome()))
@@ -137,8 +138,9 @@ public class Game implements JSONString{
 		return homeTrucks;
 	}
 	
-	/** Returns true if any alive Truck in this game is currently on the TruckHome node, false otherwise */
-	public boolean isTruckHome(){
+	/** Returns true if any alive Truck in this game is currently on the TruckHome node, false otherwise 
+	 * @throws InterruptedException */
+	public boolean isTruckHome() throws InterruptedException{
 		for(Truck t : getTrucks())
 			if(t.getLocation() != null && t.getLocation().equals(map.getTruckHome()))
 				return true;
@@ -146,8 +148,9 @@ public class Game implements JSONString{
 		return false;
 	}
 
-	/** Returns true if all alive Truck in this game are currently on the TruckHome node, false otherwise */
-	public boolean isAllTrucksHome(){
+	/** Returns true if all alive Truck in this game are currently on the TruckHome node, false otherwise 
+	 * @throws InterruptedException */
+	public boolean isAllTrucksHome() throws InterruptedException{
 		for(Truck t : getTrucks())
 			if(t.getLocation() == null || ! t.getLocation().equals(map.getTruckHome()))
 				return false;
@@ -213,8 +216,12 @@ public class Game implements JSONString{
 	protected void deliverParcel(Parcel p, Node n, Truck t){
 		if(!p.getDestination().equals(n))
 			throw new IllegalArgumentException("Parcel " + p + "'s final destination is not " + n.getName() + ". Cannot Deliver Here");
-		if(!t.getLocation().equals(n))
-			throw new IllegalArgumentException("Truck " + t + "Is not currently at " + n.getName() + ". Cannot Deliver Here");
+		try {
+			if(!t.getLocation().equals(n))
+				throw new IllegalArgumentException("Truck " + t + "Is not currently at " + n.getName() + ". Cannot Deliver Here");
+		} catch (InterruptedException e1) {
+			e1.printStackTrace();
+		}
 		if(!t.getLoad().equals(p))
 			throw new IllegalArgumentException("Truck " + t + "Is not currently holding Parcel " + p + ". Cannot Deliver Here");
 
@@ -386,7 +393,6 @@ public class Game implements JSONString{
 				try {
 					start.addParcel(p);
 				} catch (InterruptedException e) {
-					// TODO Auto-generated catch block
 					e.printStackTrace();
 				}
 			}

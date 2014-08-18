@@ -218,7 +218,7 @@ public class GUI extends JFrame{
 			}
 		});
 		mnMap.add(mntmRearrangeMap);
-		
+
 		JMenuItem mntmPrintJSON = new JMenuItem("Print Game JSON");
 		mntmPrintJSON.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
@@ -327,22 +327,22 @@ public class GUI extends JFrame{
 			}
 		}
 
-				//Extend nodes for distance and buffer area
-				boolean flag = true;
-				while(flag){
-					flag = false;
-					for(Node n : game.getMap().getNodes()){
-						for(Node n2 : game.getMap().getNodes()){
-							Circle c = n.getCircle();
-							Circle c2 = n2.getCircle();
-							if(!c.equals(c2) && (c.getDistance(c2) < Circle.BUFFER_RADUIS)){
-								c.setX1((int)(Math.random()*maxX) + NODE_BUFFER_SIZE);
-								c.setY1((int)(Math.random()*maxY) + NODE_BUFFER_SIZE);
-								flag = true;
-							}
-						}
+		//Extend nodes for distance and buffer area
+		boolean flag = true;
+		while(flag){
+			flag = false;
+			for(Node n : game.getMap().getNodes()){
+				for(Node n2 : game.getMap().getNodes()){
+					Circle c = n.getCircle();
+					Circle c2 = n2.getCircle();
+					if(!c.equals(c2) && (c.getDistance(c2) < Circle.BUFFER_RADUIS)){
+						c.setX1((int)(Math.random()*maxX) + NODE_BUFFER_SIZE);
+						c.setY1((int)(Math.random()*maxY) + NODE_BUFFER_SIZE);
+						flag = true;
 					}
 				}
+			}
+		}
 
 		for(Edge r : game.getMap().getEdges()){
 			Line l = r.getLine();
@@ -353,11 +353,11 @@ public class GUI extends JFrame{
 			drawingPanel.remove(l);
 			drawingPanel.add(l);
 		}
-		
+
 		//Shift map to move it to center screen
 		int shiftX = 0;
 		int shiftY = 0;
-		
+
 		for(Node n : game.getMap().getNodes()){
 			if(n.getCircle().getX1() < NODE_BUFFER_SIZE){
 				shiftX = NODE_BUFFER_SIZE - n.getCircle().getX1();
@@ -372,7 +372,7 @@ public class GUI extends JFrame{
 				shiftY = (maxY - NODE_BUFFER_SIZE) - n.getCircle().getY1();
 			}
 		}
-		
+
 		for(Node n : game.getMap().getNodes()){
 			n.getCircle().setX1(n.getCircle().getX1() + shiftX);
 			n.getCircle().setY1(n.getCircle().getY1() + shiftY);
@@ -414,8 +414,20 @@ public class GUI extends JFrame{
 			t.setGUI(this);
 			Circle c = t.getCircle();
 			c.setBounds(drawingPanel.getBounds());
-			c.setX1(t.getLocation().getCircle().getX1());
-			c.setY1(t.getLocation().getCircle().getY1());
+			boolean unset = true;
+			while(unset){
+				try {
+					c.setX1(t.getLocation().getCircle().getX1());
+					c.setY1(t.getLocation().getCircle().getY1());
+					unset = false;
+				} catch (InterruptedException e) {
+					try {
+						Thread.sleep(50);
+					} catch (InterruptedException e1) {
+						e1.printStackTrace();
+					}
+				}
+			}
 			drawingPanel.remove(c);
 			drawingPanel.add(c);
 		}
