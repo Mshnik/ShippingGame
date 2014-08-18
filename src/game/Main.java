@@ -1,8 +1,7 @@
-package gameFiles;
+package game;
 
 import gui.GUI;
 
-import java.io.File;
 import java.util.ArrayList;
 
 /** Game starting methods. Also serves as a util holder */
@@ -23,18 +22,12 @@ public class Main {
 		Manager m = null;
 		try {
 			m = (Manager) createUserManager(userManagerClass);
-		} catch (ClassNotFoundException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (InstantiationException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (IllegalAccessException e) {
-			// TODO Auto-generated catch block
+		} catch (Exception e) {
 			e.printStackTrace();
 		}
 		
-		Game g = new Game(m);
+		
+		Game g = new Game(m, Game.gameFile("JSONMap1.txt"));
 		m.setGame(g);
 		
 		new GUI(g);

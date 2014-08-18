@@ -1,4 +1,4 @@
-package gameFiles;
+package game;
 import gui.Circle;
 import gui.GUI;
 

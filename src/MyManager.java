@@ -1,6 +1,6 @@
 import java.util.ArrayList;
 
-import gameFiles.*;
+import game.*;
 
 public class MyManager extends Manager {
 

@@ -1,4 +1,4 @@
-package gameFiles;
+package game;
 import java.awt.Color;
 
 /** The Score Class is a convenient way to monitor the score of a Game. <br>

@@ -1,12 +1,14 @@
-package gameFiles;
+package game;
 import gui.GUI;
 import gui.TextIO;
 
+import java.awt.Color;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashSet;
 
+import org.json.JSONArray;
 import org.json.JSONObject;
 import org.json.JSONString;
 
@@ -25,6 +27,9 @@ import org.json.JSONString;
  */
 public class Game implements JSONString{
 
+	protected static final String MAP_DIRECTORY = "Maps/";
+	protected static final String MAP_EXTENSION = ".txt";
+	
 	private static final int DEFAULT_NUMB_ROADS = 19;
 	private static final int DEFAULT_MIN_ROAD_LENGTH = 2;
 	private static final int DEFAULT_AVG_ROAD_LENGTH = 25;
@@ -54,7 +59,6 @@ public class Game implements JSONString{
 			try {
 				map.getTruckHome().setTruckHere(t, true);
 			} catch (InterruptedException e) {
-				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
 			trucks.add(t);
@@ -89,7 +93,6 @@ public class Game implements JSONString{
 		try {
 			readGame(f);
 		} catch (IOException e1) {
-			// TODO Auto-generated catch block
 			e1.printStackTrace();
 		}
 	}
@@ -239,7 +242,6 @@ public class Game implements JSONString{
 				try {
 					t.gameOver();
 				} catch (InterruptedException e) {
-					// TODO Auto-generated catch block
 					e.printStackTrace();
 				}
 			}
@@ -247,7 +249,6 @@ public class Game implements JSONString{
 			try {
 				manager.gameOver();
 			} catch (InterruptedException e) {
-				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
 		}
@@ -268,7 +269,6 @@ public class Game implements JSONString{
 			try {
 				t.gameOver();
 			} catch (InterruptedException e) {
-				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
 		}
@@ -276,7 +276,6 @@ public class Game implements JSONString{
 		try {
 			manager.gameOver();
 		} catch (InterruptedException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 	}
@@ -307,6 +306,25 @@ public class Game implements JSONString{
 		return s + "\n}";
 	}
 	
+	/** Returns a file for the string map filename. Throws an IllegalArgumentException
+	 * if this map does not exist. 
+	 */
+	public static File gameFile(String filename) throws IllegalArgumentException{
+		//Check that filename ends with .txt. If not, strip off the bad extension(if any) and add .txt
+		if(! filename.endsWith(MAP_EXTENSION)){
+			int i = filename.indexOf('.');
+			if(i != -1)
+				filename = filename.substring(0, i);
+			filename += MAP_EXTENSION;
+		}
+			
+		File f = new File(MAP_DIRECTORY + filename);
+		if(! f.exists())
+			throw new IllegalArgumentException("File " + f + " for filename " + filename + " DNE!");
+		
+		return f;
+	}
+	
 	/** Reads the Game in File f, creates it, and returns it.
 	 * Also sets the trucks and parcels of this game while reading the map
 	 * @param g - the Game this map will belong to
@@ -318,104 +336,60 @@ public class Game implements JSONString{
 		parcels = new HashSet<Parcel>();
 		
 		JSONObject obj = new JSONObject(TextIO.read(f));
-		System.out.println(obj);
 		
-		String[] text = TextIO.readToArray(f);
-
-		int endMap = -1;
-		for(int i = 0; i < text.length; i++){
-			if(text[i].equals(Map.END_NODE_IDENTIFIER)){
-				endMap = i;
-				break;
-			}
-		}
-
-		if(endMap == -1)
-			throw new IOException("No End Node Identifier (" + Map.END_NODE_IDENTIFIER + ") Found in file " + f.getName() + 
-					".\nCannot assemble map.");
-
-		String[] mapText = new String[endMap];
-		for(int i = 0; i < mapText.length; i++){
-			mapText[i] = text[i];
-		}
-
-		for(String s : mapText){
-			String[] sPieces = TextIO.parseToArray(s);
-			if(sPieces.length > 0 && !sPieces[0].equals("")){
-				Node n = new Node(this, sPieces[0]);
+		//First process map - under key with value of MAP_TOKEN.
+		JSONObject mapJSON = obj.getJSONObject(MAP_TOKEN);
+		//Read in all nodes of map
+		for(String key : mapJSON.keySet()){
+			if(key.startsWith(Map.NODE_TOKEN)){
+				JSONObject nodeJSON = mapJSON.getJSONObject(key);
+				Node n = new Node(this, nodeJSON.getString(MapElement.NAME_TOKEN));
 				map.getNodes().add(n);
 				if(n.getName().equals(Map.TRUCK_HOME_NAME))
 					map.setTruckHome(n);
 			}
 		}
+		//Read in all edges of map
+		for(String key : mapJSON.keySet()){
+			if(key.startsWith(Map.EDGE_TOKEN)){
+				JSONObject edgeJSON = mapJSON.getJSONObject(key);
+				JSONArray exitArr = edgeJSON.getJSONArray(MapElement.LOCATION_TOKEN);
 
-		for(String s : mapText){
-			String[] sPieces = TextIO.parseToArray(s);
-			if(sPieces.length > 0){
-				Node firstNode = map.getNode(sPieces[0]);
-				for(int i = 1; i < sPieces.length; i++){
-					int index = sPieces[i].indexOf("-");
-					if(index != -1){
-						Node secondNode = map.getNode(sPieces[i].substring(0, index));
-						int length = Integer.parseInt(sPieces[i].substring(index+1));
-						Edge e = new Edge(firstNode, secondNode, length);
-						map.getEdges().add(e);
-						firstNode.addExit(e);
-						secondNode.addExit(e);
-					}
+				int length = edgeJSON.getInt(MapElement.LENGTH_TOKEN);
+				Node firstExit = map.getNode((String)exitArr.get(0));
+				Node secondExit = map.getNode((String)exitArr.get(1));
+
+				Edge e = new Edge(firstExit, secondExit, length);
+				map.getEdges().add(e);
+				firstExit.addExit(e);
+				secondExit.addExit(e);
+			}
+		}
+		//Map reading finished.
+		
+		//Read in the trucks and parcels
+		for(String key : obj.keySet()){
+			if (key.startsWith(TRUCK_TOKEN)){
+				JSONObject truck = obj.getJSONObject(key);
+				Color c = new Color(truck.getInt(MapElement.COLOR_TOKEN));
+				String name = truck.getString(MapElement.NAME_TOKEN);
+				Truck t = new Truck(this, name, map.getTruckHome(), c);
+				trucks.add(t);
+			} else if( key.startsWith(PARCEL_TOKEN)){
+				JSONObject parcel = obj.getJSONObject(key);
+				Color c = new Color(parcel.getInt(MapElement.COLOR_TOKEN));
+				Node start = map.getNode(parcel.getString(MapElement.LOCATION_TOKEN));
+				Node dest = map.getNode(parcel.getString(MapElement.DESTINATION_TOKEN));
+				
+				Parcel p = new Parcel(this, start, dest, c);
+				parcels.add(p);
+				try {
+					start.addParcel(p);
+				} catch (InterruptedException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
 				}
 			}
-		}
-
-
-		//Add Trucks to Game
-		int endTrucks = -1;
-		for(int i = 0; i < text.length; i++){
-			if(text[i].equals(Map.END_TRUCK_IDENTIFIER)){
-				endTrucks = i;
-				break;
-			}
-		}
-
-		if(endTrucks == -1)
-			throw new IOException("No End Truck Identifier (" + Map.END_TRUCK_IDENTIFIER + ") Found in file " + f.getName() + 
-					".\nCannot assemble map.");
-
-		String[] truckText = new String[endTrucks-endMap - 1];
-		for(int i = 0; i < truckText.length; i++){
-			truckText[i] = text[i + endMap + 1];
-		}
-
-		ArrayList<Truck> trucks = getTrucks();
-
-		for(String s : truckText){
-			String[] sPieces = TextIO.parseToArray(s);
-			trucks.add(new Truck(this, sPieces[0], map.getTruckHome(), Score.getColor(sPieces[1])));
-		}
-
-		//Add Parcels to Game
-		int endParcels = -1;
-		for(int i = 0; i < text.length; i++){
-			if(text[i].equals(Map.END_PARCEL_IDENTIFIER)){
-				endParcels = i;
-				break;
-			}
-		}
-
-		if(endParcels == -1)
-			throw new IOException("No End Parcel Identifier (" + Map.END_PARCEL_IDENTIFIER + ") Found in file " + f.getName() + 
-					".\nCannot assemble map.");
-
-		String[] parcelText = new String[endParcels - endTrucks - 1];
-		for(int i = 0; i < parcelText.length; i++){
-			parcelText[i] = text[i + endTrucks + 1];
-		}
-
-		HashSet<Parcel> parcels = this.getParcels();
-
-		for(String s : parcelText){
-			String[] sPieces = TextIO.parseToArray(s);
-			parcels.add(new Parcel(this, map.getNode(sPieces[0]), map.getNode(sPieces[1]), Score.getColor(sPieces[2])));
 		}
 	}
 	
@@ -429,7 +403,7 @@ public class Game implements JSONString{
 			throw new RuntimeException("Can't Write Game File if the game is running.");
 	
 		
-		String n = Map.MAP_DIRECTORY + fileName + ".txt";
+		String n = MAP_DIRECTORY + fileName + ".txt";
 		TextIO.write(n, toJSONString());
 	}
 }

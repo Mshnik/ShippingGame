@@ -1,6 +1,6 @@
 package gui;
-import gameFiles.Edge;
-import gameFiles.MapElement;
+import game.Edge;
+import game.MapElement;
 
 import java.awt.BasicStroke;
 import java.awt.Color;

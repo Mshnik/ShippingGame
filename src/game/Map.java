@@ -1,6 +1,5 @@
-package gameFiles;
+package game;
 
-import java.io.File;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashSet;
@@ -16,18 +15,12 @@ import org.json.JSONString;
  */
 public class Map implements JSONString{
 
-	protected static final String MAP_DIRECTORY = "Maps/";
-	protected static final File MAP_1 = new File(MAP_DIRECTORY + "Map1.txt");
-	protected static final String END_NODE_IDENTIFIER = "End Of Map";
-	protected static final String END_TRUCK_IDENTIFIER = "End of Trucks";
-	protected static final String END_PARCEL_IDENTIFIER = "End of Parcels";
-
 	private Node truckHome;
 	protected static final String TRUCK_HOME_NAME = "Truck Depot";
 
 	private HashSet<Edge> edges;
 	private HashSet<Node> nodes;
-
+	
 	/** Constructor for use without an attached game. Sets game to null, initializes blank edges and nodes fields */
 	public Map(){
 		edges = new HashSet<Edge>();
@@ -212,8 +205,8 @@ public class Map implements JSONString{
 		return output;
 	}
 
-	private static final String NODE_TOKEN = "node-";
-	private static final String EDGE_TOKEN = "edge-";
+	protected static final String NODE_TOKEN = "node-";
+	protected static final String EDGE_TOKEN = "edge-";
 	
 	@Override
 	/** Returns a JSON-compliant version of toString() */

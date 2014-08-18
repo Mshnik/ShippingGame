@@ -1,4 +1,4 @@
-package gameFiles;
+package game;
 
 import java.awt.Color;
 

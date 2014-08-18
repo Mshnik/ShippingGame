@@ -1,6 +1,6 @@
 package gui;
-import gameFiles.MapElement;
-import gameFiles.Score;
+import game.MapElement;
+import game.Score;
 
 import java.awt.BasicStroke;
 import java.awt.Color;

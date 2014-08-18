@@ -1,4 +1,4 @@
-package gameFiles;
+package game;
 import gui.Line;
 
 import java.awt.Color;

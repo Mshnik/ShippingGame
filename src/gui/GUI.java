@@ -1,9 +1,9 @@
 package gui;
-import gameFiles.Edge;
-import gameFiles.Game;
-import gameFiles.Node;
-import gameFiles.Parcel;
-import gameFiles.Truck;
+import game.Edge;
+import game.Game;
+import game.Node;
+import game.Parcel;
+import game.Truck;
 
 import javax.swing.JFrame;
 import javax.swing.JPanel;

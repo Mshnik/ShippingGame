@@ -1,4 +1,4 @@
-package gameFiles;
+package game;
 import gui.Circle;
 
 import java.awt.Color;
