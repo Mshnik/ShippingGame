@@ -1,15 +1,10 @@
 package gui;
-import game.Edge;
-import game.Game;
-import game.Node;
-import game.Parcel;
-import game.Truck;
 
+import game.*;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
 import java.awt.BorderLayout;
 import java.awt.Dimension;
-import java.awt.Point;
 
 import javax.swing.JLabel;
 
@@ -25,9 +20,6 @@ import java.awt.event.ActionListener;
 import java.awt.event.ActionEvent;
 import java.io.File;
 import java.io.IOException;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.LinkedList;
 
 import javax.swing.BoxLayout;
 import java.awt.SystemColor;
@@ -46,9 +38,9 @@ public class GUI extends JFrame{
 	/***/
 	private static final long serialVersionUID = 2941318999657277463L;
 
-	private static final int NODE_BUFFER_SIZE = Circle.DEFAULT_DIAMETER*3;
+	static final int NODE_BUFFER_SIZE = Circle.DEFAULT_DIAMETER*3;
 
-	private static final int MAX_NEIGHBOR_DISTANCE = Circle.DEFAULT_DIAMETER * 5;
+	static final int MAX_NEIGHBOR_DISTANCE = Circle.DEFAULT_DIAMETER * 5;
 
 	/** The color for menu items when they are not active */
 	public static final Color INACTIVE_COLOR = Color.GRAY;
@@ -262,108 +254,16 @@ public class GUI extends JFrame{
 		setGame(g);
 	}
 
-	class MapUserData{
-		Point loc;
-		double neighborsPlaced;
-
-		MapUserData(){
-			loc = null;
-			neighborsPlaced = 0;
-		}
-	}
-
 	/** Draws all elements of the game on the threads. Used when the game is started */
 	private void drawMap(){
 		int maxX = drawingPanel.getBounds().width - NODE_BUFFER_SIZE*2;
 		int maxY = drawingPanel.getBounds().height - NODE_BUFFER_SIZE*2;
 
-		//Hashmap of user data before this operation. Temporarily comandeers that field.
-		HashMap<Node, Object> userData = new HashMap<Node, Object>();
-		for(Node n : game.getMap().getNodes()){
-			userData.put(n, n.getUserData());
-		}
-
-		//Put an integer in the object field. For map purposes.
-		for(Node n : game.getMap().getNodes()){
-			n.setUserData(new MapUserData());
-		}
-
-		//Nodes that have successfully been put on map
-		LinkedList<Node> toPlace = new LinkedList<Node>();
-		HashSet<Node> placed = new HashSet<Node>();
-		toPlace.add(game.getMap().getNodes().iterator().next()); //Make an arbitrary node the first to place.
-		boolean first = true;
-		while(! toPlace.isEmpty()){
-			Node n = toPlace.poll();
-			if(! placed.contains(n)){
-				MapUserData nData = (MapUserData)n.getUserData();
-				Circle c = n.getCircle();
-				if(first){
-					c.setX1(maxX/2 + NODE_BUFFER_SIZE);
-					c.setY1(maxY/2 + NODE_BUFFER_SIZE);
-					nData.loc = new Point(c.getX1(), c.getY1());
-					first = false;
-				}
-				else{
-					Node neighbor = null;
-					for(Node possibleNeighbor : placed){
-						if(possibleNeighbor.isConnectedTo(n))
-							neighbor = possibleNeighbor;
-					}
-					if(neighbor == null){
-						throw new RuntimeException("Disjoint graph?");
-					}
-					else{
-						MapUserData neighborData = (MapUserData)neighbor.getUserData();
-						boolean flag = false;
-						int loopCount = 0;
-						do{
-							flag = false;
-							double rot = (loopCount / 4) * 0.25;
-							c.setX1(neighborData.loc.x + (int)(Math.cos(Math.PI/2.0 * (neighborData.neighborsPlaced + rot)) * MAX_NEIGHBOR_DISTANCE));
-							c.setY1(neighborData.loc.y + (int)(Math.sin(Math.PI/2.0 * (neighborData.neighborsPlaced + rot)) * MAX_NEIGHBOR_DISTANCE));
-							nData.loc = new Point(c.getX1(), c.getY1());
-							for(Node each : placed){
-								if(each.getCircle().getX1() == c.getX1() && each.getCircle().getY1() == c.getY1()){
-									neighborData.neighborsPlaced++;
-									flag = true;
-									break;
-								}
-
-							}
-							loopCount++;
-						}while(flag);
-						neighborData.neighborsPlaced++;
-					}
-				}
-				//c.setBounds(drawingPanel.getBounds());
-				drawingPanel.remove(c);
-				drawingPanel.add(c);
-				placed.add(n);
-				for(Edge e : n.getExits()){
-					if(! placed.contains(e.getOther(n)))
-						toPlace.add(e.getOther(n));
-				}
-			}
-		}
-
-		//Extend nodes for distance and buffer area
-		boolean flag = true;
-		while(flag){
-			flag = false;
-			for(Node n : game.getMap().getNodes()){
-				for(Node n2 : game.getMap().getNodes()){
-					Circle c = n.getCircle();
-					Circle c2 = n2.getCircle();
-					if(!c.equals(c2) && (c.getDistance(c2) < Circle.BUFFER_RADUIS)){
-						c.setX1((int)(Math.random()*maxX) + NODE_BUFFER_SIZE);
-						c.setY1((int)(Math.random()*maxY) + NODE_BUFFER_SIZE);
-						flag = true;
-					}
-				}
-			}
-		}
-
+		//Fix the positions of the nodes on the panel using the Force model.
+		//See the Flexor class for how this is done.
+		Flexor.flexNodes(drawingPanel, game.getMap().getNodes(), maxX, maxY);
+		
+		//Draw the edges on the map
 		for(Edge r : game.getMap().getEdges()){
 			Line l = r.getLine();
 			l.setC1(r.getExits()[0].getCircle());
@@ -373,63 +273,17 @@ public class GUI extends JFrame{
 			drawingPanel.remove(l);
 			drawingPanel.add(l);
 		}
-
-		//Shift map to move it to center screen
-		int shiftX = 0;
-		int shiftY = 0;
-
-		for(Node n : game.getMap().getNodes()){
-			if(n.getCircle().getX1() < NODE_BUFFER_SIZE){
-				shiftX = NODE_BUFFER_SIZE - n.getCircle().getX1();
-			}
-			if(n.getCircle().getX1() > maxX - NODE_BUFFER_SIZE){
-				shiftX = (maxX - NODE_BUFFER_SIZE) - n.getCircle().getX1();
-			}
-			if(n.getCircle().getY1() < NODE_BUFFER_SIZE){
-				shiftY = NODE_BUFFER_SIZE - n.getCircle().getY1();
-			}
-			if(n.getCircle().getY1() > maxY - NODE_BUFFER_SIZE){
-				shiftY = (maxY - NODE_BUFFER_SIZE) - n.getCircle().getY1();
-			}
-		}
-
-		for(Node n : game.getMap().getNodes()){
-			n.getCircle().setX1(n.getCircle().getX1() + shiftX);
-			n.getCircle().setY1(n.getCircle().getY1() + shiftY);
-		}
-
-		//		//Move lines and nodes to untangle
-		//		int attempts = 0;
-		//		int maxAttempts = (int)Math.pow(game.getMap().getEdges().size(), 2);
-		//		while(game.getMap().isIntersection() && attempts < maxAttempts){
-		//			Edge[] intersectingRoads = game.getMap().getAIntersection();
-		//
-		//			if(intersectingRoads == null)
-		//				break;
-		//
-		//			Edge r = intersectingRoads[0];
-		//			Edge r2 = intersectingRoads[1];
-		//
-		//			Circle c1 = r.getLine().getC1();
-		//			Circle c2 = r2.getLine().getC1();
-		//
-		//			c1.switchLocation(c2);
-		//
-		//			attempts++;
-		//		}
-
-		repaint();
-
+		
+		//Draw the parcels on the map
 		for(Parcel p : game.getParcels()){
 			p.getCircle().setX1(p.getLocation().getCircle().getX1());
 			p.getCircle().setY1(p.getLocation().getCircle().getY1());
 			//p.getCircle().setBounds(drawingPanel.getBounds());
 			drawingPanel.remove(p.getCircle());
 			drawingPanel.add(p.getCircle());
-			repaint();
 		}
 
-
+		//Draw the trucks on the map
 		for(Truck t : game.getTrucks()){
 			Circle c = t.getCircle();
 			c.setBounds(drawingPanel.getBounds());
@@ -452,11 +306,6 @@ public class GUI extends JFrame{
 		}
 
 		repaint();
-
-		//Reset userData fields to what they were before.
-		for(Node n : game.getMap().getNodes()){
-			n.setUserData(userData.get(n));
-		}
 	}
 
 	/** Sets the game to Game g */

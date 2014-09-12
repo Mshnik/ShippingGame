@@ -17,7 +17,6 @@ import java.awt.RenderingHints;
 import java.awt.geom.Ellipse2D;
 
 import javax.swing.JPanel;
-import javax.swing.border.LineBorder;
 
 /** The Circle class is a graphic class that allows the drawing of circles.
  * Circles use an (x1, y1, diameter) coordinate system of where they are located on the threads.
@@ -204,8 +203,13 @@ public class Circle extends JPanel{
 	}
 
 	/** Returns the distance between this Circle and Circle c */
-	protected int getDistance(Circle c){
-		return (int)Math.sqrt( (Math.pow(x1-c.getX1(), 2) + Math.pow(y1 - c.getY1(), 2) ) );
+	public double getDistance(Circle c){
+		return Math.sqrt( (Math.pow(x1-c.getX1(), 2) + Math.pow(y1 - c.getY1(), 2) ) );
+	}
+	
+	/** Returns the vector from this circle to circle c */
+	public Vector getVectorTo(Circle c){
+		return new Vector(c.x1 - x1, c.y1 - y1);
 	}
 
 	@Override
