@@ -7,7 +7,6 @@ import java.util.Iterator;
 
 import org.json.JSONString;
 
-
 /** The Map Class is a container for the HashSets of Edges and Nodes that make up
  * the playing field of the game. It also allows for easy access to random nodes and edges.
  * @author MPatashnik
@@ -22,7 +21,7 @@ public class Map implements JSONString{
 	private HashSet<Node> nodes;
 	
 	/** Constructor for use without an attached game. Sets game to null, initializes blank edges and nodes fields */
-	public Map(){
+	protected Map(){
 		edges = new HashSet<Edge>();
 		nodes = new HashSet<Node>();
 	}
@@ -148,7 +147,9 @@ public class Map implements JSONString{
 	}
 
 	/** Returns true if there is any intersection of the lines drawn by the
-	 * edges in edges, false otherwise
+	 * edges in edges, false otherwise.
+	 * 
+	 * Used for GUI intersection detection, not useful outside of the GUI context.
 	 */
 	public boolean isIntersection(){
 		for(Edge r : edges){
@@ -165,7 +166,9 @@ public class Map implements JSONString{
 	}
 
 	/** Returns a 2x1 array of edges that have lines that intersect
-	 * If no two edges intersect, returns null
+	 * If no two edges intersect, returns null.
+	 * 
+	 * Used for GUI intersection detection, not useful outside of the GUI context.
 	 */
 	public Edge[] getAIntersection(){
 		for(Edge r : edges){

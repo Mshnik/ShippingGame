@@ -1,5 +1,4 @@
 import java.util.ArrayList;
-
 import game.*;
 
 public class MyManager extends Manager {
@@ -32,66 +31,69 @@ public class MyManager extends Manager {
 	}
 
 	@Override
-	public void truckNotification(Truck t, int message){
-		switch(message){
-		case(Manager.PARCEL_AT_NODE): 
-			if(t.getLoad() == null){
+	public void truckNotification(Truck t, Notification message){
+		if(game.isRunning()){
+			System.out.println("" + t + ":" + message);
+			switch(message){
+			case PARCEL_AT_NODE: 
+				if(t.getLoad() == null){
 
-				game.setUpdateMessage("Parcel Picked Up");
-				Parcel p = null;
-				try {
-					p = t.getLocation().getRandomParcel();
-				} catch (InterruptedException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
+					game.setUpdateMessage("Parcel Picked Up");
+					Parcel p = null;
+					try {
+						p = t.getLocation().getRandomParcel();
+					} catch (InterruptedException e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+					}
+					try{
+						t.loadUnloadParcel(p, Truck.LOAD);
+					} catch(Exception e){}
+					try{
+						t.clearTravel();
+						if(t.getGoingTo() == null)
+							t.addToTravel(t.getLocation().getRandomExit());
+						else
+							t.addToTravel(t.getGoingTo().getRandomExit());
+					} catch(InterruptedException e){
+
+					}
+
+					//Do some calculation or something
+					try {
+						Thread.sleep(1000);
+					} catch (InterruptedException e1) {
+						// TODO Auto-generated catch block
+						e1.printStackTrace();
+					}
 				}
+				break;
+			case LOCATION_CHANGED: 
 				try{
-					t.loadUnloadParcel(p, Truck.LOAD);
-				} catch(Exception e){}
-				try{
-					t.clearTravel();
-					if(t.getGoingTo() == null)
-						t.addToTravel(t.getLocation().getRandomExit());
-					else
-						t.addToTravel(t.getGoingTo().getRandomExit());
-				} catch(InterruptedException e){
+					if(t.getLocation().equals(game.getMap().getTruckHome()) && game.getParcels().isEmpty())
+						break;
+				} catch(InterruptedException e){ break; }
 
-				}
-
-				//Do some calculation or something
 				try {
-					Thread.sleep(10000);
+					if(t.getLoad() != null && t.getLoad().getDestination().equals(t.getLocation()))
+						try{
+							t.loadUnloadParcel(t.getLoad(), Truck.UNLOAD);
+						} catch(Exception e){}
 				} catch (InterruptedException e1) {
 					// TODO Auto-generated catch block
 					e1.printStackTrace();
 				}
-			}
-		break;
-		case(Manager.LOCATION_CHANGED): 
-			try{
-			if(t.getLocation().equals(game.getMap().getTruckHome()) && game.getParcels().isEmpty())
+
+				try{
+					if(t.getGoingTo() == null)
+						t.addToTravel(t.getLocation().getRandomExit());
+					else
+						t.addToTravel(t.getGoingTo().getRandomExit());
+				} catch(InterruptedException e){}
 				break;
-			} catch(InterruptedException e){ break; }
-
-			try {
-				if(t.getLoad() != null && t.getLoad().getDestination().equals(t.getLocation()))
-					try{
-						t.loadUnloadParcel(t.getLoad(), Truck.UNLOAD);
-					} catch(Exception e){}
-			} catch (InterruptedException e1) {
-				// TODO Auto-generated catch block
-				e1.printStackTrace();
+			default:
+				break;
 			}
-
-		try{
-			if(t.getGoingTo() == null)
-				t.addToTravel(t.getLocation().getRandomExit());
-			else
-				t.addToTravel(t.getGoingTo().getRandomExit());
-		} catch(InterruptedException e){}
-		break;
-		default:
-			break;
 		}
 	}
 

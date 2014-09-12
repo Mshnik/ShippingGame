@@ -1,13 +1,27 @@
 package game;
 import gui.Circle;
-import gui.GUI;
 
 import java.awt.Color;
 import java.util.LinkedList;
 import java.util.Queue;
 import java.util.concurrent.Semaphore;
 
-public class Truck implements MapElement, Runnable, Colorable{
+/** The Truck class is a runnable object that represents a single Truck in the game.
+ * Trucks are instantiated by the game and put into their own thread to run.
+ * Trucks maintain a queue of travel directions, each of which is an edge to travel.
+ * While the queue is empty, trucks idle at their current location.
+ * Once the queue is populated, the truck will continue to follow those directions
+ * until the queue is empty again. The speed at which a Truck travels can be set
+ * using the setSpeed(int i) method, which determines how many units of road
+ * the truck travels each frame. Trucks can be told to pick up or drop off parcels
+ * when they are not traveling. <br> <br>
+ * 
+ * Interaction with Trucks is done through the Truck's internal calling of the truckNotification
+ * method in the Manager class. Whenever the Truck makes an action, it lets the manager know of 
+ * this change, allowing for input at that time.
+ * @author MPatashnik
+ */
+public class Truck implements MapElement, Runnable, Colorable, UserData{
 
 	/** The Two States that a Truck can be in at any time - either Waiting (staying on its location
 	 * and awaiting further travel instructions) or Traveling (currently moving from node to node
@@ -113,6 +127,7 @@ public class Truck implements MapElement, Runnable, Colorable{
 			while(travel.isEmpty() && game.isRunning()){
 				try{
 					Thread.sleep(WAIT_TIME);
+					game.getManager().truckNotification(this, Manager.Notification.WAITING);
 				}
 				catch (InterruptedException e){
 					e.printStackTrace();
@@ -184,7 +199,7 @@ public class Truck implements MapElement, Runnable, Colorable{
 			locLock.acquire();
 			location = l;
 			locLock.release();
-			game.getManager().truckNotification(this, Manager.LOCATION_CHANGED);
+			game.getManager().truckNotification(this, Manager.Notification.LOCATION_CHANGED);
 		}
 	}
 
@@ -209,7 +224,7 @@ public class Truck implements MapElement, Runnable, Colorable{
 			locLock.acquire();
 			travelingTo = t;
 			locLock.release();
-			game.getManager().truckNotification(this, Manager.TRAVELING_TO_CHANGED);
+			game.getManager().truckNotification(this, Manager.Notification.TRAVELING_TO_CHANGED);
 		}
 	}
 
@@ -260,7 +275,7 @@ public class Truck implements MapElement, Runnable, Colorable{
 			locLock.acquire();
 			goingTo = g;
 			locLock.release();
-			game.getManager().truckNotification(this, Manager.GOING_TO_CHANGED);
+			game.getManager().truckNotification(this, Manager.Notification.GOING_TO_CHANGED);
 		}
 	}
 
@@ -281,7 +296,7 @@ public class Truck implements MapElement, Runnable, Colorable{
 			statusLock.acquire();
 			status = s;
 			statusLock.release();
-			game.getManager().truckNotification(this, Manager.STATUS_CHANGED);
+			game.getManager().truckNotification(this, Manager.Notification.STATUS_CHANGED);
 		}
 	}
 
@@ -335,7 +350,9 @@ public class Truck implements MapElement, Runnable, Colorable{
 		userData = uData;
 	}
 
+	/** The state of loading a parcel - use for loadUnloadParcel(..) */
 	public static final boolean LOAD = true;
+	/** The state of unloading a parcel - use for loadUnloadParcel(..) */
 	public static final boolean UNLOAD = false;
 
 	/** Handles loading and unloading parcels.
@@ -371,7 +388,7 @@ public class Truck implements MapElement, Runnable, Colorable{
 			load.loadUnload(this, Truck.LOAD);
 
 			game.getScore().changeScore(Score.PICKUP_COST);
-			game.getManager().truckNotification(this, Manager.PICKED_UP_PARCEL);
+			game.getManager().truckNotification(this, Manager.Notification.PICKED_UP_PARCEL);
 		}
 	}
 
@@ -384,7 +401,7 @@ public class Truck implements MapElement, Runnable, Colorable{
 		location.getTrueParcels().add(load);
 		load.loadUnload(this, Truck.UNLOAD);
 		game.getScore().changeScore(Score.DROPOFF_COST);
-		game.getManager().truckNotification(this, Manager.DROPPED_OFF_PARCEL);
+		game.getManager().truckNotification(this, Manager.Notification.DROPPED_OFF_PARCEL);
 		load = null;
 
 	}
@@ -479,11 +496,8 @@ public class Truck implements MapElement, Runnable, Colorable{
 			int progress = 0;
 			long startTravelTime = System.currentTimeMillis();
 			while(progress < r.getLength()){
-				Thread.sleep(game.getGUI().getGameSpeed());
+				Thread.sleep(game.getGameSpeed());
 
-				while(game.isPaused()){
-					Thread.sleep(game.getGUI().getGameSpeed());
-				}
 				//Get the speed lock, begin speed and cost computations
 				speedLock.acquire();
 				//If we can go the full speed's units, do that
@@ -499,18 +513,20 @@ public class Truck implements MapElement, Runnable, Colorable{
 				}
 				speedLock.release();
 				double percent = (double)progress / (double)r.getLength();
+				
+				//Update Truck's location on the GUI
 				updateGUILocation( (int) (percent * there.getX1() + (1-percent) * here.getX1()), 
 						(int) (percent * there.getY1() + (1-percent) * here.getY1()));
 			}
 			long finishTravelTime = System.currentTimeMillis();
 			lastTravelTime += (finishTravelTime - startTravelTime); //Discount the time spent traveling
 
-			statusLock.acquire();
-			status = Status.WAITING;
-			statusLock.release();
 			//Change the status without firing an update.
 			//Status update on waiting should only come when the truck
 			//Out of travel directions entirely, which occurs in the run() method.
+			statusLock.acquire();
+			status = Status.WAITING;
+			statusLock.release();
 
 			setLocation(travelingTo);
 
@@ -522,7 +538,7 @@ public class Truck implements MapElement, Runnable, Colorable{
 			travelingAlong.getLine().updateToColorPolicy();
 
 			if(location.getParcels().size() > 0)
-				game.getManager().truckNotification(this, Manager.PARCEL_AT_NODE);
+				game.getManager().truckNotification(this, Manager.Notification.PARCEL_AT_NODE);
 
 			if(game.getParcels().isEmpty() && game.isAllTrucksHome())
 				game.finish();
@@ -553,16 +569,19 @@ public class Truck implements MapElement, Runnable, Colorable{
 	}
 
 	@Override
+	/** Returns the name of this truck to display on the GUI */
 	public String getMappedName() {
 		return getTruckName();
 	}
 
 	@Override
+	/** Returns the location of this' name relative to its position on the GUI */
 	public int getRelativeX() {
 		return -Circle.DEFAULT_DIAMETER/2;
 	}
 
 	@Override
+	/** Returns the location of this' name relative to its position on the GUI */
 	public int getRelativeY() {
 		return Circle.DEFAULT_DIAMETER + 10;			
 	}

@@ -3,6 +3,7 @@ package game;
 import gui.GUI;
 
 import java.util.ArrayList;
+import java.util.concurrent.Semaphore;
 
 /** Game starting methods. Also serves as a util holder */
 public class Main {
@@ -14,24 +15,16 @@ public class Main {
 	 */
 	public static void main(String[] args) throws IllegalArgumentException{
 		
-		if(args == null || args.length == 0)
-			throw new IllegalArgumentException("Illegal String Array Passed into Main");
+		if(args == null || args.length != 1)
+			throw new IllegalArgumentException("Illegal String Array Passed into Main:\n" +
+												"expecting length 1 array of name of manager class.\n" +
+												"recieved " + args + " of length " + (args == null ? "null" : args.length));
 		
 		String userManagerClass = args[0];
 		
-		Manager m = null;
-		try {
-			m = (Manager) createUserManager(userManagerClass);
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
-		
-		
-		Game g = new Game(m, Game.gameFile("JSONMap1.txt"));
-		m.setGame(g);
+		Game g = new Game(userManagerClass, Game.gameFile("JSONMap1.txt"));
 		
 		new GUI(g);
-//		new GUI();
 	}
 	
 	/** Creates and returns an instance of the user defined manager class
@@ -42,7 +35,7 @@ public class Main {
 	 * @throws IllegalAccessException - If the constructor for the class is not visible
 	 * @throws IllegalArgumentException - If the given class is not a subclass of Manager.
 	 */
-	private static Object createUserManager(String userManagerClass) throws ClassNotFoundException, InstantiationException, IllegalAccessException, IllegalArgumentException{
+	public static Object createUserManager(String userManagerClass) throws ClassNotFoundException, InstantiationException, IllegalAccessException, IllegalArgumentException{
 		@SuppressWarnings("rawtypes")
 		Class c= Class.forName(userManagerClass);
 		if(!Manager.class.isAssignableFrom(c))
@@ -51,35 +44,54 @@ public class Main {
 		return c.newInstance();//assuming you aren't worried about constructor .
 	}
 	
-	/** Returns the sum of the natural numbers from 1 to n */
+	/** Returns the sum of the natural numbers from 1 to i */
 	public static int sumTo(int i){
 		if(i <= 0)
 			return 0;
 		return i + sumTo(i-1);
 	}
 	
-	//Part of fib series calculated thus far. Bit of memoization
+	//Part of fib series calculated thus far. Bit of memoization for speed.
 	private static ArrayList<Integer> fibCalc;
 	
-	/** Returns the ith fibonachi number (0 indexed), starting with 0,1,1,2 ... Returns -1 if given number is negative */
-	public static int fib(int i){
-		if(fibCalc == null){
+	//Lock that ensures that fibCalc arrayList is added to/accessed correctly.
+	private static Semaphore fibLock;
+	
+	/** Returns the ith fibonachi number (0 indexed), starting with 0,1,1,2 ... Returns -1 if given number is negative 
+	 * @throws InterruptedException */
+	public static int fib(int i) throws InterruptedException{
+		if(fibLock == null || fibCalc == null){
 			fibCalc = new ArrayList<Integer>();
+			fibLock = new Semaphore(1);
+			fibLock.acquire();
 			fibCalc.add(0); //First number
 			fibCalc.add(1); //Second number
+			fibLock.release();
 		}
-		if (i < 0)
+		fibLock.acquire();
+		if (i < 0){
+			fibLock.release();
 			return -1;
-		else if( i < fibCalc.size())
-			return fibCalc.get(i);
+		}
+		else if( i < fibCalc.size()){
+			int k = fibCalc.get(i);
+			fibLock.release();
+			return k;
+		}
 		
+		//Release the lock before recursive calls.
+		fibLock.release();
 		//Calculate next number
 		int f = fib(i-2) + fib(i-1);
+		
+		//Acquire before checking size/adding.
+		fibLock.acquire();
 		//Check that we're storing it in the correct place.
 		if (fibCalc.size() != i)
 			throw new RuntimeException("Wut. Trying to calculate fib number " + i + " but precalced is " + fibCalc.toString());
 		
 		fibCalc.add(f);
+		fibLock.release();
 		return f;
 	}
 	

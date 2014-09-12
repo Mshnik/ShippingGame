@@ -11,7 +11,7 @@ import org.json.JSONString;
  * All map elements must also be JSON-able, and override the toJSONString method.
  * @author MPatashnik
  */
-public interface MapElement extends JSONString{
+public interface MapElement extends JSONString, Colorable{
 
 	/** The key for the name field */
 	public static final String NAME_TOKEN = "name";

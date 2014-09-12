@@ -39,8 +39,21 @@ public class Game implements JSONString{
 	private static final String[] DEFAULT_TRUCKS = {"Truck_A", "Truck_B", "Truck_C"};
 	private static final int DEFAULT_NUMB_PARCELS = 5;
 
+	public static final int VERY_SLOW_SPEED = 4;
+	public static final int SLOW_SPEED = 3;
+	public static final int REGULAR_SPEED = 2;
+	public static final int FAST_SPEED = 1;
+	public static final int VERY_FAST_SPEED = 0;
+	
+	private static final int[] SPEED_VALUES = {1, 10, 40, 80, 200};
+	
+	private File file;	//The file this game was loaded from. Null if none.
+	private String managerClass; //The name of the class the manager was created from.
+	
 	private GUI gui;
 	private Manager manager;
+	
+	private int speed; //The speed of the game. Can only be changed before game starts running.
 	
 	private boolean running;
 	private Score score;
@@ -49,8 +62,13 @@ public class Game implements JSONString{
 	private ArrayList<Truck> trucks;
 
 	/** Creates a default (test) game instance. Uses default values for all fields */
-	public Game(Manager m){
-		manager = m;
+	public Game(String managerClassname){
+		managerClass = managerClassname;
+		try {
+			manager = (Manager)Main.createUserManager(managerClassname);
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
 		score = new Score(this);
 		map = new Map(this, DEFAULT_NODES, DEFAULT_NUMB_ROADS, DEFAULT_MIN_ROAD_LENGTH, DEFAULT_AVG_ROAD_LENGTH, DEFAULT_MAX_ROAD_LENGTH);
 		trucks = new ArrayList<Truck>(DEFAULT_TRUCKS.length);
@@ -84,17 +102,28 @@ public class Game implements JSONString{
 			}
 			//			System.out.println("Parcel traveling from " + start.getName() + " to " + dest.getName());
 		}
+		
+		file = null;
+		setGameSpeed(REGULAR_SPEED);
 	}
 	
 	/** Creates a game instance with a set Map, read from File f. Uses Default for all other fields */
-	public Game(Manager m, File f){
-		manager = m;
+	public Game(String managerClassname, File f){
+		managerClass = managerClassname;
+		file = f;
+		try {
+			manager = (Manager)Main.createUserManager(managerClassname);
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		manager.setGame(this);
 		score = new Score(this);
 		try {
 			readGame(f);
 		} catch (IOException e1) {
 			e1.printStackTrace();
 		}
+		setGameSpeed(REGULAR_SPEED);
 	}
 
 	/** Returns true if this game is currently running, false otherwise */
@@ -102,9 +131,10 @@ public class Game implements JSONString{
 		return running;
 	}
 	
-	/** Returns true if this game is currently paused, false otherwise */
-	public boolean isPaused(){
-		return gui.isPaused();
+	/** Sets the value of running. Also informs gui of changes */
+	public void setRunning(boolean r){
+		running = r;
+		gui.updateRunning();
 	}
 	
 	/** Sets the map to map m */
@@ -158,6 +188,8 @@ public class Game implements JSONString{
 		return true;
 	}
 	
+
+	
 	/** Returns the value of the score*/
 	public int getScoreValue(){
 		return score.value();
@@ -172,12 +204,35 @@ public class Game implements JSONString{
 	public Manager getManager(){
 		return manager;
 	}
+	
+	/** Returns a String of the class used to load the manager */
+	public String getManagerClassname(){
+		return managerClass;
+	}
+	
+	/** Returns the file this game was created from. Returns null if this was created, not loaded */
+	public File getFile(){
+		return file;
+	}
 
+	/** Returns the speed of the game */
+	public int getGameSpeed(){
+		return speed;
+	}
+	
+	/** Sets the speed of the game. Throws a runtimeException if the game has already started.
+	 * Input should be one of the given constants for speed in the Game Class. */
+	public void setGameSpeed(int s) throws RuntimeException{
+		if(isRunning())
+			throw new RuntimeException("Can't change speed of " + this + " because it is already running");
+		speed = SPEED_VALUES[s];
+	}
+	
 	/** Starts the game by having each truck begin running, then having the manager begin running.
 	 * Make sure not to do this twice. */
 	public void start(){
 		if(! running){
-			running = true;
+			setRunning(true);
 			for(Truck t : trucks){
 				Thread th = new Thread(t);
 				th.start();
@@ -242,9 +297,7 @@ public class Game implements JSONString{
 	/** Ends this game prematurely by halting trucks and manager */
 	public void kill(){
 		if(running){
-			running = false;
-			gui.dispose();
-	
+			setRunning(false);
 			for(Truck t : getTrucks()){
 				try {
 					t.gameOver();
@@ -266,10 +319,8 @@ public class Game implements JSONString{
 	 * Halts all trucks
 	 */
 	protected void finish(){
-		running = false;
-		gui.getCheckBoxPaused().setSelected(true);		
+		setRunning(false);	
 		gui.setUpdateMessage("Game Finished!");
-		gui.getCheckBoxPaused().setEnabled(false);
 		gui.repaint();
 
 		for(Truck t : getTrucks()){

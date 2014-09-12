@@ -10,8 +10,18 @@ import java.util.HashSet;
 import java.util.concurrent.Semaphore;
 
 
-/** A node (vertex) on the graph. */
-public class Node implements MapElement{
+/** A Node (vertex) on the graph of the game.
+ *  Each Node has maintains a set of edges that exit it,
+ *  A hashmap of trucks, mapping to either at this node or not at this node,
+ *  and a set of Parcels that are on this node (and not loaded on a truck). <br><br>
+ *  
+ *  All of the methods that modify these collections are protected, but all of the getters
+ *  Are public for use by the user. Additionally, convience methods such as isConnectedTo(Node n)
+ *  are provided for user use.
+ *  
+ *  @author MPatashnik
+ **/
+public class Node implements MapElement, UserData{
 	
 	private final Game game;
 	

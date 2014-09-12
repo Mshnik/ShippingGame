@@ -4,8 +4,18 @@ import gui.Circle;
 import java.awt.Color;
 import java.util.concurrent.Semaphore;
 
-
-public class Parcel implements MapElement, Colorable{
+/** The Parcel class represents a carriable and deliverable package
+ * in the game. Each Parcel has a start location and a destination
+ * When dropped off at its desired destination, the parcel will disappear
+ * from the game and award the player points. If the parcel matches colors
+ * with the Truck carrying it, the point award for delivery is higher <br><br>
+ * 
+ * Only one truck can carry a parcel at a time.
+ * 
+ * @author MPatashnik
+ *
+ */
+public class Parcel implements MapElement, Colorable, UserData{
 
 	/** The game this Parcel belongs to */
 	private final Game game;
@@ -206,11 +216,13 @@ public class Parcel implements MapElement, Colorable{
 	}
 
 	@Override
+	/** Returns 0, since Parcels have no mapped name */
 	public int getRelativeX() {
 		return 0;
 	}
 
 	@Override
+	/** Returns 0, since Parcels have no mapped name */
 	public int getRelativeY() {
 		return 0;
 	}
@@ -237,5 +249,4 @@ public class Parcel implements MapElement, Colorable{
 		c.setY1(y);
 		c.repaint();
 	}
-
 }

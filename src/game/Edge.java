@@ -19,11 +19,11 @@ import java.util.concurrent.Semaphore;
  * There are no public Edge constructors, so classes outside of the gameFiles package will not be able to construct additional Edge objects
  * <br><br>
  * 
- * The Edge Class also has public static methods, which pertian to the minimum and maximum lengths of all Edges.
+ * The Edge Class also has public static methods, which pertains to the minimum and maximum lengths of all Edges.
  * @author MPatashnik
  *
  */
-public class Edge implements MapElement{
+public class Edge implements MapElement, Colorable, UserData{
 
 	/** The length of "Blank" Edges. Should be later changed to an actual length value */
 	protected static final int DUMMY_LENGTH = Integer.MIN_VALUE;
@@ -104,18 +104,18 @@ public class Edge implements MapElement{
 		return exits;
 	}
 
-	/** Returns the first exit of this line */
+	/** Returns the first exit of this Edge */
 	public Node getFirstExit(){
 		return exits[0];
 	}
 
-	/** Returns the second exit of this line */
+	/** Returns the second exit of this Edge */
 	public Node getSecondExit(){
 		return exits[1];
 	}
 
 	/** Returns the exits of this line, a length 2 array of Nodes. Copies the nodes into a new array to
-	 * prevent interference with the exits of this node
+	 * prevent interference with the exits of this node.
 	 */
 	public Node[] getExits(){
 		Node[] newExits = new Node[2];
@@ -167,7 +167,8 @@ public class Edge implements MapElement{
 		updateMinMaxLength();
 	}
 
-	/** Updates the Minimum and Maximum lengths of all edge instances */
+	/** Updates the Minimum and Maximum lengths of all edge instances.
+	 * Called internally during processing, no need to call this after game initialized. */
 	public static void updateMinMaxLength(){
 		minLength = DEFAULT_MIN_LENGTH;
 		maxLength = DEFAULT_MAX_LENGTH;
@@ -238,6 +239,9 @@ public class Edge implements MapElement{
 		userData = uData;
 	}
 
+	/** Returns the color this Edge, as it is pained on the GUI. Color
+	 * of edges has no game significance.
+	 */
 	public Color getColor(){
 		return line.getColor();
 	}

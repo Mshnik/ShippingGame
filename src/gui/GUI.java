@@ -15,28 +15,25 @@ import javax.swing.JLabel;
 
 import java.awt.Color;
 import javax.swing.border.LineBorder;
-import javax.swing.AbstractButton;
-import javax.swing.ButtonGroup;
 import javax.swing.JFileChooser;
 import javax.swing.JMenuBar;
 import javax.swing.JMenu;
 import javax.swing.JOptionPane;
 import javax.swing.JMenuItem;
+
 import java.awt.event.ActionListener;
 import java.awt.event.ActionEvent;
 import java.io.File;
 import java.io.IOException;
-import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedList;
 
 import javax.swing.BoxLayout;
 import java.awt.SystemColor;
-import javax.swing.JRadioButton;
-import javax.swing.JCheckBox;
-import java.awt.event.MouseAdapter;
-import java.awt.event.MouseEvent;
+import javax.swing.JCheckBoxMenuItem;
+import javax.swing.event.ChangeListener;
+import javax.swing.event.ChangeEvent;
 
 /** The GUI Class creates the JFrame that shows the game.
  * The user and the manager have no interaction with the GUI class.
@@ -53,6 +50,12 @@ public class GUI extends JFrame{
 
 	private static final int MAX_NEIGHBOR_DISTANCE = Circle.DEFAULT_DIAMETER * 5;
 
+	/** The color for menu items when they are not active */
+	public static final Color INACTIVE_COLOR = Color.GRAY;
+
+	/** The color for menu items when they are active */
+	public static final Color ACTIVE_COLOR = Color.BLACK;
+
 	private static final Dimension MAIN_WINDOW_SIZE = new Dimension(1000, 800);
 
 	private GUI self;
@@ -60,15 +63,18 @@ public class GUI extends JFrame{
 
 	private JPanel drawingPanel;
 
+	private boolean editMode;
+
 	private JLabel lblUpdate;
 	private JLabel lblScore;
-	private JCheckBox chckBoxPaused;
+	private JLabel editLbl;
 	private JMenuBar menuBar;
-	private ButtonGroup speedGroup;
 
 	/** GUI constructor. Creates a window to show a game */
 	protected GUI() {
 		self = this;
+
+		editMode = false;
 
 		setMinimumSize(MAIN_WINDOW_SIZE);
 		setDefaultCloseOperation(EXIT_ON_CLOSE);
@@ -106,56 +112,16 @@ public class GUI extends JFrame{
 		JLabel lblSpace = new JLabel("\t\t");
 		bottomPanel.add(lblSpace);
 
-		JPanel speedPanel = new JPanel();
-		speedPanel.setBackground(SystemColor.textHighlight);
-		bottomPanel.add(speedPanel);
-
-		chckBoxPaused = new JCheckBox("Paused");
-		speedPanel.add(chckBoxPaused);
-
-		JRadioButton rdbtnVerySlow = new JRadioButton(VERY_SLOW_NAME);
-		speedPanel.add(rdbtnVerySlow);
-
-		JRadioButton rdbtnSlow = new JRadioButton(SLOW_NAME);
-		speedPanel.add(rdbtnSlow);
-
-		JRadioButton rdbtnReg = new JRadioButton(REGULAR_NAME);
-		rdbtnReg.setSelected(true);
-		speedPanel.add(rdbtnReg);
-
-		JRadioButton rdbtnFast = new JRadioButton(FAST_NAME);
-		speedPanel.add(rdbtnFast);
-
-		JRadioButton rdbtnVeryFast = new JRadioButton(VERY_FAST_NAME);
-		speedPanel.add(rdbtnVeryFast);
-
-		speedGroup = new ButtonGroup();
-		speedGroup.add(rdbtnVerySlow);
-		speedGroup.add(rdbtnSlow);
-		speedGroup.add(rdbtnReg);
-		speedGroup.add(rdbtnFast);
-		speedGroup.add(rdbtnVeryFast);
-
 		menuBar = new JMenuBar();
 		setJMenuBar(menuBar);
 
-		JMenu mnGame = new JMenu("Game");
-		menuBar.add(mnGame);
+		JMenu mnFile = new JMenu("File");
+		menuBar.add(mnFile);
 
-		JMenuItem mntmStart = new JMenuItem("Start");
-		mntmStart.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent arg0) {
-				if(game != null && !game.isRunning())
-					game.start();
-			}
-		});
-		
-		JMenuItem mntmLoadGame = new JMenuItem("Load Game");
+		JMenuItem mntmLoadGame = new JMenuItem("Open...");
 		mntmLoadGame.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				boolean paused = self.isPaused();
-				self.getCheckBoxPaused().setSelected(true);
 				if(game == null || !game.isRunning()){
 					JFileChooser f = new JFileChooser(new File(Game.MAP_DIRECTORY));
 					f.setDialogTitle("Select Game to Load");
@@ -165,91 +131,113 @@ public class GUI extends JFrame{
 					File fil = f.getSelectedFile();
 					if(fil != null && fil.exists()){
 						Game oldGame =  game;
-						game = new Game(oldGame.getManager(), fil);
-						oldGame.kill();
+						game = new Game(oldGame.getManagerClassname(), fil);
 						game.setGUI(self);
 						oldGame.getManager().setGame(game);
+						oldGame.kill();
 						drawingPanel.removeAll();
 						drawMap();
 					}
 				}
-				self.getCheckBoxPaused().setSelected(paused);
 			}
 		});
-		mnGame.add(mntmLoadGame);
-		mnGame.add(mntmStart);
+		mnFile.add(mntmLoadGame);
 
-		JMenuItem mntmNew = new JMenuItem("New");
-		mntmNew.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent e) {
-				boolean paused = self.isPaused();
-				self.getCheckBoxPaused().setSelected(true);
-				int returnVal = JOptionPane.YES_OPTION;
-				if(game != null){
-					returnVal = JOptionPane.showConfirmDialog(null, "Are You Sure You Want to Start a New Game?");
-				}
+		JMenuItem mntmStart = new JMenuItem("Start");
+		mntmStart.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent arg0) {
+				if(game != null && !game.isRunning() && ! editMode)
+					game.start();
+			}
+		});
+		mnFile.add(mntmStart);
+
+		JMenuItem mntmReset = new JMenuItem("Reset");
+		mntmReset.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent arg0) {
+				int returnVal = JOptionPane.showConfirmDialog(null, "Are You Sure You Want to Reset?");
 				if(returnVal == JOptionPane.YES_OPTION){
-					if(game != null){
-						game.kill();
-						drawingPanel.removeAll();
-					}
-
-					//					game = GUI.showCreateNewGame();
-					//					game.setGUI(self);
-
+					Game oldGame =  game;
+					game = new Game(oldGame.getManagerClassname(), oldGame.getFile());
+					game.setGUI(self);
+					oldGame.kill();
+					drawingPanel.removeAll();
 					drawMap();
+					setUpdateMessage("Game Reset");
+					updateScore(game.getScoreValue());
 				}
-				self.getCheckBoxPaused().setSelected(paused);
 			}
 		});
-		mnGame.add(mntmNew);
+		mnFile.add(mntmReset);
 
 		JMenuItem mntmQuit = new JMenuItem("Quit");
 		mntmQuit.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				boolean paused = self.isPaused();
-				self.getCheckBoxPaused().setSelected(true);
 				int returnVal = JOptionPane.showConfirmDialog(null, "Are You Sure You Want to Quit?");
 				if(returnVal == JOptionPane.YES_OPTION){
 					System.exit(0);
 				}
-				self.getCheckBoxPaused().setSelected(paused);
 			}
 		});
-		mnGame.add(mntmQuit);
+		mnFile.add(mntmQuit);
 
-		JMenu mnMap = new JMenu("Map");
-		menuBar.add(mnMap);
+		JMenu mnGame = new JMenu("Game");
+		menuBar.add(mnGame);
 
-		JMenuItem mntmSaveMap = new JMenuItem("Save Map");
+		JMenuItem mntmNew = new JMenuItem("New");
+		mntmNew.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				int returnVal = JOptionPane.YES_OPTION;
+				if(game != null){
+					returnVal = JOptionPane.showConfirmDialog(null, "Are You Sure You Want to Create a New Game?");
+				}
+				if(returnVal == JOptionPane.YES_OPTION){
+					if(game != null){
+						Game oldGame =  game;
+						game = new Game(oldGame.getManagerClassname());
+						game.setGUI(self);
+						oldGame.getManager().setGame(game);
+						oldGame.kill();
+					}
+					drawingPanel.removeAll();
+					drawMap();
+				}
+			}
+		});
+		mnGame.add(mntmNew);
+
+		JCheckBoxMenuItem chckbxmntmShowEditToolbar = new JCheckBoxMenuItem("Show Edit Toolbar");
+		chckbxmntmShowEditToolbar.addChangeListener(new ChangeListener() {
+			public void stateChanged(ChangeEvent e) {
+				if(game != null && ! game.isRunning()){
+					JCheckBoxMenuItem source = (JCheckBoxMenuItem)e.getSource();
+					editMode = source.isSelected();
+					if(editMode){
+						editLbl.setText("Editing");
+					} else {
+						editLbl.setText("");
+					}
+				}
+			}
+		});
+		mnGame.add(chckbxmntmShowEditToolbar);
+
+		JMenuItem mntmSaveMap = new JMenuItem("Save");
 		mntmSaveMap.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
-				boolean paused = self.isPaused();
-				self.getCheckBoxPaused().setSelected(true);
 				if(game != null && !game.isRunning()){
 					String mapName = JOptionPane.showInputDialog("Enter New Map Name");
 					if(mapName != null && !mapName.equals("")){
 						try {
 							game.writeGame(mapName);
 						} catch (IOException e) {
-							// TODO Auto-generated catch block
 							e.printStackTrace();
 						}
 					}
 				}
-				self.getCheckBoxPaused().setSelected(paused);
 			}
 		});
-		mnMap.add(mntmSaveMap);
-
-		JMenuItem mntmRearrangeMap = new JMenuItem("Re-Arrange Map");
-		mntmRearrangeMap.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent e) {
-				if(!game.isRunning())
-					drawMap();
-			}
-		});
-		mnMap.add(mntmRearrangeMap);
+		mnGame.add(mntmSaveMap);
 
 		JMenuItem mntmPrintJSON = new JMenuItem("Print Game JSON");
 		mntmPrintJSON.addActionListener(new ActionListener() {
@@ -257,7 +245,11 @@ public class GUI extends JFrame{
 				System.out.println(self.game.toJSONString());
 			}
 		});
-		mnMap.add(mntmPrintJSON);
+		mnGame.add(mntmPrintJSON);
+
+		editLbl = new JLabel("");
+		editLbl.setForeground(Color.RED);
+		menuBar.add(editLbl);
 
 		setVisible(true);
 		pack();
@@ -480,14 +472,15 @@ public class GUI extends JFrame{
 		return drawingPanel;
 	}
 
-	/** returns the menuCheckBoxPaused check box */
-	public JCheckBox getCheckBoxPaused(){
-		return chckBoxPaused;
-	}
-
-	/** Returns true if the GUI is currently paused false otherwise */
-	public boolean isPaused(){
-		return chckBoxPaused.isSelected();
+	/** Updates the gui to reflect the game's running state. Called internally by game. */
+	public void updateRunning(){
+		boolean running = game.isRunning();
+		if(running){
+			//TODO
+		}
+		else{
+			//TODO
+		}
 	}
 
 	/** Updates the GUI to show the newScore */
@@ -500,44 +493,23 @@ public class GUI extends JFrame{
 		return lblUpdate.getText();
 	}
 
-	/** Updates the GUI to show the given String as an update message */
+	/** Amount of time to wait after an update message is posted to delete it (in ms) */
+	private static final int MESSAGE_DELETE_TIME = 3000; 
+	
+	/** Updates the GUI to show the given String as an update message.
+	 * Also starts a timer thread to delete the message after a few seconds. */
 	public void setUpdateMessage(String newUpdate){
 		lblUpdate.setText(newUpdate);
-	}
-
-	protected static final int VERY_SLOW_SPEED = 200;
-	private static final String VERY_SLOW_NAME = "Very Slow";
-	protected static final int SLOW_SPEED = 80;
-	private static final String SLOW_NAME = "Slow";
-	protected static final int REGULAR_SPEED = 40;
-	private static final String REGULAR_NAME = "Regular";
-	protected static final int FAST_SPEED = 10;
-	private static final String FAST_NAME = "Fast";
-	protected static final int VERY_FAST_SPEED = 1;
-	private static final String VERY_FAST_NAME = "Very Fast";
-
-	/** Returns the speed of the game based on the selected radiobutton at the south of the GUI.
-	 * @return - either SLOW_SPEED, REGULAR_SPEED, or FAST_SPEED, based on the selected button.
-	 * 				returns REGULAR_SPEED if no button is selected.
-	 */
-	public int getGameSpeed(){
-		for(Enumeration<AbstractButton> e = speedGroup.getElements(); e.hasMoreElements(); ){
-			AbstractButton button = e.nextElement();
-			if(button.isSelected()){
-				String t = button.getText();
-				if(t.equals(VERY_SLOW_NAME))
-					return VERY_SLOW_SPEED;
-				if(t.equals(SLOW_NAME))
-					return SLOW_SPEED;
-				if(t.equals(REGULAR_NAME))
-					return REGULAR_SPEED;
-				if(t.equals(FAST_NAME))
-					return FAST_SPEED;
-				if(t.equals(VERY_FAST_NAME))
-					return VERY_FAST_SPEED;
+		Runnable r = new Runnable(){
+			@Override
+			public void run() {
+				try {
+					Thread.sleep(MESSAGE_DELETE_TIME);
+				} catch (InterruptedException e) {}
+				setUpdateMessage("  ");
 			}
-		}
-
-		return REGULAR_SPEED;
+		};
+		Thread t = new Thread(r);
+		t.start();
 	}
 }
