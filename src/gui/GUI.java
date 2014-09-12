@@ -256,13 +256,9 @@ public class GUI extends JFrame{
 
 	/** Draws all elements of the game on the threads. Used when the game is started */
 	private void drawMap(){
-		int maxX = drawingPanel.getBounds().width - NODE_BUFFER_SIZE*2;
-		int maxY = drawingPanel.getBounds().height - NODE_BUFFER_SIZE*2;
+		final int maxX = drawingPanel.getBounds().width - NODE_BUFFER_SIZE*2;
+		final int maxY = drawingPanel.getBounds().height - NODE_BUFFER_SIZE*2;
 
-		//Fix the positions of the nodes on the panel using the Force model.
-		//See the Flexor class for how this is done.
-		Flexor.flexNodes(drawingPanel, game.getMap().getNodes(), maxX, maxY);
-		
 		//Draw the edges on the map
 		for(Edge r : game.getMap().getEdges()){
 			Line l = r.getLine();
@@ -272,6 +268,26 @@ public class GUI extends JFrame{
 			l.updateToColorPolicy();
 			drawingPanel.remove(l);
 			drawingPanel.add(l);
+		}
+		
+		//Fix the positions of the nodes on the panel using the Force model.
+		//See the Flexor class for how this is done.
+		//Done in seperate thread so progress can be seen. drawingPanel is notified when this is done.
+		new Thread(new Runnable(){
+			@Override
+			public void run() {
+				synchronized(drawingPanel){
+					Flexor.flexNodes(drawingPanel, game.getMap().getNodes(), 20, 20, maxX, maxY);		
+				}
+			}
+		}).start();
+		
+		try {
+			synchronized(drawingPanel){
+				drawingPanel.wait();
+			}
+		} catch (InterruptedException e2) {
+			e2.printStackTrace();
 		}
 		
 		//Draw the parcels on the map
