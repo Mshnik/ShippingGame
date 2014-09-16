@@ -1,7 +1,8 @@
-package gui;
+package game;
 
 import java.awt.Point;
 
+/** A simple geometric vector class (a la Point) that allows doubles for its fields */
 public class Vector {
 
 	private double x;

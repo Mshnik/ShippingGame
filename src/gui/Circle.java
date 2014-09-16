@@ -4,6 +4,7 @@ import game.Node;
 import game.Parcel;
 import game.Score;
 import game.Truck;
+import game.Vector;
 
 import java.awt.BasicStroke;
 import java.awt.Color;

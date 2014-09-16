@@ -129,7 +129,6 @@ public class Flexor {
 
 		//Multiply the resulting vector by the scaling coefficient
 		v.mult(c4);
-		System.out.println(n.getName() + ":" + v);
 		
 		double x = Math.max(minX, Math.min(maxX, (nVec.getX() + v.getX())));
 		double y = Math.max(minY, Math.min(maxY, (nVec.getY() + v.getY())));
