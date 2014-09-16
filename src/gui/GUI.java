@@ -277,7 +277,7 @@ public class GUI extends JFrame{
 			@Override
 			public void run() {
 				synchronized(drawingPanel){
-					Flexor.flexNodes(drawingPanel, game.getMap().getNodes(), 20, 20, maxX, maxY);		
+					Flexor.flexNodes(drawingPanel, game.getMap().getNodes(), 50, 50, maxX, maxY);		
 				}
 			}
 		}).start();

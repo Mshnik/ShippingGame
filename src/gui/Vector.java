@@ -1,5 +1,7 @@
 package gui;
 
+import java.awt.Point;
+
 public class Vector {
 
 	private double x;
@@ -74,6 +76,16 @@ public class Vector {
 	/** Returns the length of this vector */
 	public double magnitude(){
 		return length();
+	}
+	
+	/** Returns the distance between this vector and that vector */
+	public double distance(Vector there){
+		return Point.distance(x, y, there.x, there.y);
+	}
+	
+	/** Returns a new vector from this to there */
+	public Vector to(Vector there){
+		return new Vector(there.x - x, there.y - y);
 	}
 
 	@Override
