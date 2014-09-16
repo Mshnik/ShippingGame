@@ -15,33 +15,62 @@ import javax.swing.JPanel;
 public class Flexor {
 
 	/** Parameters for the force-directed graph. See above link for explanation thereof. */
-	private static final double c1 = 3;
-	private static final double c2 = 30; //Repurposed a bit, not exactly as in algorithm. Now a conversion from graph dist to edge length
+	private static final double c1 = 1;
+	private static final double c2 = 100; //Repurposed a bit, not exactly as in algorithm. Now a conversion from graph dist to edge length
 	private static final double c3 = 1000;
-	private static final double c4 = 0.2;
+	private static final double c4 = 0.8;
 
-	/** Guard against 0 distance values */
-	private static final double MIN_DIST = 1;
-	
-	private static final int REPETITIONS = 100;
+	/** Guard against too small distance values */
+	private static final double MIN_DIST = 100;
+
+	private static final int REPETITIONS = 250;
 
 	public static void flexNodes(JPanel drawingPanel, HashSet<Node> nodes, 
-								int minX, int minY, int maxX, int maxY){
-		//Assign all initial locations randomly
+			int minX, int minY, int maxX, int maxY){
+		randomizeNodes(nodes, maxX, maxY, drawingPanel);
+
+		for(int i = 0; i < REPETITIONS; i++){
+			for(Node n : nodes){
+				addForce(drawingPanel, n, nodes, minX, minY, maxX, maxY);
+			}
+			
+			if(i == REPETITIONS/2)
+				fixEdgeOverlap(nodes);
+		}
+
+		drawingPanel.notifyAll();
+	}
+
+	/** Assigns locations of all nodes randomly */
+	private static void randomizeNodes(HashSet<Node> nodes, int maxX, int maxY, JPanel drawingPanel){
 		for(Node n : nodes){
 			n.updateGUILocation((int)(Math.random() * maxX),(int)(Math.random() * maxY)) ;
 			//Remove, re-add from drawing panel
 			drawingPanel.remove(n.getCircle());
 			drawingPanel.add(n.getCircle());
 		}
+	}
 
-		for(int i = 0; i < REPETITIONS; i++){
-			for(Node n : nodes){
-				addForce(drawingPanel, n, nodes, minX, minY, maxX, maxY);
+	/** Tries to find connected edges that have overlapping other edges and swaps their positions */
+	private static void fixEdgeOverlap(HashSet<Node> nodes){
+		for(Node n : nodes){
+			HashSet<Edge> nExits = n.getExits();
+			for(Edge e : nExits){
+				Node n2 = e.getOther(n);
+				HashSet<Edge> n2Exits = n2.getExits();
+
+				//Check to see if n and n2 each have a different exit that overlap.
+				for(Edge e3 : nExits){
+					if(e3 != e){
+						for(Edge e4 : n2Exits){
+							if(e3.getLine().intersects(e4.getLine()))
+								n.getCircle().switchLocation(n2.getCircle());
+						}
+					}
+				}
+
 			}
 		}
-		
-		drawingPanel.notifyAll();
 	}
 
 	private static void addForce(JPanel panel, Node n, HashSet<Node> otherNodes, int minX, int minY, int maxX, int maxY){
@@ -55,7 +84,7 @@ public class Flexor {
 				//If connected, calculate spring force
 				if(n.isConnectedTo(n2)){
 					double graphDist = n.getConnect(n2).getLength();
-					double force = c1 * Math.log(graphDist * c2 /dist);
+					double force = c1 * Math.log(Math.pow(graphDist,0.5) * c2 /dist);
 					a.mult(force);
 					//System.out.println("force " + force);
 					v.addVector(a);
@@ -68,17 +97,19 @@ public class Flexor {
 					v.addVector(a);
 				}
 			}
+
+
 		}
-		
+
 		//Multiply the resulting vector by the scaling coefficient
 		v.mult(c4);
 
 		int x = Math.max(minX, Math.min(maxX, (int)(n.getCircle().getX1() + v.getX())));
 		int y = Math.max(minY, Math.min(maxY, (int)(n.getCircle().getY1() + v.getY())));
-		
+
 		//Apply the vector v to n's circle
 		n.updateGUILocation(x, y);
-		
+
 		//Repaint to see the changes
 		panel.repaint();
 	}

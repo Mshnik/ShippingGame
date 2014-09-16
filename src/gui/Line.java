@@ -189,7 +189,7 @@ public class Line  extends JPanel{
 		return represents;
 	}
 
-	private static final int ON_LINE_TOLERANCE = 5;	//Number of pixels of tolerance for a point to be on the line
+	private static final int ON_LINE_TOLERANCE = 20;	//Number of pixels of tolerance for a point to be on the line
 
 	/** Returns true if Point p is within ON_LINE_TOLERANCE pixels of this line */
 	public boolean isOnLine(Point p){

@@ -100,7 +100,7 @@ public class Score {
 	 * <br> 9 : 17
 	 * <br> 10 : 22   
 	 * @throws IllegalArgumentException if speed is out of the range [min,max] speed.
-	 * @returns -Cost, calculated using the above table  
+	 * @return -Cost, calculated using the above table  
 	 */
 	public static int cost(int speed) throws IllegalArgumentException{
 		if (speed < Truck.MIN_SPEED || speed > Truck.MAX_SPEED)
