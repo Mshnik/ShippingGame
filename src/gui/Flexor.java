@@ -24,7 +24,7 @@ public class Flexor {
 	/** Guard against too small distance values */
 	private static final double MIN_DIST = 10;
 
-	private static final int REPETITIONS = 1000;
+	private static final int REPETITIONS = 100;
 
 	protected static void flexNodes(JPanel drawingPanel, HashSet<Node> nodes, 
 			int minX, int minY, int maxX, int maxY){

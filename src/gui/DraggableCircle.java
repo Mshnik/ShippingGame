@@ -48,8 +48,7 @@ public class DraggableCircle extends Circle {
 			}
 
 			@Override
-			public void mouseMoved(MouseEvent e) {
-			}
+			public void mouseMoved(MouseEvent e) {}
 			
 		};
 		
