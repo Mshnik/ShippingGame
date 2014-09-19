@@ -3,10 +3,10 @@ import gui.Circle;
 import gui.DraggableCircle;
 
 import java.awt.Color;
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.concurrent.Semaphore;
 
 
@@ -34,12 +34,12 @@ public class Node implements MapElement, UserData{
 	private HashMap<Truck, Boolean> truckHere; //Maps truck -> is here
 	
 	private String name;
-	private HashSet<Edge> exits = new HashSet<Edge>();
-	private HashSet<Parcel> parcels = new HashSet<Parcel>();
+	private HashSet<Edge> exits = new HashSet<Edge>();			//Edges leaving this Node
+	private HashSet<Parcel> parcels = new HashSet<Parcel>();	//Parcels currently here and not on truck
 	
 	private Object userData;
 	
-	private Circle circle;
+	private Circle circle;	//Circle that represents this graphically
 
 	/** Constructor for a named Node with no starting exits but with a specific circle drawing
 	 * @param g - the Game this Node belongs to
@@ -98,9 +98,12 @@ public class Node implements MapElement, UserData{
 
 	/** Returns a random exit from exits */
 	public Edge getRandomExit(){
-		ArrayList<Edge> exitsCopy = new ArrayList<Edge>(exits.size());
-		exitsCopy.addAll(exits);
-		return exitsCopy.get((int)(Math.random()*exits.size()));
+		Iterator<Edge> it = exits.iterator();
+		Edge e = null;
+		//Move forward along the iterator a random number of times.
+		for(int i = 0; i < (int)(Math.random() * exits.size()) + 1; i++)
+			e = it.next();
+		return e;
 	}
 
 	/** Sets the value of exits to newExits */
@@ -128,7 +131,8 @@ public class Node implements MapElement, UserData{
 		return exits.size();
 	}
 
-	/** Returns true if exits contains Edge r, false otherwise */
+	/** Returns true if exits contains Edge r (r is an edge connected to this), 
+	 * false otherwise */
 	public boolean isExit(Edge r){
 		return exits.contains(r);
 	}
@@ -168,13 +172,7 @@ public class Node implements MapElement, UserData{
 	/** Returns a random parcel at this node 
 	 * @throws InterruptedException */
 	public Parcel getRandomParcel() throws InterruptedException{
-		parcelLock.acquire();
-		ArrayList<Parcel> parcelClone = new ArrayList<Parcel>();
-		parcelClone.addAll(parcels);
-		int i = (int)(Math.random()*parcelClone.size());
-		Parcel p = parcelClone.get(i);
-		parcelLock.release();
-		return p;
+		return Main.randomElement(parcels, parcelLock);
 	}
 	
 	/** Returns true if parcel p is on this node, false otherwise 
@@ -224,8 +222,7 @@ public class Node implements MapElement, UserData{
 	/** Returns the userData stored in this Node. May be null if the user has not yet given this Node userData 
 	 * @throws InterruptedException */
 	public Object getUserData(){
-		Object o = userData;
-		return o;
+		return userData;
 	}
 	
 	/** Sets the value of userData to Object uData. To erase the current userData just pass in null */

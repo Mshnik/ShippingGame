@@ -66,22 +66,22 @@ public abstract class Manager implements Runnable{
 	public abstract void truckNotification(Truck t, Notification message);
 	
 	/** Returns the Game this Manager belongs to */
-	public Game getGame(){
+	public final Game getGame(){
 		return game;
 	}
 
 	/** Returns the Map for this Game */
-	public Map getMap(){
+	public final Map getMap(){
 		return game.getMap();
 	}
 
 	/** Returns the Trucks in this Game */
-	public ArrayList<Truck> getTrucks(){
+	public final ArrayList<Truck> getTrucks(){
 		return game.getTrucks();
 	}
 
 	/** Returns the Parcels in this Game */
-	public HashSet<Parcel> getParcels(){
+	public final HashSet<Parcel> getParcels(){
 		return game.getParcels();
 	}
 

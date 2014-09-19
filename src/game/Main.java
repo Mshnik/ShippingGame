@@ -3,6 +3,8 @@ package game;
 import gui.GUI;
 
 import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.Iterator;
 import java.util.concurrent.Semaphore;
 
 /** Game starting methods. Also serves as a util holder */
@@ -98,6 +100,22 @@ public class Main {
 	/** Returns the given string with quotes added around it */
 	public static String addQuotes(String s){
 		return "\"" + s + "\"";
+	}
+	
+	/** Returns a random element of the given set. Locks lock before doing processing.
+	 * If lock is null, doesn't lock. */
+	protected static <T> T randomElement(HashSet<T> elms, Semaphore lock){
+		if(lock != null)
+			try {
+				lock.acquire();
+			} catch (InterruptedException e) {}
+		Iterator<T> it = elms.iterator();
+		T val = null;
+		for(int i = 0; i < (int)(Math.random() * elms.size() - 1) + 1; i++){
+			val = it.next();
+		}
+		if(lock != null) lock.release();
+		return val;
 	}
 	
 }

@@ -1,7 +1,5 @@
 package game;
 
-import java.util.ArrayList;
-import java.util.Collections;
 import java.util.HashSet;
 import java.util.Iterator;
 
@@ -26,79 +24,14 @@ public class Map implements JSONString{
 		nodes = new HashSet<Node>();
 	}
 
-	/** Constructor. Initializes a randomized map with the given inputs
-	 * @param g - The game this map belongs to
-	 * @param nodeNames - The nodes in this map. Also determines the number of nodes
-	 * @param numbEdges - The number of Roads in this map. Guarantees that the map is connected.
-	 * @param minLength - The minimum length of edges
-	 * @param avgLength - The average length of edges
-	 * @param maxLength - The maximum length of edges
-	 */
-	protected Map(Game g, String[] nodeNames, int numbEdges, int minLength, int avgLength, int maxLength){
-		edges = new HashSet<Edge>();
-
-		ArrayList<Node> tempNodes = new ArrayList<Node>(nodeNames.length);
-
-		truckHome = new Node(g, TRUCK_HOME_NAME, null);
-
-		tempNodes.add(truckHome);
-
-		for(String name : nodeNames)
-			tempNodes.add(new Node(g, name, null));
-
-		for(int i = 0; i < tempNodes.size() -1; i++){
-			tempNodes.get(i).connectTo(tempNodes.get(i+1), Edge.DUMMY_LENGTH);
-			numbEdges--;
-		}
-
-		while(numbEdges > 0){
-			int rand = (int)(Math.random()*tempNodes.size());
-			int randTwo = (int)(Math.random()*tempNodes.size());
-
-			if(rand != randTwo && rand != (randTwo - 1) && rand != (randTwo + 1) ){
-				if(! tempNodes.get(rand).isConnectedTo(tempNodes.get(randTwo))){
-					tempNodes.get(rand).connectTo(tempNodes.get(randTwo), Edge.DUMMY_LENGTH);
-					numbEdges--;
-				}
-			}
-		}
-
-		Collections.shuffle(tempNodes);
-
-		boolean flip = true;
-		int randLength = 0;
-		for(Node n : tempNodes){
-			for(Edge r : n.getTrueExits()){
-				edges.add(r);
-				if(flip)
-					randLength = (int)(Math.random()*(maxLength - minLength))+minLength;
-				else
-					randLength = maxLength - randLength;
-
-				r.setLength(randLength);
-
-				flip = !flip;
-			}
-		}
-
-		nodes = new HashSet<Node>();
-		nodes.addAll(tempNodes);
-	}
-
 	/** Returns a random node in this map */
 	public Node getRandomNode(){
-		int i = (int)(Math.random()*nodes.size());
-		ArrayList<Node> nodesCopy = new ArrayList<Node>();
-		nodesCopy.addAll(nodes);
-		return nodesCopy.get(i);
+		return Main.randomElement(nodes, null);
 	}
 
 	/** Returns a random edge in this map */
 	public Edge getRandomEdge(){
-		int i = (int)(Math.random()*edges.size());
-		ArrayList<Edge> edgesCopy = new ArrayList<Edge>();
-		edgesCopy.addAll(edges);
-		return edgesCopy.get(i);
+		return Main.randomElement(edges, null);
 	}
 
 	/** Returns a HashSet containing all the Nodes in this map. Allows addition and removal of Nodes to this map */
@@ -150,6 +83,7 @@ public class Map implements JSONString{
 	 * edges in edges, false otherwise.
 	 * 
 	 * Used for GUI intersection detection, not useful outside of the GUI context.
+	 * Has nothing to say about the non-GUI version of the map
 	 */
 	public boolean isIntersection(){
 		for(Edge r : edges){
@@ -169,6 +103,7 @@ public class Map implements JSONString{
 	 * If no two edges intersect, returns null.
 	 * 
 	 * Used for GUI intersection detection, not useful outside of the GUI context.
+	 * Has nothing to say about the non-GUI version of the map
 	 */
 	public Edge[] getAIntersection(){
 		for(Edge r : edges){

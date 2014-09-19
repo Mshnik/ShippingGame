@@ -20,7 +20,7 @@ public class MyManager extends Manager {
 				e1.printStackTrace();
 			}
 			try {
-				t.setSpeed(i);
+				t.setSpeed(Truck.MAX_SPEED);
 			} catch (InterruptedException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
@@ -33,7 +33,6 @@ public class MyManager extends Manager {
 	@Override
 	public void truckNotification(Truck t, Notification message){
 		if(game.isRunning()){
-			System.out.println("" + t + ":" + message);
 			switch(message){
 			case PARCEL_AT_NODE: 
 				if(t.getLoad() == null){
@@ -57,14 +56,6 @@ public class MyManager extends Manager {
 							t.addToTravel(t.getGoingTo().getRandomExit());
 					} catch(InterruptedException e){
 
-					}
-
-					//Do some calculation or something
-					try {
-						Thread.sleep(1000);
-					} catch (InterruptedException e1) {
-						// TODO Auto-generated catch block
-						e1.printStackTrace();
 					}
 				}
 				break;

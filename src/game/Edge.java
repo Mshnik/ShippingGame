@@ -37,16 +37,16 @@ public class Edge implements MapElement, Colorable, UserData{
 	private static int maxLength = DEFAULT_MAX_LENGTH;
 
 	private Node[] exits;	//The Nodes this edge connects. Always has length 2.
-	private int length;		//The length of this line
+	private int length;		//The length of this edge. Not correlated with the graphical distance
 
 	private Semaphore truckLock; //Lock that trucks must acquire in order to make changes to this edge.
 
 	private int truckHereCount; 			   //A count of the trucks here (mappings in truckHere to true)
 	private HashMap<Truck, Boolean> truckHere; //Maps truck -> is here
 	
-	private Object userData;
+	private Object userData; //User data (if any) stored in this edge
 
-	private Line line;
+	private Line line; //Graphical representation of this Edge
 
 	/** Constructor. Accepts a non-null Node array of length 2 to be exits and an integer length
 	 * lengthOfRoad must be positive and non-zero
@@ -151,12 +151,12 @@ public class Edge implements MapElement, Colorable, UserData{
 		exits = newExits;
 	}
 
-	/** Returns the length of this line */
+	/** Returns the length of this Edge. Uncorrelated with its graphical length on the GUI */
 	public int getLength(){
 		return length;
 	}
 
-	/** Sets the length of this line.
+	/** Sets the length of this Edge. Uncorrelated with its graphical length on the GUI
 	 * @throws IllegalArgumentException if lengthOfRoad is less than 1 and not equal to DUMMY_LENGTH
 	 */
 	protected void setLength(int lengthOfRoad) throws IllegalArgumentException{
@@ -181,12 +181,12 @@ public class Edge implements MapElement, Colorable, UserData{
 		}
 	}
 
-	/** Returns the maximum length of all edges */
+	/** Returns the maximum length of all edges on the current map */
 	public static int getMaxLength(){
 		return maxLength;
 	}
 
-	/** Returns the minimum length of all edges */
+	/** Returns the minimum length of all edges on the current map */
 	public static int getMinLength(){
 		return minLength;
 	}
@@ -224,12 +224,12 @@ public class Edge implements MapElement, Colorable, UserData{
 		return null;
 	}
 
-	/** Returns the Line that represents this node graphically */
+	/** Returns the Line that represents this edge graphically */
 	public Line getLine(){
 		return line;
 	}
 
-	/** Returns the userData stored in this Node. May be null if the user has not yet given this Node userData */
+	/** Returns the userData stored in this edge. May be null if the user has not yet given this Node userData */
 	public Object getUserData(){
 		return userData;
 	}
@@ -239,7 +239,7 @@ public class Edge implements MapElement, Colorable, UserData{
 		userData = uData;
 	}
 
-	/** Returns the color this Edge, as it is pained on the GUI. Color
+	/** Returns the color of this Edge, as it is pained on the GUI. Color
 	 * of edges has no game significance.
 	 */
 	public Color getColor(){
@@ -310,7 +310,7 @@ public class Edge implements MapElement, Colorable, UserData{
 	}
 
 	@Override
-	/** Returns true if a truck is currently at this node, false otherwise */
+	/** Returns true if the given truck is currently traveling this edge, false otherwise */
 	public boolean isTruckHere(Truck t) throws InterruptedException{
 		truckLock.acquire();
 		Boolean b = truckHere.get(t);
@@ -321,7 +321,7 @@ public class Edge implements MapElement, Colorable, UserData{
 	}
 	
 	@Override
-	/** Returns the number of trucks here */
+	/** Returns the number of trucks here - currently traveling this edge */
 	public int trucksHere() throws InterruptedException{
 		truckLock.acquire();
 		int i = truckHereCount;
@@ -330,7 +330,7 @@ public class Edge implements MapElement, Colorable, UserData{
 	}
 
 	@Override
-	/** Repaints itself. Values of x and y unused. */
+	/** Repaints itself. Values of x and y unused, but included to comply with interface. */
 	public void updateGUILocation(int x, int y) {
 		getLine().repaint();
 	}

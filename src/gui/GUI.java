@@ -176,28 +176,6 @@ public class GUI extends JFrame{
 		JMenu mnGame = new JMenu("Game");
 		menuBar.add(mnGame);
 
-		JMenuItem mntmNew = new JMenuItem("New");
-		mntmNew.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent e) {
-				int returnVal = JOptionPane.YES_OPTION;
-				if(game != null){
-					returnVal = JOptionPane.showConfirmDialog(null, "Are You Sure You Want to Create a New Game?");
-				}
-				if(returnVal == JOptionPane.YES_OPTION){
-					if(game != null){
-						Game oldGame =  game;
-						game = new Game(oldGame.getManagerClassname());
-						game.setGUI(self);
-						oldGame.getManager().setGame(game);
-						oldGame.kill();
-					}
-					drawingPanel.removeAll();
-					drawMap();
-				}
-			}
-		});
-		mnGame.add(mntmNew);
-
 		JCheckBoxMenuItem chckbxmntmShowEditToolbar = new JCheckBoxMenuItem("Show Edit Toolbar");
 		chckbxmntmShowEditToolbar.addChangeListener(new ChangeListener() {
 			public void stateChanged(ChangeEvent e) {

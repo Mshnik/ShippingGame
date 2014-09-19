@@ -11,6 +11,9 @@ import java.awt.Color;
  */
 public class Score {
 
+	/** Milliseconds per frame. Wait time between travel updates*/
+	public static final int FRAME = 40;
+	
 	/** The score cost of idling for a frame, per truck.
 	 * So you are losing points at a slow rate constantly,
 	 * you can't compute the optimal solution forever. 
@@ -122,8 +125,8 @@ public class Score {
 			return -(speed);
 	}
 
-	private int score;
-	private Game game;
+	private int score; //The score maintained by this score object
+	private Game game; //The game this score belongs to
 
 	/** Constructor. Creates an instance to keep track of the score 
 	 * @param g - the Game this Score belongs to*/

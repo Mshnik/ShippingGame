@@ -34,19 +34,19 @@ public class Truck implements MapElement, Runnable, Colorable, UserData{
 	private static final int WAIT_TIME = 5;
 	protected static final int NUMB_DEFAULT_TRAVEL_DIRECTIONS = 200;
 
-	private String name;
-	private Circle circle;
+	private String name;			//The name of this truck
+	private Circle circle;			//The circle that represents this Graphically
 	private Color color = Circle.DEFAULT_TRUCK_COLOR;
 
-	private Queue<Edge> travel;
+	private Queue<Edge> travel; 	//This truck's queue of travel directions, FIFO.
 
-	private Parcel load;
+	private Parcel load;			//The Parcel (if any) this truck is currently holding
 	private Node location;			//The Node this truck is currently at
 	private Node travelingTo;		//The Node at the end of the Edge that this truck is currently on
 	private Node goingTo;			//The Node this truck will be at once it finishes its current travel queue.
 	private Edge travelingAlong;	//The Edge this Truck is currently traveling along
 
-	private Status status;
+	private Status status;			//This truck's status, either waiting or traveling
 
 	private long lastTravelTime;    //System time (ms) when this truck last finished travel
 
@@ -55,14 +55,15 @@ public class Truck implements MapElement, Runnable, Colorable, UserData{
 	public static final int MIN_SPEED = 1;  //Min value for truck's speed
 
 	private int speed; //The number of units this moves per frame when traveling. Must be between min and max
-	private Semaphore speedLock; //Lock for getting/changing speed
-	private Semaphore locLock;   // A lock associated with the changing of locaiton, travelingTo, goingTo, etc.
-	                             //Lock should be released before any notifications are fired.
-	private Semaphore statusLock; //A Lock for the status of this truck.
+	private Semaphore speedLock; 	//Lock for getting/changing speed
+	private Semaphore locLock;   	// A lock associated with the changing of locaiton, travelingTo, goingTo, etc.
+	                             	//Lock should be released before any notifications are fired.
+	private Semaphore statusLock; 	//A Lock for the status of this truck.
+	private Semaphore parcelLock;	//A Lock for the parcel this truck is carrying
 	
 	private Object userData;
 
-	private final Game game;
+	private final Game game;		//The game this truck belongs to
 
 	/** Constructor for the Truck Class. Uses a default color
 	 * @param g - the Game this Truck belongs to
@@ -91,6 +92,7 @@ public class Truck implements MapElement, Runnable, Colorable, UserData{
 		speedLock = new Semaphore(1);
 		locLock = new Semaphore(1);
 		statusLock = new Semaphore(1);
+		parcelLock = new Semaphore(1);
 
 		location = startLocation;
 		travelingTo = null;
@@ -304,7 +306,8 @@ public class Truck implements MapElement, Runnable, Colorable, UserData{
 	 * if no truck is being carried
 	 */
 	public Parcel getLoad(){
-		return load;
+		Parcel p = load;
+		return p;
 	}
 
 	/** Returns the Color of this Truck */
@@ -383,9 +386,11 @@ public class Truck implements MapElement, Runnable, Colorable, UserData{
 			throw new RuntimeException("Can't Pickup Parcel with non-null load. Already holding a Parcel.");
 
 		if(location.getTrueParcels().contains(p)){
+			parcelLock.acquire();
 			location.getTrueParcels().remove(p);
 			load = p;
 			load.loadUnload(this, Truck.LOAD);
+			parcelLock.release();
 
 			game.getScore().changeScore(Score.PICKUP_COST);
 			game.getManager().truckNotification(this, Manager.Notification.PICKED_UP_PARCEL);
@@ -398,11 +403,13 @@ public class Truck implements MapElement, Runnable, Colorable, UserData{
 		if(load == null)
 			throw new RuntimeException("Can't Drop Off a null parcel. No Parcel to drop off.");
 
+		parcelLock.acquire();
 		location.getTrueParcels().add(load);
 		load.loadUnload(this, Truck.UNLOAD);
+		load = null;
+		parcelLock.release();
 		game.getScore().changeScore(Score.DROPOFF_COST);
 		game.getManager().truckNotification(this, Manager.Notification.DROPPED_OFF_PARCEL);
-		load = null;
 
 	}
 
@@ -496,7 +503,7 @@ public class Truck implements MapElement, Runnable, Colorable, UserData{
 			int progress = 0;
 			long startTravelTime = System.currentTimeMillis();
 			while(progress < r.getLength()){
-				Thread.sleep(game.getGameSpeed());
+				Thread.sleep(Score.FRAME);
 
 				//Get the speed lock, begin speed and cost computations
 				speedLock.acquire();

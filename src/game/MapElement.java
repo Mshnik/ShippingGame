@@ -13,15 +13,16 @@ import org.json.JSONString;
  */
 public interface MapElement extends JSONString, Colorable{
 
-	/** The key for the name field */
+	/** The key for the name field for JSON implementations. */
 	public static final String NAME_TOKEN = "name";
-	/** The key for the color field */
+	/** The key for the color field for JSON implementations.  */
 	public static final String COLOR_TOKEN = "color";
-	/** The key for the location field. May be a single value (in parcel), or an array (in edge) */
+	/** The key for the location field for JSON implementations. 
+	 * May be a single value (in parcel), or an array (in edge) */
 	public static final String LOCATION_TOKEN = "location";
-	/** The key for the destination field. */
+	/** The key for the destination field for JSON implementations. */
 	public static final String DESTINATION_TOKEN = "destination";
-	/** The key for the length field. */
+	/** The key for the length field for JSON implementations. */
 	public static final String LENGTH_TOKEN = "length";
 	
 	/** The Name this Object has when drawn on the map */
