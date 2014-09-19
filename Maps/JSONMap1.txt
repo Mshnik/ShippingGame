@@ -47,63 +47,63 @@
 },
 "edge-0":{
 "location":["Los Angeles","Dallas"],
-"length":1
+"length":10
 },
 "edge-1":{
 "location":["DC","Los Angeles"],
-"length":39
+"length":390
 },
 "edge-2":{
 "location":["Truck Depot","New York"],
-"length":59
+"length":590
 },
 "edge-3":{
 "location":["Atlanta","Miami"],
-"length":22
+"length":220
 },
 "edge-4":{
 "location":["Richmond","Orlando"],
-"length":27
+"length":270
 },
 "edge-5":{
 "location":["Albany","Boston"],
-"length":5
+"length":50
 },
 "edge-6":{
 "location":["Chicago","DC"],
-"length":52
+"length":520
 },
 "edge-7":{
 "location":["Boston","Richmond"],
-"length":33
+"length":330
 },
 "edge-8":{
 "location":["Seattle","DC"],
-"length":8
+"length":80
 },
 "edge-9":{
 "location":["San Francisco","Atlanta"],
-"length":12
+"length":120
 },
 "edge-10":{
 "location":["New York","Los Angeles"],
-"length":46
+"length":460
 },
 "edge-11":{
 "location":["New York","Chicago"],
-"length":19
+"length":190
 },
 "edge-12":{
 "location":["Truck Depot","Chicago"],
-"length":40
+"length":400
 },
 "edge-13":{
 "location":["DC","New York"],
-"length":21
+"length":210
 },
 "edge-14":{
 "location":["New York","Albany"],
-"length":20
+"length":200
 },
 "edge-15":{
 "location":["Portland","Albany"],
@@ -111,15 +111,15 @@
 },
 "edge-16":{
 "location":["Miami","Seattle"],
-"length":38
+"length":380
 },
 "edge-17":{
 "location":["Dallas","San Francisco"],
-"length":48
+"length":480
 },
 "edge-18":{
 "location":["Seattle","Portland"],
-"length":57
+"length":570
 }
 },
 "truck-0":{
