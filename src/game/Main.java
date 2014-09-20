@@ -67,7 +67,6 @@ public class Main {
 	 * @throws InterruptedException */
 	public static int fib(int i) throws InterruptedException{
 		fibLock.acquire();
-		System.out.println(fibCalc.toString());
 		if (i < 0){
 			fibLock.release();
 			return -1;
