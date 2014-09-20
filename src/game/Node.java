@@ -71,6 +71,11 @@ public class Node implements MapElement, UserData{
 		parcelLock = new Semaphore(1);
 		truckLock = new Semaphore(1);
 	}
+	
+	/** Returns the game this Node belongs to */
+	public Game getGame(){
+		return game;
+	}
 
 	/** Returns the name of this Node */
 	public String getName(){
@@ -190,7 +195,7 @@ public class Node implements MapElement, UserData{
 	 * @param length the length of the Edge
 	 */
 	protected void connectTo(Node other, int length){
-		Edge r = new Edge(this, other, length);
+		Edge r = new Edge(game, this, other, length);
 		addExit(r);
 		other.addExit(r);
 	}

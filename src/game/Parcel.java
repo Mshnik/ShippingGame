@@ -70,6 +70,11 @@ public class Parcel implements MapElement, Colorable, UserData{
 
 		parcelLock = new Semaphore(1);
 	}
+	
+	/** Returns the game this Parcel belongs to */
+	public Game getGame(){
+		return game;
+	}
 
 	/** Returns the start Node of this Parcel */
 	public Node getStart(){

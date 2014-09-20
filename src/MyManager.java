@@ -12,7 +12,6 @@ public class MyManager extends Manager {
 	public void run() {
 		game = getGame();
 		trucks = game.getTrucks();
-		int i = Truck.MIN_SPEED;
 		for(Truck t : trucks){
 			try {
 				t.addToTravel(t.getLocation().getRandomExit());
@@ -25,8 +24,6 @@ public class MyManager extends Manager {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
-			i++;
-			i++;
 		}
 	}
 

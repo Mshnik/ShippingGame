@@ -48,4 +48,7 @@ public interface MapElement extends JSONString, Colorable{
 	/** Update the location of this on the gui */
 	public void updateGUILocation(int x, int y);
 	
+	/** Returns the game this mapElement belogns to */
+	public Game getGame();
+	
 }

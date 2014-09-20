@@ -307,7 +307,7 @@ public class GUI extends JFrame{
 		game = g;
 		game.setGUI(this);
 		drawMap();
-		Edge.updateMinMaxLength();
+		game.getMap().updateMinMaxLength();
 	}
 
 	/** Returns the panel that the map is drawn on */

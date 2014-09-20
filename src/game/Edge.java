@@ -3,7 +3,6 @@ import gui.Line;
 
 import java.awt.Color;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.concurrent.Semaphore;
 
 /** The Edge Class in ShippingGame allows creation of the connections between Nodes that Trucks can Travel along
@@ -28,13 +27,8 @@ public class Edge implements MapElement, Colorable, UserData{
 	/** The length of "Blank" Edges. Should be later changed to an actual length value */
 	protected static final int DUMMY_LENGTH = Integer.MIN_VALUE;
 
-	private static HashSet<Edge> edges = new HashSet<Edge>();
-
-	public static final int DEFAULT_MIN_LENGTH = Integer.MAX_VALUE;
-	public static final int DEFAULT_MAX_LENGTH = 0;
-
-	private static int minLength = DEFAULT_MIN_LENGTH;
-	private static int maxLength = DEFAULT_MAX_LENGTH;
+	public static final int DEFAULT_MIN_LENGTH = Integer.MAX_VALUE;	//Max val an edge can have for length
+	public static final int DEFAULT_MAX_LENGTH = 0;					//Min val an edge can have for length
 
 	private Node[] exits;	//The Nodes this edge connects. Always has length 2.
 	private int length;		//The length of this edge. Not correlated with the graphical distance
@@ -47,6 +41,8 @@ public class Edge implements MapElement, Colorable, UserData{
 	private Object userData; //User data (if any) stored in this edge
 
 	private Line line; //Graphical representation of this Edge
+	
+	private final Game game;	//The game this Edge belongs to
 
 	/** Constructor. Accepts a non-null Node array of length 2 to be exits and an integer length
 	 * lengthOfRoad must be positive and non-zero
@@ -55,8 +51,8 @@ public class Edge implements MapElement, Colorable, UserData{
 	 * 		if lengthOfRoad is less than 1 and not equal to Edge.DUMMY_LENGTH
 	 * 		if either of the nodes are null
 	 * 		if exits[0] and exits[1] are the same node*/
-	protected Edge(Node exits[], int lengthOfRoad) throws IllegalArgumentException{
-		this(exits[0], exits[1], lengthOfRoad);
+	protected Edge(Game g, Node exits[], int lengthOfRoad) throws IllegalArgumentException{
+		this(g, exits[0], exits[1], lengthOfRoad);
 
 		if(exits.length != 2)
 			throw new IllegalArgumentException("Incorrectly sized Node Array Passed into Edge Constructor");
@@ -68,7 +64,7 @@ public class Edge implements MapElement, Colorable, UserData{
 	 * 		if lengthOfRoad is less than 1 and not equal to Edge.DUMMY_LENGTH
 	 * 		if either of the nodes are null
 	 * 		if firstExit and secondExit are the same node*/
-	protected Edge(Node firstExit, Node secondExit, int lengthOfRoad) throws IllegalArgumentException{
+	protected Edge(Game g, Node firstExit, Node secondExit, int lengthOfRoad) throws IllegalArgumentException{
 
 		if(firstExit == null)
 			throw new IllegalArgumentException("First Node Passed into Edge constructor is null");
@@ -82,7 +78,7 @@ public class Edge implements MapElement, Colorable, UserData{
 		if(lengthOfRoad <= 0 && lengthOfRoad != DUMMY_LENGTH)
 			throw new IllegalArgumentException("lengthOfRoad value " + lengthOfRoad + " is an illegal value.");
 
-
+		game = g;
 		exits = new Node[2];
 		exits[0] = firstExit;
 		exits[1] = secondExit;
@@ -93,12 +89,15 @@ public class Edge implements MapElement, Colorable, UserData{
 		truckHereCount = 0;
 
 		length = lengthOfRoad;
-		updateMinMaxLength();
 
 		line = new Line(null, null, this);
-		edges.add(this);
 	}
 
+	/** Returns the Game this Edge belongs to. */
+	public Game getGame(){
+		return game;
+	}
+	
 	/** Returns the exits of this line, a length 2 array of Nodes */
 	protected Node[] getTrueExits(){
 		return exits;
@@ -164,31 +163,6 @@ public class Edge implements MapElement, Colorable, UserData{
 			throw new IllegalArgumentException("lengthOfRoad value " + lengthOfRoad + " is an illegal value.");
 
 		length = lengthOfRoad;
-		updateMinMaxLength();
-	}
-
-	/** Updates the Minimum and Maximum lengths of all edge instances.
-	 * Called internally during processing, no need to call this after game initialized. */
-	public static void updateMinMaxLength(){
-		minLength = DEFAULT_MIN_LENGTH;
-		maxLength = DEFAULT_MAX_LENGTH;
-
-		for(Edge e : edges){
-			if(e.length != DUMMY_LENGTH){
-				minLength = Math.min(minLength, e.length);
-				maxLength = Math.max(maxLength, e.length);
-			}
-		}
-	}
-
-	/** Returns the maximum length of all edges on the current map */
-	public static int getMaxLength(){
-		return maxLength;
-	}
-
-	/** Returns the minimum length of all edges on the current map */
-	public static int getMinLength(){
-		return minLength;
 	}
 
 	/** Returns true if Node node is one of the exits of this Edge, false otherwise */

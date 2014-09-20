@@ -13,27 +13,6 @@ public class Score {
 
 	/** Milliseconds per frame. Wait time between travel updates*/
 	public static final int FRAME = 40;
-	
-	/** The score cost of idling for a frame, per truck.
-	 * So you are losing points at a slow rate constantly,
-	 * you can't compute the optimal solution forever. 
-	 * Lower than any cost of travel for a frame, but not 0.
-	 */
-	public static final int WAIT_COST = -1;
-
-	/** One time cost incurred when a truck picks up a parcel */
-	public static final int PICKUP_COST = -100;
-
-	/** One time cost incurred when a truck drops off a parcel */
-	public static final int DROPOFF_COST = -100;
-
-	/** The score value of successfully delivering one parcel to its final destination */
-	public static final int PAYOFF = 5000;
-
-	/** The score multiplier of successfully delivering a parcel using the correct color of Truck.
-	 * Thus, the score value of  an on-color delivery is PAYOFF * ON_COLOR_MULTIPLIER
-	 */
-	public static final int ON_COLOR_MULTIPLIER = 3;
 
 	/** The Colors that are in the game. Colors of Trucks and of Parcels are chosen from this Array.
 	 * Other colors are not allowed in the game, as setColor(Color c) methods must check for c being

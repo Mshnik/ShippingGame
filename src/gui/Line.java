@@ -1,5 +1,6 @@
 package gui;
 import game.Edge;
+import game.Map;
 import game.MapElement;
 
 import java.awt.BasicStroke;
@@ -146,12 +147,13 @@ public class Line  extends JPanel{
 	}
 
 	private Color getDistGradientColor(){
-		if(Edge.getMaxLength() == Edge.DEFAULT_MAX_LENGTH && Edge.getMinLength() == Edge.DEFAULT_MIN_LENGTH)
+		Map m = represents.getGame().getMap();
+		if(m.getMaxLength() == Edge.DEFAULT_MAX_LENGTH && m.getMinLength() == Edge.DEFAULT_MIN_LENGTH)
 			return DEFAULT_COLOR;
 		
 		Edge e = (Edge)represents;
-		int max = Edge.getMaxLength();
-		int min = Edge.getMinLength();
+		int max = m.getMaxLength();
+		int min = m.getMinLength();
 		double v = (double)(e.getLength() - min)/ ((double)(max - min));
 
 		return new Color( (int)( (double)GRADIENT_LONG_COLOR.getRed() * v) + (int)( (double)GRADIENT_SHORT_COLOR.getRed() * (1-v)),

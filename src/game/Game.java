@@ -202,9 +202,9 @@ public class Game implements JSONString{
 			throw new IllegalArgumentException("Truck " + t + "Is not currently holding Parcel " + p + ". Cannot Deliver Here");
 
 		if(t.getColor().equals(p.getColor()))
-			score.changeScore(Score.PAYOFF * Score.ON_COLOR_MULTIPLIER);
+			score.changeScore(map.PAYOFF * map.ON_COLOR_MULTIPLIER);
 		else
-			score.changeScore(Score.PAYOFF);
+			score.changeScore(map.PAYOFF);
 
 		parcels.remove(p);
 		try {
@@ -310,14 +310,21 @@ public class Game implements JSONString{
 	 * @param f - the Text file with the map in it
 	 * @throws IOException if End_Node_Identifier is not found in the file, or if TextIO.read(f) throws an exception*/
 	protected void readGame(File f) throws IOException{
-		map = new Map();
-		trucks = new ArrayList<Truck>();
-		parcels = new HashSet<Parcel>();
-
 		JSONObject obj = new JSONObject(TextIO.read(f));
 
 		//First process map - under key with value of MAP_TOKEN.
 		JSONObject mapJSON = obj.getJSONObject(MAP_TOKEN);
+		//Read score coefficients
+		JSONArray scoreJSON = mapJSON.getJSONArray(Map.SCORE_TOKEN);
+		int[] coeffs = new int[scoreJSON.length()];
+		for(int i = 0; i < coeffs.length; i++){
+			coeffs[i] = scoreJSON.getInt(i);
+		}
+		map = new Map(coeffs);
+		
+		trucks = new ArrayList<Truck>();
+		parcels = new HashSet<Parcel>();
+		
 		//Read in all nodes of map
 		for(String key : mapJSON.keySet()){
 			if(key.startsWith(Map.NODE_TOKEN)){
@@ -338,7 +345,7 @@ public class Game implements JSONString{
 				Node firstExit = map.getNode((String)exitArr.get(0));
 				Node secondExit = map.getNode((String)exitArr.get(1));
 
-				Edge e = new Edge(firstExit, secondExit, length);
+				Edge e = new Edge(this, firstExit, secondExit, length);
 				map.getEdges().add(e);
 				firstExit.addExit(e);
 				secondExit.addExit(e);

@@ -26,6 +26,10 @@ public class Main {
 		
 		Game g = new Game(userManagerClass, Game.gameFile("JSONMap1.txt"));
 		
+		//Add intital elements to fibCalc
+		fibCalc.add(0);
+		fibCalc.add(1);
+		
 		new GUI(g);
 	}
 	
@@ -54,23 +58,16 @@ public class Main {
 	}
 	
 	//Part of fib series calculated thus far. Bit of memoization for speed.
-	private static ArrayList<Integer> fibCalc;
+	private static ArrayList<Integer> fibCalc = new ArrayList<Integer>();
 	
 	//Lock that ensures that fibCalc arrayList is added to/accessed correctly.
-	private static Semaphore fibLock;
+	private static Semaphore fibLock = new Semaphore(1);
 	
 	/** Returns the ith fibonachi number (0 indexed), starting with 0,1,1,2 ... Returns -1 if given number is negative 
 	 * @throws InterruptedException */
 	public static int fib(int i) throws InterruptedException{
-		if(fibLock == null || fibCalc == null){
-			fibCalc = new ArrayList<Integer>();
-			fibLock = new Semaphore(1);
-			fibLock.acquire();
-			fibCalc.add(0); //First number
-			fibCalc.add(1); //Second number
-			fibLock.release();
-		}
 		fibLock.acquire();
+		System.out.println(fibCalc.toString());
 		if (i < 0){
 			fibLock.release();
 			return -1;
@@ -89,10 +86,8 @@ public class Main {
 		//Acquire before checking size/adding.
 		fibLock.acquire();
 		//Check that we're storing it in the correct place.
-		if (fibCalc.size() != i)
-			throw new RuntimeException("Wut. Trying to calculate fib number " + i + " but precalced is " + fibCalc.toString());
-		
-		fibCalc.add(f);
+		if (fibCalc.size() == i)		
+			fibCalc.add(f);
 		fibLock.release();
 		return f;
 	}

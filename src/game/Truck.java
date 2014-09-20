@@ -33,7 +33,7 @@ public class Truck implements MapElement, Runnable, Colorable, UserData{
 
 	private static final int WAIT_TIME = 5;
 	protected static final int NUMB_DEFAULT_TRAVEL_DIRECTIONS = 200;
-
+	
 	private String name;			//The name of this truck
 	private Circle circle;			//The circle that represents this Graphically
 	private Color color = Circle.DEFAULT_TRUCK_COLOR;
@@ -166,10 +166,15 @@ public class Truck implements MapElement, Runnable, Colorable, UserData{
 	private void fixLastTravelTime(){
 		long now = System.currentTimeMillis();
 		long diff = now - lastTravelTime;
-		game.getScore().changeScore(Score.WAIT_COST * (int)(diff / WAIT_TIME));
+		game.getScore().changeScore(game.getMap().WAIT_COST * (int)(diff / WAIT_TIME));
 		lastTravelTime = now;
 	}
 
+	/** Returns the game this Truck belongs to */
+	public Game getGame(){
+		return game;
+	}
+	
 	/** Returns the name of this Truck */
 	public String getTruckName(){
 		return name;
@@ -392,7 +397,7 @@ public class Truck implements MapElement, Runnable, Colorable, UserData{
 			load.loadUnload(this, Truck.LOAD);
 			parcelLock.release();
 
-			game.getScore().changeScore(Score.PICKUP_COST);
+			game.getScore().changeScore(game.getMap().PICKUP_COST);
 			game.getManager().truckNotification(this, Manager.Notification.PICKED_UP_PARCEL);
 		}
 	}
@@ -408,7 +413,7 @@ public class Truck implements MapElement, Runnable, Colorable, UserData{
 		load.loadUnload(this, Truck.UNLOAD);
 		load = null;
 		parcelLock.release();
-		game.getScore().changeScore(Score.DROPOFF_COST);
+		game.getScore().changeScore(game.getMap().DROPOFF_COST);
 		game.getManager().truckNotification(this, Manager.Notification.DROPPED_OFF_PARCEL);
 
 	}
