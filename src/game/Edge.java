@@ -35,7 +35,6 @@ public class Edge implements MapElement, Colorable, UserData{
 
 	private Semaphore truckLock; //Lock that trucks must acquire in order to make changes to this edge.
 
-	private int truckHereCount; 			   //A count of the trucks here (mappings in truckHere to true)
 	private HashMap<Truck, Boolean> truckHere; //Maps truck -> is here
 	
 	private Object userData; //User data (if any) stored in this edge
@@ -86,9 +85,8 @@ public class Edge implements MapElement, Colorable, UserData{
 		truckLock = new Semaphore(1);
 		
 		truckHere = new HashMap<Truck, Boolean>();
-		truckHereCount = 0;
 
-		length = lengthOfRoad;
+		setLength(lengthOfRoad);
 
 		line = new Line(null, null, this);
 	}
@@ -158,11 +156,13 @@ public class Edge implements MapElement, Colorable, UserData{
 	/** Sets the length of this Edge. Uncorrelated with its graphical length on the GUI
 	 * @throws IllegalArgumentException if lengthOfRoad is less than 1 and not equal to DUMMY_LENGTH
 	 */
-	protected void setLength(int lengthOfRoad) throws IllegalArgumentException{
+	private void setLength(int lengthOfRoad) throws IllegalArgumentException{
 		if(lengthOfRoad <= 0 && lengthOfRoad != DUMMY_LENGTH)
 			throw new IllegalArgumentException("lengthOfRoad value " + lengthOfRoad + " is an illegal value.");
 
 		length = lengthOfRoad;
+		game.getMap().maxLength = Math.max(game.getMap().maxLength, length);
+		game.getMap().minLength = Math.min(game.getMap().minLength, length);
 	}
 
 	/** Returns true if Node node is one of the exits of this Edge, false otherwise */
@@ -257,10 +257,6 @@ public class Edge implements MapElement, Colorable, UserData{
 	 * Gets its truckLock to prevent Truck thread collision */
 	protected void setTruckHere(Truck t, Boolean isHere) throws InterruptedException{
 		truckLock.acquire();
-		if(truckHere.containsKey(t) && ! truckHere.get(t) && isHere)
-			truckHereCount++;
-		else if(! truckHere.containsKey(t) || truckHere.get(t) && ! isHere)
-			truckHereCount--;
 		truckHere.put(t, isHere);
 		truckLock.release();
 	}
@@ -298,7 +294,10 @@ public class Edge implements MapElement, Colorable, UserData{
 	/** Returns the number of trucks here - currently traveling this edge */
 	public int trucksHere() throws InterruptedException{
 		truckLock.acquire();
-		int i = truckHereCount;
+		int i = 0;
+		for(Boolean b : truckHere.values()){
+			if(b) i++;
+		}
 		truckLock.release();
 		return i;
 	}

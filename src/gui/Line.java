@@ -29,13 +29,13 @@ public class Line  extends JPanel{
 	public static final int COLOR_POLICY_HIGHLIGHT_TRAVEL = 1;
 	public static final int COLOR_POLICY_DISTANCE_GRADIENT = 2;
 
-	private static final Color GRADIENT_SHORT_COLOR = Color.BLACK;
-	private static final Color GRADIENT_LONG_COLOR = Color.CYAN;
+	private static final Color GRADIENT_SHORT_COLOR = Color.CYAN;
+	private static final Color GRADIENT_LONG_COLOR = Color.BLACK;
 
 	private static final int[] ACCEPTABLE_COLOR_POLICIES = {COLOR_POLICY_DEFAULT, COLOR_POLICY_HIGHLIGHT_TRAVEL, 
 		COLOR_POLICY_DISTANCE_GRADIENT};
 
-	private static int colorPolicy = COLOR_POLICY_HIGHLIGHT_TRAVEL;
+	private static int colorPolicy = COLOR_POLICY_DISTANCE_GRADIENT;
 
 	private Circle c1;
 	private Circle c2;
@@ -127,7 +127,7 @@ public class Line  extends JPanel{
 			color = DEFAULT_COLOR;
 			break;
 		case COLOR_POLICY_HIGHLIGHT_TRAVEL:
-			boolean b = false;
+			boolean b = true;
 			try{
 				b = represents.trucksHere() > 0;
 			}catch(InterruptedException e){}
@@ -148,7 +148,7 @@ public class Line  extends JPanel{
 
 	private Color getDistGradientColor(){
 		Map m = represents.getGame().getMap();
-		if(m.getMaxLength() == Edge.DEFAULT_MAX_LENGTH && m.getMinLength() == Edge.DEFAULT_MIN_LENGTH)
+		if(m.getMaxLength() == Edge.DEFAULT_MAX_LENGTH || m.getMinLength() == Edge.DEFAULT_MIN_LENGTH)
 			return DEFAULT_COLOR;
 		
 		Edge e = (Edge)represents;

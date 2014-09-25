@@ -17,8 +17,8 @@ public class Map implements JSONString{
 
 	private HashSet<Edge> edges;    //All edges in this map
 	
-	private int minLength;			//Min length among all edges
-	private int maxLength;			//Max length among all edges
+	protected int minLength;			//Min length among all edges
+	protected int maxLength;			//Max length among all edges
 	
 	private HashSet<Node> nodes;    //All nodes in this map
 	
@@ -59,6 +59,9 @@ public class Map implements JSONString{
 		
 		edges = new HashSet<Edge>();
 		nodes = new HashSet<Node>();
+		
+		minLength = Edge.DEFAULT_MIN_LENGTH;
+		maxLength = Edge.DEFAULT_MAX_LENGTH;
 	}
 
 	/** Returns a random node in this map */

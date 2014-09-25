@@ -1,6 +1,11 @@
 import java.util.ArrayList;
 import game.*;
 
+/** A sample implementation of the Manager class - almost random (a tiny bit smarter)
+ * Manager.
+ * @author MPatashnik
+ *
+ */
 public class MyManager extends Manager {
 
 	private Game game;
@@ -84,43 +89,4 @@ public class MyManager extends Manager {
 			}
 		}
 	}
-
-	//	private static final int PICK_DROP = 0;
-	//	private static final int PICK_TO_DESTINATION = 1;
-
-	//	/** Picks up and drops off parcels according to the given behavior
-	//	 * @param type - either:
-	//	 * 			Truck.PICK_DROP - always picks up a parcel when it encounters one and always drops it off at the next node
-	//	 * 			Truck.PICK_TO_DESTINATION - always picks up a parcel when it encounters one, then holds on to it until
-	//	 * 				it has arrived at that parcel's destination 
-	//	 * @throws IllegalArgumentException - If an unknown type is given.
-	//	 * */
-	//	private void parcelBehavior(int type) throws IllegalArgumentException{
-	//		if(type == PICK_DROP){
-	//			if(load == null){
-	//				if(!location.getTrueParcels().isEmpty()){
-	//					Parcel p = location.getRandomParcel();
-	//					loadUnloadParcel(p, LOAD);
-	//				}
-	//			}
-	//			else{
-	//				loadUnloadParcel(load, UNLOAD);
-	//			}	
-	//		}
-	//		else if (type == PICK_TO_DESTINATION){
-	//			if(load == null){
-	//				if(!location.getTrueParcels().isEmpty()){
-	//					Parcel p = location.getRandomParcel();
-	//					loadUnloadParcel(p, LOAD);
-	//				}
-	//			}
-	//			else{
-	//				if(location.equals(load.getDestination()))
-	//					loadUnloadParcel(load, UNLOAD);
-	//			}	
-	//		}
-	//		else {throw new IllegalArgumentException("Illegal type value put into parcelBehavior. Unknown behavior for Truck " + name);}
-	//	}
-
-
 }
