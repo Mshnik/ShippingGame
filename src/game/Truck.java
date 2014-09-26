@@ -3,6 +3,7 @@ import gui.Circle;
 
 import java.awt.Color;
 import java.util.LinkedList;
+import java.util.List;
 import java.util.Queue;
 import java.util.concurrent.Semaphore;
 
@@ -464,6 +465,30 @@ public class Truck implements MapElement, Runnable, Colorable, UserData{
 		}
 		travel.add(r);
 		travelLock.release();
+	}
+	
+	/** Sets the travel queue to travel the given list of edges, in order. */
+	public void setTravelQueue(List<Edge> path){
+		for(Edge e : path){
+			addToTravel(e);
+		}
+	}
+	
+	/** Sets the travel queue to travel the given path.
+	 * First element should be the truck's current location, and the last
+	 * is the expected destination
+	 * @throws RuntimeException if the truck isn't currently at the first node in the path
+	 */
+	public void setTravelPath(List<Node> path) throws RuntimeException{
+		if(path.get(0) != getLocation())
+			throw new RuntimeException("Can't travel " + path + " because " + this + " is currently at " + getLocation());
+		Node prev = null;
+		for(Node n : path){
+			if(prev != null){
+				addToTravel(prev.getConnect(n));
+			}
+			prev = n;
+		}
 	}
 
 	/** Pops the front road r of this Truck's travel plans, in a fashion that prevents thread collision.
