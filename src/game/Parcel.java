@@ -70,7 +70,7 @@ public class Parcel implements MapElement, Colorable, UserData{
 
 		parcelLock = new Semaphore(1);
 	}
-	
+
 	/** Returns the game this Parcel belongs to */
 	public Game getGame(){
 		return game;
@@ -180,16 +180,8 @@ public class Parcel implements MapElement, Colorable, UserData{
 
 	/** Used when game notifies this parcel that it has reached its destination */
 	private void reachedDestination(){
-		while(true){
-			try {
-				game.deliverParcel(this, holder.getLocation(), holder);
-				return;
-			} catch (InterruptedException e) {
-				try {
-					Thread.sleep(50);
-				} catch (InterruptedException e1) {}
-			}
-		}
+		game.deliverParcel(this, holder.getLocation(), holder);
+		return;
 	}
 
 	@Override

@@ -148,7 +148,7 @@ public class GUI extends JFrame{
 
 		JMenu mnGame = new JMenu("Game");
 		menuBar.add(mnGame);
-		
+
 		JMenuItem mntmStart = new JMenuItem("Start");
 		mntmStart.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
@@ -186,16 +186,16 @@ public class GUI extends JFrame{
 
 		JMenu mnGUI = new JMenu("GUI");
 		menuBar.add(mnGUI);
-		
+
 		JLabel lblEdgeColoring = new JLabel(" Edge Coloring");
 		lblEdgeColoring.setFont(new Font("Lucida Grande", Font.PLAIN, 14));
 		mnGUI.add(lblEdgeColoring);
-		
+
 		ButtonGroup edgeStyleGroup = new ButtonGroup();
-		
+
 		JRadioButtonMenuItem d = addEdgeStyleCheckbox("Default", Line.ColorPolicy.DEFAULT, mnGUI, edgeStyleGroup);
 		d.setSelected(true);
-		
+
 		addEdgeStyleCheckbox("Highlight Travel", Line.ColorPolicy.HIGHLIGHT_TRAVEL, mnGUI, edgeStyleGroup);
 		addEdgeStyleCheckbox("Gradient", Line.ColorPolicy.DISTANCE_GRADIENT, mnGUI, edgeStyleGroup);
 
@@ -203,23 +203,23 @@ public class GUI extends JFrame{
 		pack();
 		repaint();
 	}
-	
+
 	/** Creates and adds to the gui a checkbox with the given text for edge paint style.
 	 * Returns a reference to the created checkbox */
 	private JRadioButtonMenuItem addEdgeStyleCheckbox(String s, final Line.ColorPolicy k, final JMenu mnGUI, ButtonGroup edgeStyleGroup){
 		JRadioButtonMenuItem r = new JRadioButtonMenuItem(s);
 		r.addItemListener(new ItemListener() {
-		    public void itemStateChanged(ItemEvent event) {
-		        if (event.getStateChange() == ItemEvent.SELECTED) {
-		    		Line.setColorPolicy(k);
-		    		if(game != null && game.getMap() != null){
-		    			for(Edge ed : game.getMap().getEdges()){
-		    				ed.getLine().updateToColorPolicy();
-		    			}
-		    		}
-		    		drawingPanel.repaint();
-		        }
-		    }
+			public void itemStateChanged(ItemEvent event) {
+				if (event.getStateChange() == ItemEvent.SELECTED) {
+					Line.setColorPolicy(k);
+					if(game != null && game.getMap() != null){
+						for(Edge ed : game.getMap().getEdges()){
+							ed.getLine().updateToColorPolicy();
+						}
+					}
+					drawingPanel.repaint();
+				}
+			}
 		});
 		edgeStyleGroup.add(r);
 		mnGUI.add(r);
@@ -242,7 +242,7 @@ public class GUI extends JFrame{
 			drawingPanel.remove(p.getCircle());
 			drawingPanel.add(p.getCircle());
 		}
-		
+
 		//Draw the edges on the map
 		for(Edge r : game.getMap().getEdges()){
 			Line l = r.getLine();
@@ -253,7 +253,7 @@ public class GUI extends JFrame{
 			drawingPanel.remove(l);
 			drawingPanel.add(l);
 		}
-		
+
 		//Fix the positions of the nodes on the panel using the Force model.
 		//See the Flexor class for how this is done.
 		//Done in seperate thread so progress can be seen. drawingPanel is notified when this is done.
@@ -265,7 +265,7 @@ public class GUI extends JFrame{
 				}
 			}
 		}).start();
-		
+
 		try {
 			synchronized(drawingPanel){
 				drawingPanel.wait();
@@ -273,7 +273,7 @@ public class GUI extends JFrame{
 		} catch (InterruptedException e2) {
 			e2.printStackTrace();
 		}
-		
+
 		//Set Locations the parcels on the map
 		for(Parcel p : game.getParcels()){
 			p.getCircle().setX1(p.getLocation().getCircle().getX1());
@@ -284,18 +284,8 @@ public class GUI extends JFrame{
 		for(Truck t : game.getTrucks()){
 			Circle c = t.getCircle();
 			c.setBounds(drawingPanel.getBounds());
-			boolean unset = true;
-			while(unset){
-				try {
-					c.setX1(t.getLocation().getCircle().getX1());
-					c.setY1(t.getLocation().getCircle().getY1());
-					unset = false;
-				} catch (InterruptedException e) {
-					try {
-						Thread.sleep(50);
-					} catch (InterruptedException e1) {}
-				}
-			}
+			c.setX1(t.getLocation().getCircle().getX1());
+			c.setY1(t.getLocation().getCircle().getY1());
 			drawingPanel.remove(c);
 			drawingPanel.add(c);
 		}
@@ -319,7 +309,7 @@ public class GUI extends JFrame{
 			drawingPanel.setComponentZOrder(t.getCircle(), z);
 			z++;
 		}
-		
+
 		repaint();
 	}
 
@@ -359,10 +349,10 @@ public class GUI extends JFrame{
 
 	/** Amount of time to wait after an update message is posted to delete it (in ms) */
 	private static final int MESSAGE_DELETE_TIME = 3000; 
-	
+
 	/** The timer thread to clear the update message after a few seconds */
 	private static Thread messageClearer;
-	
+
 	/** Updates the GUI to show the given String as an update message.
 	 * Also starts a timer thread to delete the message after a few seconds. */
 	public void setUpdateMessage(String newUpdate){
