@@ -33,7 +33,7 @@ public class Truck implements MapElement, Runnable, Colorable, UserData{
 
 	private static final int WAIT_TIME = 5;
 	protected static final int NUMB_DEFAULT_TRAVEL_DIRECTIONS = 200;
-	
+
 	private String name;			//The name of this truck
 	private Circle circle;			//The circle that represents this Graphically
 	private Color color = Circle.DEFAULT_TRUCK_COLOR;
@@ -57,10 +57,11 @@ public class Truck implements MapElement, Runnable, Colorable, UserData{
 	private int speed; //The number of units this moves per frame when traveling. Must be between min and max
 	private Semaphore speedLock; 	//Lock for getting/changing speed
 	private Semaphore locLock;   	// A lock associated with the changing of locaiton, travelingTo, goingTo, etc.
-	                             	//Lock should be released before any notifications are fired.
+	//Lock should be released before any notifications are fired.
 	private Semaphore statusLock; 	//A Lock for the status of this truck.
 	private Semaphore parcelLock;	//A Lock for the parcel this truck is carrying
-	
+	private Semaphore travelLock;	//A Lock for editing/accessing the travel queue.
+
 	private Object userData;
 
 	private final Game game;		//The game this truck belongs to
@@ -93,6 +94,7 @@ public class Truck implements MapElement, Runnable, Colorable, UserData{
 		locLock = new Semaphore(1);
 		statusLock = new Semaphore(1);
 		parcelLock = new Semaphore(1);
+		travelLock = new Semaphore(1);
 
 		location = startLocation;
 		travelingTo = null;
@@ -149,8 +151,8 @@ public class Truck implements MapElement, Runnable, Colorable, UserData{
 				fixLastTravelTime();
 			}
 			while(!travel.isEmpty() && game.isRunning()){
-				Edge r = getTravel();
 				try {
+					Edge r = getTravel();
 					travel(r);
 				} catch (InterruptedException e){
 					e.printStackTrace();
@@ -178,7 +180,7 @@ public class Truck implements MapElement, Runnable, Colorable, UserData{
 	public Game getGame(){
 		return game;
 	}
-	
+
 	/** Returns the name of this Truck */
 	public String getTruckName(){
 		return name;
@@ -198,7 +200,7 @@ public class Truck implements MapElement, Runnable, Colorable, UserData{
 		locLock.acquire();
 		Node n = location;
 		locLock.release();
-		
+
 		return n;
 	}
 
@@ -223,7 +225,7 @@ public class Truck implements MapElement, Runnable, Colorable, UserData{
 		locLock.acquire();
 		Node n = travelingTo;
 		locLock.release();
-		
+
 		return n;
 	}
 
@@ -259,7 +261,7 @@ public class Truck implements MapElement, Runnable, Colorable, UserData{
 		locLock.acquire();
 		Node n = travelingAlong.getOther(travelingTo);
 		locLock.release();
-		
+
 		return n;
 	}
 
@@ -274,7 +276,7 @@ public class Truck implements MapElement, Runnable, Colorable, UserData{
 		locLock.acquire();
 		Node n = goingTo;
 		locLock.release();
-		
+
 		return n;
 	}
 
@@ -369,7 +371,7 @@ public class Truck implements MapElement, Runnable, Colorable, UserData{
 	public void pickupLoad(Parcel p) throws RuntimeException, InterruptedException{
 		if(getStatus() == Status.TRAVELING)
 			return;
-		
+
 		if(load != null)
 			throw new RuntimeException("Can't Pickup Parcel with non-null load. Already holding a Parcel.");
 
@@ -390,7 +392,7 @@ public class Truck implements MapElement, Runnable, Colorable, UserData{
 	public void dropoffLoad() throws RuntimeException, InterruptedException{
 		if(getStatus() == Status.TRAVELING)
 			return;
-		
+
 		if(load == null)
 			throw new RuntimeException("Can't Drop Off a null parcel. No Parcel to drop off.");
 
@@ -408,11 +410,7 @@ public class Truck implements MapElement, Runnable, Colorable, UserData{
 	public Circle getCircle(){
 		return circle;
 	}
-
-	private static final int GET_TRAVEL = 0;
-	private static final int ADD_TO_TRAVEL = 1;
-	private static final int CLEAR_TRAVEL = 2;
-
+	
 	/** Adds the road r to this Truck's travel plans, in a fashion that prevents thread collision 
 	 * @throws InterruptedException */
 	public void addToTravel(Edge r) throws InterruptedException{
@@ -421,13 +419,19 @@ public class Truck implements MapElement, Runnable, Colorable, UserData{
 		else
 			setGoingTo(r.getOther(goingTo));
 
-		changeTravelQueue(r, ADD_TO_TRAVEL);
+		travelLock.acquire();
+		travel.add(r);
+		travelLock.release();
 	}
 
 	/** Pops the front road r of this Truck's travel plans, in a fashion that prevents thread collision.
-	 * Used for traveling within the Truck Class */
-	private Edge getTravel(){
-		return changeTravelQueue(null, GET_TRAVEL);
+	 * Used for traveling within the Truck Class 
+	 * @throws InterruptedException */
+	private Edge getTravel() throws InterruptedException{
+		travelLock.acquire();
+		Edge e = travel.poll();
+		travelLock.release();
+		return e;
 	}
 
 	/** Clears the Truck's travel plans, in a fashion that prevents thread collision.
@@ -436,31 +440,9 @@ public class Truck implements MapElement, Runnable, Colorable, UserData{
 	 * @throws InterruptedException */
 	public void clearTravel() throws InterruptedException{
 		setGoingTo(travelingTo);
-		changeTravelQueue(null, CLEAR_TRAVEL);
-	}
-
-	/** Modifies the travel queue in a way to prevent thread collision.
-	 * @param r - The Edge that should be added to the queue if state == ADD_TO_TRAVEL. Can be null if used for getting.
-	 * @param state - Either ADD_TO_TRAVEL (adding a new Node/Edge), GET_TRAVEL (polling off the top road),
-	 * 					or CLEAR_TRAVEL (clearing the Travel queue)
-	 * @return - The top Edge in the queue if GET_TRAVEL is used, null otherwise
-	 * @throws IllegalArgumentException - if a state other than GET_TRAVEL, ADD_TO_TRAVEL, or CLEAR_TRAVEL is used
-	 */
-	private synchronized Edge changeTravelQueue(Edge r, int state) throws IllegalArgumentException{
-		if(state == GET_TRAVEL){
-			return travel.poll();
-		}
-		else if(state == ADD_TO_TRAVEL){
-			travel.add(r);
-			return null;
-		}
-		else if(state == CLEAR_TRAVEL){
-			travel.clear();
-			return null;
-		}
-		else{
-			throw new IllegalArgumentException("An invalid state given. Cannot interpret use");
-		}
+		travelLock.acquire();
+		travel.clear();
+		travelLock.release();
 	}
 
 	/** Tells the Truck to travel along the given edge.
@@ -511,7 +493,7 @@ public class Truck implements MapElement, Runnable, Colorable, UserData{
 				}
 				speedLock.release();
 				double percent = (double)progress / (double)r.getLength();
-				
+
 				//Update Truck's location on the GUI
 				updateGUILocation( (int) (percent * there.getX1() + (1-percent) * here.getX1()), 
 						(int) (percent * there.getY1() + (1-percent) * here.getY1()));
@@ -602,7 +584,7 @@ public class Truck implements MapElement, Runnable, Colorable, UserData{
 	protected void gameOver() throws InterruptedException{
 		clearTravel();
 	}
-	
+
 	@Override
 	/** Returns a JSON String of this truck.
 	 * Just the basic truck info pertaining to map creation - location and load not included.
