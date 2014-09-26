@@ -10,6 +10,7 @@ import javax.swing.JLabel;
 
 import java.awt.Color;
 import javax.swing.border.LineBorder;
+import javax.swing.ButtonGroup;
 import javax.swing.JFileChooser;
 import javax.swing.JMenuBar;
 import javax.swing.JMenu;
@@ -18,14 +19,14 @@ import javax.swing.JMenuItem;
 
 import java.awt.event.ActionListener;
 import java.awt.event.ActionEvent;
+import java.awt.event.ItemEvent;
+import java.awt.event.ItemListener;
 import java.io.File;
-import java.io.IOException;
 
 import javax.swing.BoxLayout;
 import java.awt.SystemColor;
-import javax.swing.JCheckBoxMenuItem;
-import javax.swing.event.ChangeListener;
-import javax.swing.event.ChangeEvent;
+import javax.swing.JRadioButtonMenuItem;
+import java.awt.Font;
 
 /** The GUI Class creates the JFrame that shows the game.
  * The user and the manager have no interaction with the GUI class.
@@ -59,7 +60,6 @@ public class GUI extends JFrame{
 
 	private JLabel lblUpdate;
 	private JLabel lblScore;
-	private JLabel editLbl;
 	private JMenuBar menuBar;
 
 	/** GUI constructor. Creates a window to show a game */
@@ -135,6 +135,20 @@ public class GUI extends JFrame{
 		});
 		mnFile.add(mntmLoadGame);
 
+		JMenuItem mntmQuit = new JMenuItem("Quit");
+		mntmQuit.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				int returnVal = JOptionPane.showConfirmDialog(null, "Are You Sure You Want to Quit?");
+				if(returnVal == JOptionPane.YES_OPTION){
+					System.exit(0);
+				}
+			}
+		});
+		mnFile.add(mntmQuit);
+
+		JMenu mnGame = new JMenu("Game");
+		menuBar.add(mnGame);
+		
 		JMenuItem mntmStart = new JMenuItem("Start");
 		mntmStart.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
@@ -142,7 +156,7 @@ public class GUI extends JFrame{
 					game.start();
 			}
 		});
-		mnFile.add(mntmStart);
+		mnGame.add(mntmStart);
 
 		JMenuItem mntmReset = new JMenuItem("Reset");
 		mntmReset.addActionListener(new ActionListener() {
@@ -160,54 +174,7 @@ public class GUI extends JFrame{
 				}
 			}
 		});
-		mnFile.add(mntmReset);
-
-		JMenuItem mntmQuit = new JMenuItem("Quit");
-		mntmQuit.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent e) {
-				int returnVal = JOptionPane.showConfirmDialog(null, "Are You Sure You Want to Quit?");
-				if(returnVal == JOptionPane.YES_OPTION){
-					System.exit(0);
-				}
-			}
-		});
-		mnFile.add(mntmQuit);
-
-		JMenu mnGame = new JMenu("Game");
-		menuBar.add(mnGame);
-
-		JCheckBoxMenuItem chckbxmntmShowEditToolbar = new JCheckBoxMenuItem("Show Edit Toolbar");
-		chckbxmntmShowEditToolbar.addChangeListener(new ChangeListener() {
-			public void stateChanged(ChangeEvent e) {
-				if(game != null && ! game.isRunning()){
-					JCheckBoxMenuItem source = (JCheckBoxMenuItem)e.getSource();
-					editMode = source.isSelected();
-					if(editMode){
-						editLbl.setText("Editing");
-					} else {
-						editLbl.setText("");
-					}
-				}
-			}
-		});
-		mnGame.add(chckbxmntmShowEditToolbar);
-
-		JMenuItem mntmSaveMap = new JMenuItem("Save");
-		mntmSaveMap.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent arg0) {
-				if(game != null && !game.isRunning()){
-					String mapName = JOptionPane.showInputDialog("Enter New Map Name");
-					if(mapName != null && !mapName.equals("")){
-						try {
-							game.writeGame(mapName);
-						} catch (IOException e) {
-							e.printStackTrace();
-						}
-					}
-				}
-			}
-		});
-		mnGame.add(mntmSaveMap);
+		mnGame.add(mntmReset);
 
 		JMenuItem mntmPrintJSON = new JMenuItem("Print Game JSON");
 		mntmPrintJSON.addActionListener(new ActionListener() {
@@ -217,13 +184,46 @@ public class GUI extends JFrame{
 		});
 		mnGame.add(mntmPrintJSON);
 
-		editLbl = new JLabel("");
-		editLbl.setForeground(Color.RED);
-		menuBar.add(editLbl);
+		JMenu mnGUI = new JMenu("GUI");
+		menuBar.add(mnGUI);
+		
+		JLabel lblEdgeColoring = new JLabel(" Edge Coloring");
+		lblEdgeColoring.setFont(new Font("Lucida Grande", Font.PLAIN, 14));
+		mnGUI.add(lblEdgeColoring);
+		
+		ButtonGroup edgeStyleGroup = new ButtonGroup();
+		
+		JRadioButtonMenuItem d = addEdgeStyleCheckbox("Default", Line.ColorPolicy.DEFAULT, mnGUI, edgeStyleGroup);
+		d.setSelected(true);
+		
+		addEdgeStyleCheckbox("Highlight Travel", Line.ColorPolicy.HIGHLIGHT_TRAVEL, mnGUI, edgeStyleGroup);
+		addEdgeStyleCheckbox("Gradient", Line.ColorPolicy.DISTANCE_GRADIENT, mnGUI, edgeStyleGroup);
 
 		setVisible(true);
 		pack();
 		repaint();
+	}
+	
+	/** Creates and adds to the gui a checkbox with the given text for edge paint style.
+	 * Returns a reference to the created checkbox */
+	private JRadioButtonMenuItem addEdgeStyleCheckbox(String s, final Line.ColorPolicy k, final JMenu mnGUI, ButtonGroup edgeStyleGroup){
+		JRadioButtonMenuItem r = new JRadioButtonMenuItem(s);
+		r.addItemListener(new ItemListener() {
+		    public void itemStateChanged(ItemEvent event) {
+		        if (event.getStateChange() == ItemEvent.SELECTED) {
+		    		Line.setColorPolicy(k);
+		    		if(game != null && game.getMap() != null){
+		    			for(Edge ed : game.getMap().getEdges()){
+		    				ed.getLine().updateToColorPolicy();
+		    			}
+		    		}
+		    		drawingPanel.repaint();
+		        }
+		    }
+		});
+		edgeStyleGroup.add(r);
+		mnGUI.add(r);
+		return r;
 	}
 
 	/** GUI Constructor. Creates a window to show game g */

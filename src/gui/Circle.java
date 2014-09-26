@@ -35,7 +35,7 @@ public class Circle extends JPanel{
 	private static final long serialVersionUID = 1250263410666963976L;
 
 	/** The default diameter of Circles in pixels when they are drawn on the GUI */ 
-	public static final int DEFAULT_DIAMETER = 30;
+	public static final int DEFAULT_DIAMETER = 25;
 	
 	/** Extra space to add on diameter when calculating bounds
 	 * 
