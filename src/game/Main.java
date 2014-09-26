@@ -22,7 +22,7 @@ public class Main {
 												"expecting length 1 array of name of manager class.\n" +
 												"recieved " + args + " of length " + (args == null ? "null" : args.length));
 		
-		String userManagerClass = args[0];
+		String userManagerClass = "student."+args[0];
 		
 		Game g = new Game(userManagerClass, Game.gameFile("JSONMap1.txt"));
 		
