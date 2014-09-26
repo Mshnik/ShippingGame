@@ -362,35 +362,14 @@ public class Truck implements MapElement, Runnable, Colorable, UserData{
 		userData = uData;
 	}
 
-	/** The state of loading a parcel - use for loadUnloadParcel(..) */
-	public static final boolean LOAD = true;
-	/** The state of unloading a parcel - use for loadUnloadParcel(..) */
-	public static final boolean UNLOAD = false;
-
-	/** Handles loading and unloading parcels.
-	 * Only permit loading/unloading if this is waiting - if it is currently traveling,
-	 * don't do any loading/unloading.
-	 * 
-	 * @param p - The parcel to pick up or drop off
-	 * @param state - either Truck.LOAD or Truck.UNLOAD
-	 * 
-	 * @throws RuntimeException - @see pickupLoad(p)
-	 * @throws InterruptedException 
-	 */
-	public void loadUnloadParcel(Parcel p, boolean state) throws RuntimeException, InterruptedException{
-		if(getStatus() == Status.TRAVELING)
-			return;
-		if(state == LOAD)
-			pickupLoad(p);
-		else if(state == UNLOAD)
-			dropoffLoad();
-	}
-
 	/** Picks up parcel p at the current location. If there is, adds it to Truck and waits PARCEL_PICKUP_TIME seconds
 	 * @throws RuntimeException  - if load is not null (can't pick up) or if this Truck is currently traveling.
 	 * @throws InterruptedException 
 	 *  */
-	private void pickupLoad(Parcel p) throws RuntimeException, InterruptedException{
+	public void pickupLoad(Parcel p) throws RuntimeException, InterruptedException{
+		if(getStatus() == Status.TRAVELING)
+			return;
+		
 		if(load != null)
 			throw new RuntimeException("Can't Pickup Parcel with non-null load. Already holding a Parcel.");
 
@@ -398,7 +377,7 @@ public class Truck implements MapElement, Runnable, Colorable, UserData{
 			parcelLock.acquire();
 			location.getTrueParcels().remove(p);
 			load = p;
-			load.loadUnload(this, Truck.LOAD);
+			load.pickedUp(this);
 			parcelLock.release();
 
 			game.getScore().changeScore(game.getMap().PICKUP_COST);
@@ -408,13 +387,16 @@ public class Truck implements MapElement, Runnable, Colorable, UserData{
 
 	/** Drops off load at the current location. Throws a RuntimeException if load is null 
 	 * @throws InterruptedException */
-	private void dropoffLoad() throws RuntimeException, InterruptedException{
+	public void dropoffLoad() throws RuntimeException, InterruptedException{
+		if(getStatus() == Status.TRAVELING)
+			return;
+		
 		if(load == null)
 			throw new RuntimeException("Can't Drop Off a null parcel. No Parcel to drop off.");
 
 		parcelLock.acquire();
 		location.getTrueParcels().add(load);
-		load.loadUnload(this, Truck.UNLOAD);
+		load.droppedOff();
 		load = null;
 		parcelLock.release();
 		game.getScore().changeScore(game.getMap().DROPOFF_COST);

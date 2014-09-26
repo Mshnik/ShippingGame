@@ -48,7 +48,7 @@ public class MyManager extends Manager {
 								e.printStackTrace();
 							}
 							try{
-								t.loadUnloadParcel(p, Truck.LOAD);
+								t.pickupLoad(p);
 							} catch(Exception e){}
 							try{
 								t.clearTravel();
@@ -70,7 +70,7 @@ public class MyManager extends Manager {
 						try {
 							if(t.getLoad() != null && t.getLoad().getDestination().equals(t.getLocation()))
 								try{
-									t.loadUnloadParcel(t.getLoad(), Truck.UNLOAD);
+									t.dropoffLoad();
 								} catch(Exception e){}
 						} catch (InterruptedException e1) {
 							// TODO Auto-generated catch block

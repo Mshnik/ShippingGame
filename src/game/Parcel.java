@@ -147,22 +147,9 @@ public class Parcel implements MapElement, Colorable, UserData{
 		return circle;
 	}
 
-	/** Handles pickup and dropoff in a fashion to prevent thread collision
-	 * @param t - The truck picking up or dropping off this Parcel
-	 * @param state - either Truck.LOAD or Truck.UNLOAD
-	 * @throws InterruptedException */
-	protected void loadUnload(Truck t, boolean state) throws InterruptedException{
-		if(state == Truck.LOAD){
-			pickedUp(t);
-		}
-		else if(state == Truck.UNLOAD){
-			droppedOff();
-		}
-	}
-
 	/** Have truck t pick up this Parcel 
 	 * @throws InterruptedException */
-	private void pickedUp(Truck t) throws InterruptedException{
+	protected void pickedUp(Truck t) throws InterruptedException{
 		parcelLock.acquire();
 		holder = t;
 		parcelLock.release();
@@ -173,7 +160,7 @@ public class Parcel implements MapElement, Colorable, UserData{
 	 * @throws InterruptedException 
 	 * @throws RuntimeException if holder is currently null
 	 */
-	private void droppedOff() throws InterruptedException{
+	protected void droppedOff() throws InterruptedException{
 		parcelLock.acquire();
 		if(holder == null){
 			parcelLock.release();
