@@ -237,6 +237,12 @@ public class GUI extends JFrame{
 		final int maxX = drawingPanel.getBounds().width - NODE_BUFFER_SIZE*2;
 		final int maxY = drawingPanel.getBounds().height - NODE_BUFFER_SIZE*2;
 
+		//Add parcels and trucks so they get painted under nodes
+		for(Parcel p : game.getParcels()){
+			drawingPanel.remove(p.getCircle());
+			drawingPanel.add(p.getCircle());
+		}
+		
 		//Draw the edges on the map
 		for(Edge r : game.getMap().getEdges()){
 			Line l = r.getLine();
@@ -268,13 +274,10 @@ public class GUI extends JFrame{
 			e2.printStackTrace();
 		}
 		
-		//Draw the parcels on the map
+		//Set Locations the parcels on the map
 		for(Parcel p : game.getParcels()){
 			p.getCircle().setX1(p.getLocation().getCircle().getX1());
 			p.getCircle().setY1(p.getLocation().getCircle().getY1());
-			//p.getCircle().setBounds(drawingPanel.getBounds());
-			drawingPanel.remove(p.getCircle());
-			drawingPanel.add(p.getCircle());
 		}
 
 		//Draw the trucks on the map
@@ -290,15 +293,33 @@ public class GUI extends JFrame{
 				} catch (InterruptedException e) {
 					try {
 						Thread.sleep(50);
-					} catch (InterruptedException e1) {
-						e1.printStackTrace();
-					}
+					} catch (InterruptedException e1) {}
 				}
 			}
 			drawingPanel.remove(c);
 			drawingPanel.add(c);
 		}
 
+		//Fix the z-ordering of elements on the panel
+		//Higher z painted first -> lower z paint over higher z
+		int z = 0;
+		for(Node n : game.getMap().getNodes()){
+			drawingPanel.setComponentZOrder(n.getCircle(), z);
+			z++;
+		}
+		for(Parcel p : game.getParcels()){
+			drawingPanel.setComponentZOrder(p.getCircle(), z);
+			z++;
+		}
+		for(Edge e : game.getMap().getEdges()){
+			drawingPanel.setComponentZOrder(e.getLine(), z);
+			z++;
+		}
+		for(Truck t : game.getTrucks()){
+			drawingPanel.setComponentZOrder(t.getCircle(), z);
+			z++;
+		}
+		
 		repaint();
 	}
 
