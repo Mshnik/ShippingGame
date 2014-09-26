@@ -360,6 +360,9 @@ public class GUI extends JFrame{
 	/** Amount of time to wait after an update message is posted to delete it (in ms) */
 	private static final int MESSAGE_DELETE_TIME = 3000; 
 	
+	/** The timer thread to clear the update message after a few seconds */
+	private static Thread messageClearer;
+	
 	/** Updates the GUI to show the given String as an update message.
 	 * Also starts a timer thread to delete the message after a few seconds. */
 	public void setUpdateMessage(String newUpdate){
@@ -369,11 +372,14 @@ public class GUI extends JFrame{
 			public void run() {
 				try {
 					Thread.sleep(MESSAGE_DELETE_TIME);
+					setUpdateMessage("  ");
 				} catch (InterruptedException e) {}
-				setUpdateMessage("  ");
 			}
 		};
-		Thread t = new Thread(r);
-		t.start();
+		if(messageClearer != null && messageClearer.isAlive()){
+			messageClearer.interrupt();
+		}
+		messageClearer = new Thread(r);
+		messageClearer.start();
 	}
 }
