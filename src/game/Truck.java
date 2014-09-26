@@ -152,8 +152,12 @@ public class Truck implements MapElement, Runnable, Colorable, UserData{
 				Edge r = getTravel();
 				try {
 					travel(r);
-				} catch (InterruptedException e) {
+				} catch (InterruptedException e){
 					e.printStackTrace();
+				} catch (IllegalArgumentException e) {
+					try {
+						clearTravel(); //If traveling isn't valid, clear the queue
+					} catch (InterruptedException e1) {}	
 				}
 				fixLastTravelTime();
 			}

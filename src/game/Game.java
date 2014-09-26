@@ -116,13 +116,11 @@ public class Game implements JSONString{
 	 * @throws InterruptedException */
 	public boolean isAllTrucksHome() throws InterruptedException{
 		for(Truck t : getTrucks())
-			if(t.getLocation() == null || ! t.getLocation().equals(map.getTruckHome()))
+			if(t != null && (t.getLocation() == null || ! t.getLocation().equals(map.getTruckHome())))
 				return false;
 
 		return true;
 	}
-
-
 
 	/** Returns the value of the score*/
 	public int getScoreValue(){
