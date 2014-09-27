@@ -66,6 +66,7 @@ public class Truck implements MapElement, Runnable, Colorable, UserData{
 	private Object userData;
 
 	private final Game game;		//The game this truck belongs to
+	private Thread thread;			//The thread this truck is running in
 
 	/** Constructor for the Truck Class. Uses a default color
 	 * @param g - the Game this Truck belongs to
@@ -74,7 +75,7 @@ public class Truck implements MapElement, Runnable, Colorable, UserData{
 	 * 
 	 * Speed defaults to EFFICIENT_SPEED
 	 */
-	protected Truck(Game g, String name, Node startLocation){
+	protected Truck(Game g, Thread t, String name, Node startLocation){
 		this(g, name, startLocation, Score.getRandomColor());
 	}
 
@@ -160,6 +161,12 @@ public class Truck implements MapElement, Runnable, Colorable, UserData{
 		return game;
 	}
 
+	/** Sets the thread this truck is running in */
+	void setThread(Thread t){
+		t.setName("TRUCK-THREAD:"+getTruckName());
+		thread = t;
+	}
+	
 	/** Returns the name of this Truck */
 	public String getTruckName(){
 		return name;
@@ -657,6 +664,10 @@ public class Truck implements MapElement, Runnable, Colorable, UserData{
 	/** Called by the Game when the game is done. Causes this thread to die */
 	protected void gameOver(){
 		clearTravel();
+		try{
+			thread.join(1000); //Try to join it.
+			thread.interrupt(); //Failed - just interrupt
+		}catch(InterruptedException e){}
 	}
 
 	@Override
