@@ -22,7 +22,7 @@ import java.util.concurrent.Semaphore;
  * this change, allowing for input at that time.
  * @author MPatashnik
  */
-public class Truck implements MapElement, Runnable, Colorable, UserData{
+public class Truck implements MapElement, Runnable{
 
 	/** The Two States that a Truck can be in at any time - either Waiting (staying on its location
 	 * and awaiting further travel instructions) or Traveling (currently moving from node to node

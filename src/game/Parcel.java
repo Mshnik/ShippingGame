@@ -15,7 +15,7 @@ import java.util.concurrent.Semaphore;
  * @author MPatashnik
  *
  */
-public class Parcel implements MapElement, Colorable, UserData{
+public class Parcel implements MapElement{
 
 	/** The game this Parcel belongs to */
 	private final Game game;

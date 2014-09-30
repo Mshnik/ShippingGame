@@ -47,11 +47,49 @@ Nerrrr....
 
 \newpage
 \section{3. Class Explanation}
-sadf
+Assuming your installation worked correctly, you should be able to see the javadoc specifications for all of the public methods available to classes in the game package. If not, consult section 2 of this guide or ask on Piazza/at office hours.\\
+The game structure follows the below diagram.
+\begin{figure}[h]
+\centerline{\includegraphics[scale=0.7]{hirearchy.png}} 
+\end{figure}
+\\Each interface and class in the figure is briefly explained below. For a more thorough  explanation or the method list of a certain interface or class, see the javadoc spec for that interface or class.
+\subsection{Colorable}
+The colorable interface is implemented in classes that have a "color". Pertaining to ShippingGame, MapElement extends Colorable so that all elements that are drawn on the map are guaranteed to have a color.
+\subsection{UserData}
+The UserData interface is implemented in classes that allow the user (Your Manager) to store data in them. You don't have to use this feature of classes that implement UserData, but it may prove useful in some graph algorithms.
+\subsection{MapElement}
+In addition to being a concatenation of the requirements of the Colorable and UserData interfaces, the MapElement interface specifies required behaviors for displaying an object on the GUI. Implementing classes are required to be able to provide various GUI-sensitive information, such as how to draw it, what it's name on the GUI is, and if there are any trucks currently "on it".
+\subsection{Truck}
+Instances of the Truck class are the game pieces of ShippingGame. Trucks take instructions from Managers, are able to travel the map and pick and drop off a single parcel at a time. Trucks are runnable - each instance of truck is set to run in its own thread.
+\subsection{Node}
+Instances of the Node class make up the Map. Each Node in the map represents a city that is connected to other cities by highways (Edges). Nodes store parcels until a truck picks them up. One special Node is designated as the TruckDepot, where all Trucks begin the game and must return to before the game can end.
+\subsection{Edge}
+Instances of the Edge class connect the Nodes in the Map. Each Edge represents a highway that connects two cities (Nodes). Edges in ShippingGame are undirected (bidirectional) and weighted (have length). The weight of the edge tells how long it takes for a truck to travel a given Edge - higher weight takes longer to travel.
+\subsection{Parcel}
+Instances of the Parcel class are the scoring pieces of ShippingGame. Parcels start at a certain Node on the map, and award points when they are successfully delivered to their destination Node. The game can only end once all of the Parcels have been delivered.
+\subsection{Map}
+The Instance of the Map for each game stores the Nodes, Edges, and Parcels associated with the game. It has the scoring constants related to various actions taken during the game, and convenience methods such as getting a random Node or random Edge.
+\subsection{Score}
+The Instance of Score for each game encapsulates the score for the game. In addition to preventing the user (Your Manager) from altering the score, it has convenience methods for checking for a valid color and calculating the cost of a given Truck Speed.
+\subsection{Vector}
+The Vector class is very similar to the Point class built into java, except that it allows for doubles in all of its calculations rather than restricting to integers. It is used internally for calculation and is provided to you for convenience.
+\subsection{Main}
+The Main class begins execution of the game, and stores static convenience methods for use all over the project.
+\subsection{Manager}
+The Manager class is abstract - it is up to you to extend it. The non-abstract behavior of the Manager class gives convenience methods for getting the map, trucks, and parcels associated with the game. It also gives the Notification enum, which specifies the different reasons a Truck would notify the Manager of a change.
+\subsection{Game}
+An instance of the Game class represents the game as a whole. The game class is the unifying factor that ties all of the other pieces together, along with communicating with the GUI to make sure the visual version of the game is up to date. It includes convenience methods for querying the current state of the game.
+\subsection{Your Manager}
+An instance of Your Manager fills in the missing behavior of the Manager class to determine how the game runs. See the next section for more on what you have to do in your extension of the Manager class.
 
 \newpage
 \section{4. Your Tasks}
-In order to complete the assignment, your primary task is write a class extending the abstract Manager class explained in the previous section. In order to do this, you will have to override and implement the two abstract methods declared in the Manager class: \textbf{run()} and \textbf{truckNotification(Truck t, Notification message)}. These two methods determine the behavior of the trucks in the game.\\
+In order to complete the assignment, your primary task is write a class extending the abstract Manager class explained in the previous section. In order to do this, you will have to override and implement the two abstract methods declared in the Manager class: \textbf{run()} and \textbf{truckNotification(Truck t, Notification message)}. These two methods determine the behavior of the trucks in the game. On their own, trucks don't do anything; it's up to you to instruct them.\\
+
+\begin{figure}[h]
+\centerline{\includegraphics[scale=0.4]{fry.jpg}} 
+\caption{\em{The average intelligence of your shipping boys}}
+\end{figure}
 
 run() is called by the game as soon as the game begins, and allows you to do initial computation and give your trucks their initial set of instructions. Additionally, the body of run() will run in a separate thread from all of the trucks, so you can continue to do computation after the trucks have begun their travel. Your implementation can either loop forever and continually add information to the trucks or execute a single time for initial instructions and then rely on the truckNotification method for further interaction.\\
 
