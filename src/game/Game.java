@@ -154,10 +154,12 @@ public class Game implements JSONString{
 			setRunning(true);
 			for(Truck t : trucks){
 				Thread th = new Thread(t);
+				t.setThread(th);
 				th.start();
 			}
 
 			Thread m = new Thread(manager);
+			manager.setThread(m);
 			m.start();
 		}
 	}
@@ -217,11 +219,7 @@ public class Game implements JSONString{
 				t.gameOver();
 			}
 
-			try {
-				manager.gameOver();
-			} catch (InterruptedException e) {
-				e.printStackTrace();
-			}
+			manager.gameOver();
 		}
 	}
 
@@ -238,11 +236,7 @@ public class Game implements JSONString{
 			t.gameOver();
 		}
 
-		try {
-			manager.gameOver();
-		} catch (InterruptedException e) {
-			e.printStackTrace();
-		}
+		manager.gameOver();
 	}
 
 	private static final String MAP_TOKEN = "map";

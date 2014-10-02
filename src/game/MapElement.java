@@ -9,9 +9,10 @@ import org.json.JSONString;
  * string name to draw on the GUI, where to draw that name, what color it is, and if a truck is currently on it.
  * 
  * All map elements must also be JSON-able, and override the toJSONString method.
+ * All map elements must be able to store and return user data stored in them.
  * @author MPatashnik
  */
-public interface MapElement extends JSONString, Colorable{
+public interface MapElement extends JSONString, Colorable, UserData{
 
 	/** The key for the name field for JSON implementations. */
 	public static final String NAME_TOKEN = "name";

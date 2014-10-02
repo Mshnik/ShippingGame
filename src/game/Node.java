@@ -21,7 +21,7 @@ import java.util.concurrent.Semaphore;
  *  
  *  @author MPatashnik
  **/
-public class Node implements MapElement, UserData{
+public class Node implements MapElement{
 
 	private final Game game;
 

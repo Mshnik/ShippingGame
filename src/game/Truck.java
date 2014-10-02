@@ -3,6 +3,7 @@ import gui.Circle;
 
 import java.awt.Color;
 import java.util.LinkedList;
+import java.util.List;
 import java.util.Queue;
 import java.util.concurrent.Semaphore;
 
@@ -21,7 +22,7 @@ import java.util.concurrent.Semaphore;
  * this change, allowing for input at that time.
  * @author MPatashnik
  */
-public class Truck implements MapElement, Runnable, Colorable, UserData{
+public class Truck implements MapElement, Runnable{
 
 	/** The Two States that a Truck can be in at any time - either Waiting (staying on its location
 	 * and awaiting further travel instructions) or Traveling (currently moving from node to node
@@ -65,6 +66,7 @@ public class Truck implements MapElement, Runnable, Colorable, UserData{
 	private Object userData;
 
 	private final Game game;		//The game this truck belongs to
+	private Thread thread;			//The thread this truck is running in
 
 	/** Constructor for the Truck Class. Uses a default color
 	 * @param g - the Game this Truck belongs to
@@ -73,7 +75,7 @@ public class Truck implements MapElement, Runnable, Colorable, UserData{
 	 * 
 	 * Speed defaults to EFFICIENT_SPEED
 	 */
-	protected Truck(Game g, String name, Node startLocation){
+	protected Truck(Game g, Thread t, String name, Node startLocation){
 		this(g, name, startLocation, Score.getRandomColor());
 	}
 
@@ -159,6 +161,12 @@ public class Truck implements MapElement, Runnable, Colorable, UserData{
 		return game;
 	}
 
+	/** Sets the thread this truck is running in */
+	void setThread(Thread t){
+		t.setName("TRUCK-THREAD:"+getTruckName());
+		thread = t;
+	}
+	
 	/** Returns the name of this Truck */
 	public String getTruckName(){
 		return name;
@@ -465,6 +473,30 @@ public class Truck implements MapElement, Runnable, Colorable, UserData{
 		travel.add(r);
 		travelLock.release();
 	}
+	
+	/** Sets the travel queue to travel the given list of edges, in order. */
+	public void setTravelQueue(List<Edge> path){
+		for(Edge e : path){
+			addToTravel(e);
+		}
+	}
+	
+	/** Sets the travel queue to travel the given path.
+	 * First element should be the truck's current location, and the last
+	 * is the expected destination
+	 * @throws RuntimeException if the truck isn't currently at the first node in the path
+	 */
+	public void setTravelPath(List<Node> path) throws RuntimeException{
+		if(path.get(0) != getLocation())
+			throw new RuntimeException("Can't travel " + path + " because " + this + " is currently at " + getLocation());
+		Node prev = null;
+		for(Node n : path){
+			if(prev != null){
+				addToTravel(prev.getConnect(n));
+			}
+			prev = n;
+		}
+	}
 
 	/** Pops the front road r of this Truck's travel plans, in a fashion that prevents thread collision.
 	 * Returns null if the thread is interrupted.
@@ -632,6 +664,10 @@ public class Truck implements MapElement, Runnable, Colorable, UserData{
 	/** Called by the Game when the game is done. Causes this thread to die */
 	protected void gameOver(){
 		clearTravel();
+		try{
+			thread.join(1000); //Try to join it.
+			thread.interrupt(); //Failed - just interrupt
+		}catch(InterruptedException e){}
 	}
 
 	@Override
