@@ -10,6 +10,7 @@ import javax.swing.JLabel;
 
 import java.awt.Color;
 import javax.swing.border.LineBorder;
+import javax.swing.ButtonGroup;
 import javax.swing.JFileChooser;
 import javax.swing.JMenuBar;
 import javax.swing.JMenu;
@@ -18,14 +19,14 @@ import javax.swing.JMenuItem;
 
 import java.awt.event.ActionListener;
 import java.awt.event.ActionEvent;
+import java.awt.event.ItemEvent;
+import java.awt.event.ItemListener;
 import java.io.File;
-import java.io.IOException;
 
 import javax.swing.BoxLayout;
 import java.awt.SystemColor;
-import javax.swing.JCheckBoxMenuItem;
-import javax.swing.event.ChangeListener;
-import javax.swing.event.ChangeEvent;
+import javax.swing.JRadioButtonMenuItem;
+import java.awt.Font;
 
 /** The GUI Class creates the JFrame that shows the game.
  * The user and the manager have no interaction with the GUI class.
@@ -59,7 +60,6 @@ public class GUI extends JFrame{
 
 	private JLabel lblUpdate;
 	private JLabel lblScore;
-	private JLabel editLbl;
 	private JMenuBar menuBar;
 
 	/** GUI constructor. Creates a window to show a game */
@@ -135,6 +135,20 @@ public class GUI extends JFrame{
 		});
 		mnFile.add(mntmLoadGame);
 
+		JMenuItem mntmQuit = new JMenuItem("Quit");
+		mntmQuit.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				int returnVal = JOptionPane.showConfirmDialog(null, "Are You Sure You Want to Quit?");
+				if(returnVal == JOptionPane.YES_OPTION){
+					System.exit(0);
+				}
+			}
+		});
+		mnFile.add(mntmQuit);
+
+		JMenu mnGame = new JMenu("Game");
+		menuBar.add(mnGame);
+
 		JMenuItem mntmStart = new JMenuItem("Start");
 		mntmStart.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
@@ -142,7 +156,7 @@ public class GUI extends JFrame{
 					game.start();
 			}
 		});
-		mnFile.add(mntmStart);
+		mnGame.add(mntmStart);
 
 		JMenuItem mntmReset = new JMenuItem("Reset");
 		mntmReset.addActionListener(new ActionListener() {
@@ -160,54 +174,7 @@ public class GUI extends JFrame{
 				}
 			}
 		});
-		mnFile.add(mntmReset);
-
-		JMenuItem mntmQuit = new JMenuItem("Quit");
-		mntmQuit.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent e) {
-				int returnVal = JOptionPane.showConfirmDialog(null, "Are You Sure You Want to Quit?");
-				if(returnVal == JOptionPane.YES_OPTION){
-					System.exit(0);
-				}
-			}
-		});
-		mnFile.add(mntmQuit);
-
-		JMenu mnGame = new JMenu("Game");
-		menuBar.add(mnGame);
-
-		JCheckBoxMenuItem chckbxmntmShowEditToolbar = new JCheckBoxMenuItem("Show Edit Toolbar");
-		chckbxmntmShowEditToolbar.addChangeListener(new ChangeListener() {
-			public void stateChanged(ChangeEvent e) {
-				if(game != null && ! game.isRunning()){
-					JCheckBoxMenuItem source = (JCheckBoxMenuItem)e.getSource();
-					editMode = source.isSelected();
-					if(editMode){
-						editLbl.setText("Editing");
-					} else {
-						editLbl.setText("");
-					}
-				}
-			}
-		});
-		mnGame.add(chckbxmntmShowEditToolbar);
-
-		JMenuItem mntmSaveMap = new JMenuItem("Save");
-		mntmSaveMap.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent arg0) {
-				if(game != null && !game.isRunning()){
-					String mapName = JOptionPane.showInputDialog("Enter New Map Name");
-					if(mapName != null && !mapName.equals("")){
-						try {
-							game.writeGame(mapName);
-						} catch (IOException e) {
-							e.printStackTrace();
-						}
-					}
-				}
-			}
-		});
-		mnGame.add(mntmSaveMap);
+		mnGame.add(mntmReset);
 
 		JMenuItem mntmPrintJSON = new JMenuItem("Print Game JSON");
 		mntmPrintJSON.addActionListener(new ActionListener() {
@@ -217,13 +184,46 @@ public class GUI extends JFrame{
 		});
 		mnGame.add(mntmPrintJSON);
 
-		editLbl = new JLabel("");
-		editLbl.setForeground(Color.RED);
-		menuBar.add(editLbl);
+		JMenu mnGUI = new JMenu("GUI");
+		menuBar.add(mnGUI);
+
+		JLabel lblEdgeColoring = new JLabel(" Edge Coloring");
+		lblEdgeColoring.setFont(new Font("Lucida Grande", Font.PLAIN, 14));
+		mnGUI.add(lblEdgeColoring);
+
+		ButtonGroup edgeStyleGroup = new ButtonGroup();
+
+		JRadioButtonMenuItem d = addEdgeStyleCheckbox("Default", Line.ColorPolicy.DEFAULT, mnGUI, edgeStyleGroup);
+		d.setSelected(true);
+
+		addEdgeStyleCheckbox("Highlight Travel", Line.ColorPolicy.HIGHLIGHT_TRAVEL, mnGUI, edgeStyleGroup);
+		addEdgeStyleCheckbox("Gradient", Line.ColorPolicy.DISTANCE_GRADIENT, mnGUI, edgeStyleGroup);
 
 		setVisible(true);
 		pack();
 		repaint();
+	}
+
+	/** Creates and adds to the gui a checkbox with the given text for edge paint style.
+	 * Returns a reference to the created checkbox */
+	private JRadioButtonMenuItem addEdgeStyleCheckbox(String s, final Line.ColorPolicy k, final JMenu mnGUI, ButtonGroup edgeStyleGroup){
+		JRadioButtonMenuItem r = new JRadioButtonMenuItem(s);
+		r.addItemListener(new ItemListener() {
+			public void itemStateChanged(ItemEvent event) {
+				if (event.getStateChange() == ItemEvent.SELECTED) {
+					Line.setColorPolicy(k);
+					if(game != null && game.getMap() != null){
+						for(Edge ed : game.getMap().getEdges()){
+							ed.getLine().updateToColorPolicy();
+						}
+					}
+					drawingPanel.repaint();
+				}
+			}
+		});
+		edgeStyleGroup.add(r);
+		mnGUI.add(r);
+		return r;
 	}
 
 	/** GUI Constructor. Creates a window to show game g */
@@ -237,6 +237,12 @@ public class GUI extends JFrame{
 		final int maxX = drawingPanel.getBounds().width - NODE_BUFFER_SIZE*2;
 		final int maxY = drawingPanel.getBounds().height - NODE_BUFFER_SIZE*2;
 
+		//Add parcels and trucks so they get painted under nodes
+		for(Parcel p : game.getParcels()){
+			drawingPanel.remove(p.getCircle());
+			drawingPanel.add(p.getCircle());
+		}
+
 		//Draw the edges on the map
 		for(Edge r : game.getMap().getEdges()){
 			Line l = r.getLine();
@@ -247,7 +253,7 @@ public class GUI extends JFrame{
 			drawingPanel.remove(l);
 			drawingPanel.add(l);
 		}
-		
+
 		//Fix the positions of the nodes on the panel using the Force model.
 		//See the Flexor class for how this is done.
 		//Done in seperate thread so progress can be seen. drawingPanel is notified when this is done.
@@ -259,7 +265,7 @@ public class GUI extends JFrame{
 				}
 			}
 		}).start();
-		
+
 		try {
 			synchronized(drawingPanel){
 				drawingPanel.wait();
@@ -267,36 +273,41 @@ public class GUI extends JFrame{
 		} catch (InterruptedException e2) {
 			e2.printStackTrace();
 		}
-		
-		//Draw the parcels on the map
+
+		//Set Locations the parcels on the map
 		for(Parcel p : game.getParcels()){
 			p.getCircle().setX1(p.getLocation().getCircle().getX1());
 			p.getCircle().setY1(p.getLocation().getCircle().getY1());
-			//p.getCircle().setBounds(drawingPanel.getBounds());
-			drawingPanel.remove(p.getCircle());
-			drawingPanel.add(p.getCircle());
 		}
 
 		//Draw the trucks on the map
 		for(Truck t : game.getTrucks()){
 			Circle c = t.getCircle();
 			c.setBounds(drawingPanel.getBounds());
-			boolean unset = true;
-			while(unset){
-				try {
-					c.setX1(t.getLocation().getCircle().getX1());
-					c.setY1(t.getLocation().getCircle().getY1());
-					unset = false;
-				} catch (InterruptedException e) {
-					try {
-						Thread.sleep(50);
-					} catch (InterruptedException e1) {
-						e1.printStackTrace();
-					}
-				}
-			}
+			c.setX1(t.getLocation().getCircle().getX1());
+			c.setY1(t.getLocation().getCircle().getY1());
 			drawingPanel.remove(c);
 			drawingPanel.add(c);
+		}
+
+		//Fix the z-ordering of elements on the panel
+		//Higher z painted first -> lower z paint over higher z
+		int z = 0;
+		for(Node n : game.getMap().getNodes()){
+			drawingPanel.setComponentZOrder(n.getCircle(), z);
+			z++;
+		}
+		for(Parcel p : game.getParcels()){
+			drawingPanel.setComponentZOrder(p.getCircle(), z);
+			z++;
+		}
+		for(Edge e : game.getMap().getEdges()){
+			drawingPanel.setComponentZOrder(e.getLine(), z);
+			z++;
+		}
+		for(Truck t : game.getTrucks()){
+			drawingPanel.setComponentZOrder(t.getCircle(), z);
+			z++;
 		}
 
 		repaint();
@@ -338,7 +349,10 @@ public class GUI extends JFrame{
 
 	/** Amount of time to wait after an update message is posted to delete it (in ms) */
 	private static final int MESSAGE_DELETE_TIME = 3000; 
-	
+
+	/** The timer thread to clear the update message after a few seconds */
+	private static Thread messageClearer;
+
 	/** Updates the GUI to show the given String as an update message.
 	 * Also starts a timer thread to delete the message after a few seconds. */
 	public void setUpdateMessage(String newUpdate){
@@ -348,11 +362,14 @@ public class GUI extends JFrame{
 			public void run() {
 				try {
 					Thread.sleep(MESSAGE_DELETE_TIME);
+					setUpdateMessage("  ");
 				} catch (InterruptedException e) {}
-				setUpdateMessage("  ");
 			}
 		};
-		Thread t = new Thread(r);
-		t.start();
+		if(messageClearer != null && messageClearer.isAlive()){
+			messageClearer.interrupt();
+		}
+		messageClearer = new Thread(r);
+		messageClearer.start();
 	}
 }

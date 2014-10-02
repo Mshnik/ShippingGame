@@ -1,5 +1,6 @@
 {
 "map":{
+"scoreCoeff":[-1,-100,-100,5000,3],
 "node-0":{
 "name":"Miami"
 },

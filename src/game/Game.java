@@ -122,8 +122,6 @@ public class Game implements JSONString{
 		return true;
 	}
 
-
-
 	/** Returns the value of the score*/
 	public int getScoreValue(){
 		return score.value();
@@ -156,10 +154,12 @@ public class Game implements JSONString{
 			setRunning(true);
 			for(Truck t : trucks){
 				Thread th = new Thread(t);
+				t.setThread(th);
 				th.start();
 			}
 
 			Thread m = new Thread(manager);
+			manager.setThread(m);
 			m.start();
 		}
 	}
@@ -192,12 +192,8 @@ public class Game implements JSONString{
 	protected void deliverParcel(Parcel p, Node n, Truck t){
 		if(p.getDestination() != n)
 			throw new IllegalArgumentException("Parcel " + p + "'s final destination is not " + n.getName() + ". Cannot Deliver Here");
-		try {
-			if(t.getLocation() != n)
-				throw new IllegalArgumentException("Truck " + t + "Is not currently at " + n.getName() + ". Cannot Deliver Here");
-		} catch (InterruptedException e1) {
-			e1.printStackTrace();
-		}
+		if(t.getLocation() != n)
+			throw new IllegalArgumentException("Truck " + t + "Is not currently at " + n.getName() + ". Cannot Deliver Here");
 		if(t.getLoad() != p)
 			throw new IllegalArgumentException("Truck " + t + "Is not currently holding Parcel " + p + ". Cannot Deliver Here");
 
@@ -220,18 +216,10 @@ public class Game implements JSONString{
 		if(running){
 			setRunning(false);
 			for(Truck t : getTrucks()){
-				try {
-					t.gameOver();
-				} catch (InterruptedException e) {
-					e.printStackTrace();
-				}
+				t.gameOver();
 			}
 
-			try {
-				manager.gameOver();
-			} catch (InterruptedException e) {
-				e.printStackTrace();
-			}
+			manager.gameOver();
 		}
 	}
 
@@ -245,18 +233,10 @@ public class Game implements JSONString{
 		gui.repaint();
 
 		for(Truck t : getTrucks()){
-			try {
-				t.gameOver();
-			} catch (InterruptedException e) {
-				e.printStackTrace();
-			}
+			t.gameOver();
 		}
 
-		try {
-			manager.gameOver();
-		} catch (InterruptedException e) {
-			e.printStackTrace();
-		}
+		manager.gameOver();
 	}
 
 	private static final String MAP_TOKEN = "map";
@@ -321,10 +301,10 @@ public class Game implements JSONString{
 			coeffs[i] = scoreJSON.getInt(i);
 		}
 		map = new Map(coeffs);
-		
+
 		trucks = new ArrayList<Truck>();
 		parcels = new HashSet<Parcel>();
-		
+
 		//Read in all nodes of map
 		for(String key : mapJSON.keySet()){
 			if(key.startsWith(Map.NODE_TOKEN)){

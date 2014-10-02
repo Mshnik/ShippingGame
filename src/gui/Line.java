@@ -25,17 +25,24 @@ public class Line  extends JPanel{
 	public static final Color DEFAULT_COLOR = Color.DARK_GRAY;
 	public static final Color TRAVELING_COLOR = Color.RED;
 
-	public static final int COLOR_POLICY_DEFAULT = 0;
-	public static final int COLOR_POLICY_HIGHLIGHT_TRAVEL = 1;
-	public static final int COLOR_POLICY_DISTANCE_GRADIENT = 2;
+	/** The different ways to draw the edges of the graph.
+	 * Default - all single color
+	 * Highlight color - all default color, but highlighted when a truck is traveling it
+	 * Distance gradient - shorter edges lighter, longer edges darker
+	 * @author MPatashnik
+	 *
+	 */
+	public enum ColorPolicy{
+		DEFAULT,
+		HIGHLIGHT_TRAVEL,
+		DISTANCE_GRADIENT
+	}
 
 	private static final Color GRADIENT_SHORT_COLOR = Color.CYAN;
 	private static final Color GRADIENT_LONG_COLOR = Color.BLACK;
 
-	private static final int[] ACCEPTABLE_COLOR_POLICIES = {COLOR_POLICY_DEFAULT, COLOR_POLICY_HIGHLIGHT_TRAVEL, 
-		COLOR_POLICY_DISTANCE_GRADIENT};
 
-	private static int colorPolicy = COLOR_POLICY_DISTANCE_GRADIENT;
+	private static ColorPolicy colorPolicy = ColorPolicy.DEFAULT;
 
 	private Circle c1;
 	private Circle c2;
@@ -123,10 +130,10 @@ public class Line  extends JPanel{
 	 * @throws RuntimeException if the colorPolicy is an illegal value*/
 	public void updateToColorPolicy() throws RuntimeException{
 		switch(colorPolicy){
-		case COLOR_POLICY_DEFAULT:
+		case DEFAULT:
 			color = DEFAULT_COLOR;
 			break;
-		case COLOR_POLICY_HIGHLIGHT_TRAVEL:
+		case HIGHLIGHT_TRAVEL:
 			boolean b = true;
 			try{
 				b = represents.trucksHere() > 0;
@@ -136,7 +143,7 @@ public class Line  extends JPanel{
 			else
 				color = DEFAULT_COLOR;
 			break;
-		case COLOR_POLICY_DISTANCE_GRADIENT:
+		case DISTANCE_GRADIENT:
 			color = getDistGradientColor();
 			break;
 		default:
@@ -162,28 +169,18 @@ public class Line  extends JPanel{
 	}
 
 	/** Returns the color policy for painting roads. May be one of the following:
-	 * 	<br> COLOR_POLICY_DEFAULT - paint all roads the default color
-	 * 	<br> COLOR_POLICY_HIGHLIGHT_TRAVEL - highlight the roads that are currently being traveled
-	 *  <br> COLOR_POLICY_DISTANCE_GRADIENT - paint roads according to their length value
+	 * 	<br> DEFAULT - paint all roads the default color
+	 * 	<br> HIGHLIGHT_TRAVEL - highlight the roads that are currently being traveled
+	 *  <br> DISTANCE_GRADIENT - paint roads according to their length value
 	 */
-	public static int getColorPolicy(){
+	public static ColorPolicy getColorPolicy(){
 		return colorPolicy;
 	}
 
-	/** Sets the colorPolicy to one of the following:
-	 * 	<br> COLOR_POLICY_DEFAULT - paint all roads the default color
-	 * 	<br> COLOR_POLICY_HIGHLIGHT_TRAVEL - highlight the roads that are currently being traveled
-	 *  <br> COLOR_POLICY_DISTANCE_GRADIENT - paint roads according to their length value
-	 *  @throws IllegalArgumentException - if an unrecognized policy is given
+	/** Sets the colorPolicy to one of the colorPolicies listed in the ColorPolicy enum
 	 */
-	public static void setColorPolicy(int policy){
-		for(int i = 0; i < ACCEPTABLE_COLOR_POLICIES.length; i++)
-			if(policy == ACCEPTABLE_COLOR_POLICIES[i]){
-				colorPolicy = policy;
-				return;
-			}
-
-		throw new IllegalArgumentException("Unrecognized ColorPolicy given to Line Class");
+	public static void setColorPolicy(ColorPolicy policy){
+		colorPolicy = policy;
 	}
 
 	/** Returns the MapElement this object represents */

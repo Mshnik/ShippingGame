@@ -3,6 +3,7 @@ import gui.Circle;
 
 import java.awt.Color;
 import java.util.LinkedList;
+import java.util.List;
 import java.util.Queue;
 import java.util.concurrent.Semaphore;
 
@@ -21,7 +22,7 @@ import java.util.concurrent.Semaphore;
  * this change, allowing for input at that time.
  * @author MPatashnik
  */
-public class Truck implements MapElement, Runnable, Colorable, UserData{
+public class Truck implements MapElement, Runnable{
 
 	/** The Two States that a Truck can be in at any time - either Waiting (staying on its location
 	 * and awaiting further travel instructions) or Traveling (currently moving from node to node
@@ -33,7 +34,7 @@ public class Truck implements MapElement, Runnable, Colorable, UserData{
 
 	private static final int WAIT_TIME = 5;
 	protected static final int NUMB_DEFAULT_TRAVEL_DIRECTIONS = 200;
-	
+
 	private String name;			//The name of this truck
 	private Circle circle;			//The circle that represents this Graphically
 	private Color color = Circle.DEFAULT_TRUCK_COLOR;
@@ -57,13 +58,15 @@ public class Truck implements MapElement, Runnable, Colorable, UserData{
 	private int speed; //The number of units this moves per frame when traveling. Must be between min and max
 	private Semaphore speedLock; 	//Lock for getting/changing speed
 	private Semaphore locLock;   	// A lock associated with the changing of locaiton, travelingTo, goingTo, etc.
-	                             	//Lock should be released before any notifications are fired.
+	//Lock should be released before any notifications are fired.
 	private Semaphore statusLock; 	//A Lock for the status of this truck.
 	private Semaphore parcelLock;	//A Lock for the parcel this truck is carrying
-	
+	private Semaphore travelLock;	//A Lock for editing/accessing the travel queue.
+
 	private Object userData;
 
 	private final Game game;		//The game this truck belongs to
+	private Thread thread;			//The thread this truck is running in
 
 	/** Constructor for the Truck Class. Uses a default color
 	 * @param g - the Game this Truck belongs to
@@ -72,7 +75,7 @@ public class Truck implements MapElement, Runnable, Colorable, UserData{
 	 * 
 	 * Speed defaults to EFFICIENT_SPEED
 	 */
-	protected Truck(Game g, String name, Node startLocation){
+	protected Truck(Game g, Thread t, String name, Node startLocation){
 		this(g, name, startLocation, Score.getRandomColor());
 	}
 
@@ -93,6 +96,7 @@ public class Truck implements MapElement, Runnable, Colorable, UserData{
 		locLock = new Semaphore(1);
 		statusLock = new Semaphore(1);
 		parcelLock = new Semaphore(1);
+		travelLock = new Semaphore(1);
 
 		location = startLocation;
 		travelingTo = null;
@@ -113,18 +117,7 @@ public class Truck implements MapElement, Runnable, Colorable, UserData{
 		lastTravelTime = System.currentTimeMillis();
 		while(game.isRunning()){
 
-			boolean unset = true;
-			while(unset){
-				try {
-					setGoingTo(null);
-					unset = false;
-				} catch (InterruptedException e1) {
-					unset = true; //Try to setGoingTo again.
-					try {
-						Thread.sleep(5);
-					} catch (InterruptedException e) {}
-				}
-			}
+			setGoingTo(null);
 
 			while(travel.isEmpty() && game.isRunning()){
 				try{
@@ -134,28 +127,21 @@ public class Truck implements MapElement, Runnable, Colorable, UserData{
 				catch (InterruptedException e){
 					e.printStackTrace();
 				}
-				unset = true;
-				while(unset){
+
+				setGoingTo(null);
+
+				fixLastTravelTime();
+				while(!travel.isEmpty() && game.isRunning()){
 					try {
-						setGoingTo(null);
-						unset = false;
-					} catch (InterruptedException e1) {
-						unset = true; //Try to setstatus again.
-						try {
-							Thread.sleep(5);
-						} catch (InterruptedException e) {}
+						Edge r = getTravel();
+						travel(r);
+					} catch (InterruptedException e){
+						e.printStackTrace();
+					} catch (IllegalArgumentException e) {
+						clearTravel(); //If traveling isn't valid, clear the queue
 					}
+					fixLastTravelTime();
 				}
-				fixLastTravelTime();
-			}
-			while(!travel.isEmpty() && game.isRunning()){
-				Edge r = getTravel();
-				try {
-					travel(r);
-				} catch (InterruptedException e) {
-					e.printStackTrace();
-				}
-				fixLastTravelTime();
 			}
 		}
 		//Deduct final waiting points
@@ -174,6 +160,12 @@ public class Truck implements MapElement, Runnable, Colorable, UserData{
 	public Game getGame(){
 		return game;
 	}
+
+	/** Sets the thread this truck is running in */
+	void setThread(Thread t){
+		t.setName("TRUCK-THREAD:"+getTruckName());
+		thread = t;
+	}
 	
 	/** Returns the name of this Truck */
 	public String getTruckName(){
@@ -185,16 +177,21 @@ public class Truck implements MapElement, Runnable, Colorable, UserData{
 		name = newName;
 	}
 
-	/** Returns the Truck's current location. If this.status.equals(Status.TRAVELING), returns null 
-	 * @throws InterruptedException */
-	public Node getLocation() throws InterruptedException{
+	/** Returns the Truck's current location. 
+	 *  If this.status.equals(Status.TRAVELING) or thread is interrupted, returns null 
+	 */
+	public Node getLocation(){
 		if(status.equals(Status.TRAVELING))
 			return null;
 
-		locLock.acquire();
-		Node n = location;
-		locLock.release();
-		
+		Node n;
+		try {
+			locLock.acquire();
+			n = location;
+			locLock.release();
+		} catch (InterruptedException e) {
+			return null;
+		}
 		return n;
 	}
 
@@ -210,16 +207,21 @@ public class Truck implements MapElement, Runnable, Colorable, UserData{
 		}
 	}
 
-	/** Returns the Truck's current destination. If this.status.equals(Status.WAITING), returns null 
+	/** Returns the Truck's current destination. 
+	 * If this.status.equals(Status.WAITING) or thread is interrupted, returns null 
 	 * @throws InterruptedException */
-	public Node getTravelingTo() throws InterruptedException{
+	public Node getTravelingTo(){
 		if(status.equals(Status.WAITING))
 			return null;
 
-		locLock.acquire();
+		try {
+			locLock.acquire();
+		} catch (InterruptedException e) {
+			return null;
+		}
 		Node n = travelingTo;
 		locLock.release();
-		
+
 		return n;
 	}
 
@@ -235,61 +237,80 @@ public class Truck implements MapElement, Runnable, Colorable, UserData{
 		}
 	}
 
-	/** Returns the edge this Truck is traveling along. Returns null if status.equals(Status.WAITING) 
+	/** Returns the edge this Truck is traveling along. 
+	 * Returns null if status.equals(Status.WAITING) or thread is interrupted 
 	 * @throws InterruptedException */
-	public Edge getTravelingAlong() throws InterruptedException{
-		locLock.acquire();
+	public Edge getTravelingAlong(){
+		try {
+			locLock.acquire();
+		} catch (InterruptedException e1) {
+			return null;
+		}
 		Edge e = travelingAlong;
 		locLock.release();
 		return e;
 	}
 
 	/** Returns the node this truck is coming from, the rear exit of the edge it is currently on.
-	 * Returns null if status.equals(Status.WAITING)
-	 * @throws InterruptedException 
+	 * Returns null if status.equals(Status.WAITING) or if the thread is interrupted
 	 */
-	public Node getComingFrom() throws InterruptedException{
+	public Node getComingFrom(){
 		if(status.equals(Status.WAITING))
 			return null;
 
-		locLock.acquire();
+		try {
+			locLock.acquire();
+		} catch (InterruptedException e) {
+			return null;
+		}
 		Node n = travelingAlong.getOther(travelingTo);
 		locLock.release();
-		
+
 		return n;
 	}
 
 	/** Returns the Truck's eventual destination; the Node this Truck will be at when the current travel
-	 * queue is empty. If this.status.equals(Status.WAITING), returns null
-	 * @throws InterruptedException 
+	 * queue is empty. If this.status.equals(Status.WAITING) or thread is interrupted, returns null
 	 */
-	public Node getGoingTo() throws InterruptedException{
+	public Node getGoingTo(){
 		if(status.equals(Status.WAITING))
 			return null;
 
-		locLock.acquire();
+		try {
+			locLock.acquire();
+		} catch (InterruptedException e) {
+			return null;
+		}
 		Node n = goingTo;
 		locLock.release();
-		
+
 		return n;
 	}
 
 	/** Sets this Truck's goingTo to Node g and fires a Manager Notification.
 	 * Does not fire a Manager Notification if goingTo.equals(g)
-	 * @throws InterruptedException */
-	private void setGoingTo(Node g) throws InterruptedException{
+	 * Does nothing if thread is interrupted */
+	private void setGoingTo(Node g){
 		if(goingTo == null || !goingTo.equals(g)){
-			locLock.acquire();
+			try {
+				locLock.acquire();
+			} catch (InterruptedException e) {
+				return;
+			}
 			goingTo = g;
 			locLock.release();
 			game.getManager().truckNotification(this, Manager.Notification.GOING_TO_CHANGED);
 		}
 	}
 
-	/** Returns the current status of this Truck, either TRAVELING or WAITING 
-	 * @throws InterruptedException */
-	public Truck.Status getStatus() throws InterruptedException{
-		statusLock.acquire();
+	/** Returns the current status of this Truck, either TRAVELING or WAITING
+	 * Returns null if the thread is interrupted */
+	public Truck.Status getStatus(){
+		try {
+			statusLock.acquire();
+		} catch (InterruptedException e) {
+			return null;
+		}
 		Truck.Status s = status;
 		statusLock.release();
 		return s;
@@ -332,18 +353,26 @@ public class Truck implements MapElement, Runnable, Colorable, UserData{
 		circle.setColor(c);
 	}
 
-	/** Returns the speed this truck will/is traveling 
-	 * @throws InterruptedException */
-	public int getSpeed() throws InterruptedException{
-		speedLock.acquire();
+	/** Returns the speed this truck will/is traveling.
+	 * Returns -1 if the thread is interrupted */
+	public int getSpeed(){
+		try {
+			speedLock.acquire();
+		} catch (InterruptedException e) {
+			return -1;
+		}
 		int i = speed;
 		speedLock.release();
 		return i;
 	}
 
-	/** Sets this trucks speed */
-	public void setSpeed(int newSpeed) throws InterruptedException{
-		speedLock.acquire();
+	/** Sets this trucks speed. Does not change the speed if the thread is interrupted */
+	public void setSpeed(int newSpeed){
+		try {
+			speedLock.acquire();
+		} catch (InterruptedException e) {
+			return;
+		}
 		speed = newSpeed;
 		speedLock.release();
 	}
@@ -358,43 +387,34 @@ public class Truck implements MapElement, Runnable, Colorable, UserData{
 		userData = uData;
 	}
 
-	/** The state of loading a parcel - use for loadUnloadParcel(..) */
-	public static final boolean LOAD = true;
-	/** The state of unloading a parcel - use for loadUnloadParcel(..) */
-	public static final boolean UNLOAD = false;
-
-	/** Handles loading and unloading parcels.
-	 * Only permit loading/unloading if this is waiting - if it is currently traveling,
-	 * don't do any loading/unloading.
-	 * 
-	 * @param p - The parcel to pick up or drop off
-	 * @param state - either Truck.LOAD or Truck.UNLOAD
-	 * 
-	 * @throws RuntimeException - @see pickupLoad(p)
-	 * @throws InterruptedException 
-	 */
-	public void loadUnloadParcel(Parcel p, boolean state) throws RuntimeException, InterruptedException{
-		if(getStatus() == Status.TRAVELING)
-			return;
-		if(state == LOAD)
-			pickupLoad(p);
-		else if(state == UNLOAD)
-			dropoffLoad();
-	}
-
 	/** Picks up parcel p at the current location. If there is, adds it to Truck and waits PARCEL_PICKUP_TIME seconds
 	 * @throws RuntimeException  - if load is not null (can't pick up) or if this Truck is currently traveling.
-	 * @throws InterruptedException 
+	 * Does nothing if the thread is interrupted
 	 *  */
-	private void pickupLoad(Parcel p) throws RuntimeException, InterruptedException{
+	public void pickupLoad(Parcel p) throws RuntimeException{
+		if(getStatus() == Status.TRAVELING)
+			return;
+
 		if(load != null)
 			throw new RuntimeException("Can't Pickup Parcel with non-null load. Already holding a Parcel.");
 
 		if(location.getTrueParcels().contains(p)){
-			parcelLock.acquire();
+			try {
+				parcelLock.acquire();
+			} catch (InterruptedException e) {
+				return;
+			}
 			location.getTrueParcels().remove(p);
 			load = p;
-			load.loadUnload(this, Truck.LOAD);
+			try {
+				load.pickedUp(this);
+			} catch (InterruptedException e) {
+				//Undo changes thus far to make it so that no pickup happened.
+				location.getTrueParcels().add(p);
+				load = null;
+				parcelLock.release();
+				return;
+			}
 			parcelLock.release();
 
 			game.getScore().changeScore(game.getMap().PICKUP_COST);
@@ -403,14 +423,28 @@ public class Truck implements MapElement, Runnable, Colorable, UserData{
 	}
 
 	/** Drops off load at the current location. Throws a RuntimeException if load is null 
-	 * @throws InterruptedException */
-	private void dropoffLoad() throws RuntimeException, InterruptedException{
+	 * Does nothing if the thread is interrupted */
+	public void dropoffLoad() throws RuntimeException{
+		if(getStatus() == Status.TRAVELING)
+			return;
+
 		if(load == null)
 			throw new RuntimeException("Can't Drop Off a null parcel. No Parcel to drop off.");
 
-		parcelLock.acquire();
+		try {
+			parcelLock.acquire();
+		} catch (InterruptedException e) {
+			return;
+		}
 		location.getTrueParcels().add(load);
-		load.loadUnload(this, Truck.UNLOAD);
+		try {
+			load.droppedOff();
+		} catch (InterruptedException e) {
+			//Undo drop off
+			location.getTrueParcels().remove(load);
+			parcelLock.release();
+			return;
+		}
 		load = null;
 		parcelLock.release();
 		game.getScore().changeScore(game.getMap().DROPOFF_COST);
@@ -423,58 +457,74 @@ public class Truck implements MapElement, Runnable, Colorable, UserData{
 		return circle;
 	}
 
-	private static final int GET_TRAVEL = 0;
-	private static final int ADD_TO_TRAVEL = 1;
-	private static final int CLEAR_TRAVEL = 2;
-
 	/** Adds the road r to this Truck's travel plans, in a fashion that prevents thread collision 
-	 * @throws InterruptedException */
-	public void addToTravel(Edge r) throws InterruptedException{
+	 * Does nothing if the thread is interrupted*/
+	public void addToTravel(Edge r){
 		if(goingTo == null)
 			setGoingTo(r.getOther(location));
 		else
 			setGoingTo(r.getOther(goingTo));
 
-		changeTravelQueue(r, ADD_TO_TRAVEL);
+		try {
+			travelLock.acquire();
+		} catch (InterruptedException e) {
+			return;
+		}
+		travel.add(r);
+		travelLock.release();
+	}
+	
+	/** Sets the travel queue to travel the given list of edges, in order. */
+	public void setTravelQueue(List<Edge> path){
+		for(Edge e : path){
+			addToTravel(e);
+		}
+	}
+	
+	/** Sets the travel queue to travel the given path.
+	 * First element should be the truck's current location, and the last
+	 * is the expected destination
+	 * @throws RuntimeException if the truck isn't currently at the first node in the path
+	 */
+	public void setTravelPath(List<Node> path) throws RuntimeException{
+		if(path.get(0) != getLocation())
+			throw new RuntimeException("Can't travel " + path + " because " + this + " is currently at " + getLocation());
+		Node prev = null;
+		for(Node n : path){
+			if(prev != null){
+				addToTravel(prev.getConnect(n));
+			}
+			prev = n;
+		}
 	}
 
 	/** Pops the front road r of this Truck's travel plans, in a fashion that prevents thread collision.
-	 * Used for traveling within the Truck Class */
+	 * Returns null if the thread is interrupted.
+	 *  */
 	private Edge getTravel(){
-		return changeTravelQueue(null, GET_TRAVEL);
+		try {
+			travelLock.acquire();
+		} catch (InterruptedException e1) {
+			return null;
+		}
+		Edge e = travel.poll();
+		travelLock.release();
+		return e;
 	}
 
 	/** Clears the Truck's travel plans, in a fashion that prevents thread collision.
 	 * Resets goingTo (The Node the Truck will eventually end up at) to the value of the travelingTo field
 	 * (The Node the Truck is currently traveling towards) 
-	 * @throws InterruptedException */
-	public void clearTravel() throws InterruptedException{
+	 * Does nothing if the thread is interrupted */
+	public void clearTravel(){
+		try {
+			travelLock.acquire();
+		} catch (InterruptedException e) {
+			return;
+		}
 		setGoingTo(travelingTo);
-		changeTravelQueue(null, CLEAR_TRAVEL);
-	}
-
-	/** Modifies the travel queue in a way to prevent thread collision.
-	 * @param r - The Edge that should be added to the queue if state == ADD_TO_TRAVEL. Can be null if used for getting.
-	 * @param state - Either ADD_TO_TRAVEL (adding a new Node/Edge), GET_TRAVEL (polling off the top road),
-	 * 					or CLEAR_TRAVEL (clearing the Travel queue)
-	 * @return - The top Edge in the queue if GET_TRAVEL is used, null otherwise
-	 * @throws IllegalArgumentException - if a state other than GET_TRAVEL, ADD_TO_TRAVEL, or CLEAR_TRAVEL is used
-	 */
-	private synchronized Edge changeTravelQueue(Edge r, int state) throws IllegalArgumentException{
-		if(state == GET_TRAVEL){
-			return travel.poll();
-		}
-		else if(state == ADD_TO_TRAVEL){
-			travel.add(r);
-			return null;
-		}
-		else if(state == CLEAR_TRAVEL){
-			travel.clear();
-			return null;
-		}
-		else{
-			throw new IllegalArgumentException("An invalid state given. Cannot interpret use");
-		}
+		travel.clear();
+		travelLock.release();
 	}
 
 	/** Tells the Truck to travel along the given edge.
@@ -525,7 +575,7 @@ public class Truck implements MapElement, Runnable, Colorable, UserData{
 				}
 				speedLock.release();
 				double percent = (double)progress / (double)r.getLength();
-				
+
 				//Update Truck's location on the GUI
 				updateGUILocation( (int) (percent * there.getX1() + (1-percent) * here.getX1()), 
 						(int) (percent * there.getY1() + (1-percent) * here.getY1()));
@@ -611,12 +661,15 @@ public class Truck implements MapElement, Runnable, Colorable, UserData{
 		return 1;
 	}
 
-	/** Called by the Game when the game is done. Causes this thread to die 
-	 * @throws InterruptedException  - if this Truck thread is currently interrupted*/
-	protected void gameOver() throws InterruptedException{
+	/** Called by the Game when the game is done. Causes this thread to die */
+	protected void gameOver(){
 		clearTravel();
+		try{
+			thread.join(1000); //Try to join it.
+			thread.interrupt(); //Failed - just interrupt
+		}catch(InterruptedException e){}
 	}
-	
+
 	@Override
 	/** Returns a JSON String of this truck.
 	 * Just the basic truck info pertaining to map creation - location and load not included.

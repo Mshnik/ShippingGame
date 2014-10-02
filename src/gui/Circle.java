@@ -35,7 +35,7 @@ public class Circle extends JPanel{
 	private static final long serialVersionUID = 1250263410666963976L;
 
 	/** The default diameter of Circles in pixels when they are drawn on the GUI */ 
-	public static final int DEFAULT_DIAMETER = 20;
+	public static final int DEFAULT_DIAMETER = 25;
 	
 	/** Extra space to add on diameter when calculating bounds
 	 * 
@@ -238,6 +238,18 @@ public class Circle extends JPanel{
 		g2d.draw(circle2d);
 		g2d.setFont(new Font("Arial", Font.PLAIN, 13));
 		g2d.drawString(represents.getMappedName(), represents.getRelativeX() + PANEL_BUFFER, represents.getRelativeY() + PANEL_BUFFER);
+		
+		if(represents instanceof Node){
+			g2d.setColor(Color.BLACK);
+			Node n = (Node)represents;
+
+			try {
+				if(! n.getParcels().isEmpty()){
+					g2d.drawString(n.getParcels().size() + "", diameter/2 + 2, diameter/2 + PANEL_BUFFER + heightPlus);
+				}
+			} catch (InterruptedException e) {}
+		}
+		
 	}
 
 	@Override

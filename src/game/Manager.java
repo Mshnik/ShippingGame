@@ -21,6 +21,8 @@ import java.util.HashSet;
 public abstract class Manager implements Runnable{
 
 	private Game game;
+	
+	private Thread thread; //The thread this manager is running in.
 
 	/** Constructor for the Manager class.
 	 * Written to prevent public construction of Managers. */
@@ -89,9 +91,19 @@ public abstract class Manager implements Runnable{
 	public final void setGame(Game g){
 		game = g;
 	}
+	
+	/** Sets the Thread this manager is being run in */
+	final void setThread(Thread t){
+		t.setName("MANAGER-THREAD");
+		thread = t;
+	}
 
-	/** Called by the game when the game is over 
-	 * @throws InterruptedException - if this Manager is interrupted*/
-	protected final void gameOver() throws InterruptedException{}
+	/** Called by the game when the game is over */
+	final void gameOver(){
+		try {
+			thread.join(1000); //Wait some time
+			thread.interrupt(); //Just interrupt it
+		} catch (InterruptedException e) {}
+	}
 
 }

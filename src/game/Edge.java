@@ -22,7 +22,7 @@ import java.util.concurrent.Semaphore;
  * @author MPatashnik
  *
  */
-public class Edge implements MapElement, Colorable, UserData{
+public class Edge implements MapElement{
 
 	/** The length of "Blank" Edges. Should be later changed to an actual length value */
 	protected static final int DUMMY_LENGTH = Integer.MIN_VALUE;

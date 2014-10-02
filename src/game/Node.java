@@ -21,24 +21,24 @@ import java.util.concurrent.Semaphore;
  *  
  *  @author MPatashnik
  **/
-public class Node implements MapElement, UserData{
-	
+public class Node implements MapElement{
+
 	private final Game game;
-	
+
 	/** Threads need to get this to view/edit parcels at this node */
 	private Semaphore parcelLock;
-	
+
 	private Semaphore truckLock; //Lock that trucks must acquire in order to make changes to this edge.
 
 	private int truckHereCount; 			   //A count of the trucks here (mappings in truckHere to true)
 	private HashMap<Truck, Boolean> truckHere; //Maps truck -> is here
-	
+
 	private String name;
 	private HashSet<Edge> exits = new HashSet<Edge>();			//Edges leaving this Node
 	private HashSet<Parcel> parcels = new HashSet<Parcel>();	//Parcels currently here and not on truck
-	
+
 	private Object userData;
-	
+
 	private Circle circle;	//Circle that represents this graphically
 
 	/** Constructor for a named Node with no starting exits but with a specific circle drawing
@@ -58,20 +58,20 @@ public class Node implements MapElement, UserData{
 		this.game = g;
 		this.name = name;
 		if(exits != null)
-		  this.exits.addAll(exits);
-		
+			this.exits.addAll(exits);
+
 		if(c == null)
 			circle = new DraggableCircle(this, 0, 0, Circle.DEFAULT_DIAMETER);
 		else
 			circle = c;
-		
+
 		truckHereCount = 0;
 		truckHere = new HashMap<Truck, Boolean>();
-		
+
 		parcelLock = new Semaphore(1);
 		truckLock = new Semaphore(1);
 	}
-	
+
 	/** Returns the game this Node belongs to */
 	public Game getGame(){
 		return game;
@@ -150,7 +150,7 @@ public class Node implements MapElement, UserData{
 		parcels.add(p);
 		parcelLock.release();
 	}
-	
+
 	/** Removes parcel p from parcels 
 	 * @throws InterruptedException */
 	protected void removeParcel(Parcel p) throws InterruptedException{
@@ -158,7 +158,7 @@ public class Node implements MapElement, UserData{
 		parcels.remove(p);
 		parcelLock.release();
 	}
-	
+
 	/** Returns the parcels on this Node */
 	protected HashSet<Parcel> getTrueParcels(){
 		return parcels;
@@ -173,13 +173,13 @@ public class Node implements MapElement, UserData{
 		parcelLock.release();
 		return parcelClone;
 	}
-	
+
 	/** Returns a random parcel at this node 
 	 * @throws InterruptedException */
 	public Parcel getRandomParcel() throws InterruptedException{
 		return Main.randomElement(parcels, parcelLock);
 	}
-	
+
 	/** Returns true if parcel p is on this node, false otherwise 
 	 * @throws InterruptedException */
 	public boolean isParcelHere(Parcel p) throws InterruptedException{
@@ -188,7 +188,7 @@ public class Node implements MapElement, UserData{
 		parcelLock.release();
 		return isHere;
 	}
-	
+
 	/** Creates a new Edge with length length and adds it as an exit
 	 * to this Node and other Node
 	 * @param other the Node to connect this Node to
@@ -229,12 +229,12 @@ public class Node implements MapElement, UserData{
 	public Object getUserData(){
 		return userData;
 	}
-	
+
 	/** Sets the value of userData to Object uData. To erase the current userData just pass in null */
 	public void setUserData(Object uData){
 		userData = uData;
 	}
-	
+
 	/** Returns the Circle that represents this node graphically */
 	public Circle getCircle(){
 		return circle;
@@ -244,7 +244,7 @@ public class Node implements MapElement, UserData{
 	public void setCircle(Circle c){
 		circle = c;
 	}
-	
+
 	/** Tells the node if a Truck is currently on it or not. Gets its truckLock to prevent Truck thread collision */
 	protected void setTruckHere(Truck t, Boolean isHere) throws InterruptedException{
 		truckLock.acquire();
@@ -255,7 +255,7 @@ public class Node implements MapElement, UserData{
 		truckHere.put(t, isHere);
 		truckLock.release();
 	}
-	
+
 	/** Updates the circle graphic that represents this truck on the GUI.
 	 * Does nothing if threads is null.
 	 * Also updates the location of the load if this truck is carrying one 
@@ -273,14 +273,12 @@ public class Node implements MapElement, UserData{
 			p.updateGUILocation(x, y);
 		}
 		for(Truck t : game.getTrucks()){
-			try {
-				if(t.getLocation() == this)
+			if(t.getLocation() == this)
 				t.updateGUILocation(x, y);
-			} catch (InterruptedException e1) {}
 		}
-			
+
 	}
-	
+
 	@Override
 	/** Two Nodes are equal if they have the same name */
 	public boolean equals(Object n){
@@ -288,16 +286,16 @@ public class Node implements MapElement, UserData{
 			return false;
 		if(! (n instanceof Node) )
 			return false;
-		
+
 		return name.equals( ((Node)n).getName());
 	}
-	
+
 	@Override
 	/** A Node's hashCode is equal to the hashCode of its name */
 	public int hashCode(){
 		return name.hashCode();
 	}
-	
+
 	@Override
 	/** Returns true if a truck is currently at this node, false otherwise */
 	public boolean isTruckHere(Truck t) throws InterruptedException{
@@ -308,7 +306,7 @@ public class Node implements MapElement, UserData{
 		truckLock.release();
 		return b;
 	}
-	
+
 	@Override
 	/** Returns the number of trucks here */
 	public int trucksHere() throws InterruptedException{
@@ -327,18 +325,18 @@ public class Node implements MapElement, UserData{
 		}
 		return false;
 	}
-	
+
 	/** Returns the color of this Node */
 	public Color getColor(){
 		return circle.getColor();
 	}
-	
+
 	@Override
 	/** Returns the name of this Node */
 	public String toString(){
 		return name;
 	}
-	
+
 	@Override
 	/** Returns the string that is mapped when this Node is drawn */
 	public String getMappedName() {
@@ -356,7 +354,7 @@ public class Node implements MapElement, UserData{
 	public int getRelativeY() {
 		return 0;
 	}
-	
+
 	@Override
 	/** Returns just this' name for the JSONString - relies on JSONs of Edges and parcels
 	 * to take care of themselves
