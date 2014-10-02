@@ -19,16 +19,11 @@ public class MyManager extends Manager {
 		game = getGame();
 		trucks = game.getTrucks();
 		for(Truck t : trucks){
-			try {
-				t.addToTravel(t.getLocation().getRandomExit());
-			} catch (InterruptedException e1) {
-				e1.printStackTrace();
-			}
-			try {
-				t.setSpeed(Truck.MAX_SPEED);
-			} catch (InterruptedException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
+			Node n = game.getMap().getTruckHome();
+			for(int i = 0; i < 10; i++){
+				Edge e = n.getRandomExit();
+				t.addToTravel(e);
+				n = e.getOther(n);
 			}
 		}
 	}
@@ -37,6 +32,12 @@ public class MyManager extends Manager {
 	public void truckNotification(Truck t, Notification message){
 		if(game.isRunning()){
 			switch(message){
+			case WAITING:
+				if(t.getGoingTo() == null)
+					t.addToTravel(t.getLocation().getRandomExit());
+				else
+					t.addToTravel(t.getGoingTo().getRandomExit());
+				break;
 			case PARCEL_AT_NODE: 
 				if(t.getLoad() == null){
 
@@ -49,41 +50,28 @@ public class MyManager extends Manager {
 						e.printStackTrace();
 					}
 					try{
-						t.loadUnloadParcel(p, Truck.LOAD);
+						t.pickupLoad(p);
 					} catch(Exception e){}
-					try{
-						t.clearTravel();
-						if(t.getGoingTo() == null)
-							t.addToTravel(t.getLocation().getRandomExit());
-						else
-							t.addToTravel(t.getGoingTo().getRandomExit());
-					} catch(InterruptedException e){
-
-					}
-				}
-				break;
-			case LOCATION_CHANGED: 
-				try{
-					if(t.getLocation().equals(game.getMap().getTruckHome()) && game.getParcels().isEmpty())
-						break;
-				} catch(InterruptedException e){ break; }
-
-				try {
-					if(t.getLoad() != null && t.getLoad().getDestination().equals(t.getLocation()))
-						try{
-							t.loadUnloadParcel(t.getLoad(), Truck.UNLOAD);
-						} catch(Exception e){}
-				} catch (InterruptedException e1) {
-					// TODO Auto-generated catch block
-					e1.printStackTrace();
-				}
-
-				try{
+					t.clearTravel();
 					if(t.getGoingTo() == null)
 						t.addToTravel(t.getLocation().getRandomExit());
 					else
 						t.addToTravel(t.getGoingTo().getRandomExit());
-				} catch(InterruptedException e){}
+				}
+				break;
+			case LOCATION_CHANGED: 
+				if(t.getLocation().equals(game.getMap().getTruckHome()) && game.getParcels().isEmpty())
+					break;
+
+				if(t.getLoad() != null && t.getLoad().getDestination().equals(t.getLocation()))
+					try{
+						t.dropoffLoad();
+					} catch(Exception e){}
+
+				if(t.getGoingTo() == null)
+					t.addToTravel(t.getLocation().getRandomExit());
+				else
+					t.addToTravel(t.getGoingTo().getRandomExit());
 				break;
 			default:
 				break;
