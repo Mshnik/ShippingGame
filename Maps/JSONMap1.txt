@@ -1,50 +1,81 @@
 {
+"seed":-1,
 "map":{
 "scoreCoeff":[-1,-100,-100,5000,3],
 "node-0":{
-"name":"Miami"
+"name":"Miami",
+"x":690,
+"y":125
 },
 "node-1":{
-"name":"DC"
+"name":"DC",
+"x":156,
+"y":187
 },
 "node-2":{
-"name":"Albany"
+"name":"Atlanta",
+"x":904,
+"y":199
 },
 "node-3":{
-"name":"Atlanta"
+"name":"Albany",
+"x":455,
+"y":483
 },
 "node-4":{
-"name":"Boston"
+"name":"Boston",
+"x":634,
+"y":413
 },
 "node-5":{
-"name":"Richmond"
+"name":"Chicago",
+"x":306,
+"y":245
 },
 "node-6":{
-"name":"Chicago"
+"name":"Richmond",
+"x":802,
+"y":431
 },
 "node-7":{
-"name":"Orlando"
+"name":"Orlando",
+"x":736,
+"y":247
 },
 "node-8":{
-"name":"Portland"
+"name":"Portland",
+"x":528,
+"y":339
 },
 "node-9":{
-"name":"San Francisco"
+"name":"San Francisco",
+"x":895,
+"y":469
 },
 "node-10":{
-"name":"New York"
+"name":"Truck Depot",
+"x":447,
+"y":295
 },
 "node-11":{
-"name":"Truck Depot"
+"name":"New York",
+"x":311,
+"y":444
 },
 "node-12":{
-"name":"Seattle"
+"name":"Seattle",
+"x":525,
+"y":126
 },
 "node-13":{
-"name":"Dallas"
+"name":"Dallas",
+"x":395,
+"y":612
 },
 "node-14":{
-"name":"Los Angeles"
+"name":"Los Angeles",
+"x":134,
+"y":520
 },
 "edge-0":{
 "location":["Los Angeles","Dallas"],
@@ -71,32 +102,32 @@
 "length":5
 },
 "edge-6":{
-"location":["Chicago","DC"],
-"length":5
+"location":["San Francisco","Atlanta"],
+"length":1
 },
 "edge-7":{
-"location":["Boston","Richmond"],
-"length":3
-},
-"edge-8":{
 "location":["Seattle","DC"],
 "length":8
 },
+"edge-8":{
+"location":["Chicago","DC"],
+"length":5
+},
 "edge-9":{
-"location":["San Francisco","Atlanta"],
-"length":1
+"location":["Boston","Richmond"],
+"length":3
 },
 "edge-10":{
 "location":["New York","Los Angeles"],
 "length":4
 },
 "edge-11":{
-"location":["New York","Chicago"],
-"length":1
-},
-"edge-12":{
 "location":["Truck Depot","Chicago"],
 "length":4
+},
+"edge-12":{
+"location":["New York","Chicago"],
+"length":1
 },
 "edge-13":{
 "location":["DC","New York"],
@@ -127,32 +158,32 @@
 "name":"Truck_A",
 "color":-11534424
 },
-"truck-2":{
+"truck-1":{
 "name":"Truck_C",
 "color":-3800944
 },
 "parcel-0":{
-"location":"San Francisco",
-"destination":"Orlando",
-"color":-16726421
-},
-"parcel-1":{
-"location":"Orlando",
+"location":"DC",
 "destination":"Los Angeles",
 "color":-9622644
 },
-"parcel-2":{
+"parcel-1":{
 "location":"Albany",
 "destination":"Richmond",
 "color":-16748090
 },
-"parcel-3":{
+"parcel-2":{
 "location":"Richmond",
 "destination":"DC",
 "color":-9622644
 },
+"parcel-3":{
+"location":"San Francisco",
+"destination":"Orlando",
+"color":-16726421
+},
 "parcel-4":{
-"location":"DC",
+"location":"Orlando",
 "destination":"Los Angeles",
 "color":-9622644
 }

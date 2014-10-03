@@ -1,4 +1,5 @@
 package game;
+import gui.Circle;
 import gui.GUI;
 import gui.TextIO;
 
@@ -30,8 +31,9 @@ public class Game implements JSONString{
 	public static final String MAP_DIRECTORY = "Maps/";
 	public static final String MAP_EXTENSION = ".txt";
 
-	private File file;	//The file this game was loaded from. Null if none.
-	private String managerClass; //The name of the class the manager was created from.
+	protected int seed;		//The seed this game was generated from. -1 if none/custom.
+	private final File file;	//The file this game was loaded from. Null if none.
+	private final String managerClass; //The name of the class the manager was created from.
 
 	private GUI gui;
 	private Manager manager;
@@ -239,6 +241,7 @@ public class Game implements JSONString{
 		manager.gameOver();
 	}
 
+	private static final String SEED_TOKEN = "seed";
 	private static final String MAP_TOKEN = "map";
 	private static final String TRUCK_TOKEN = "truck-";
 	private static final String PARCEL_TOKEN = "parcel-";
@@ -249,7 +252,8 @@ public class Game implements JSONString{
 	 * JSONs the map, the parcels, and the trucks.
 	 */
 	public String toJSONString() {
-		String s = "{\n" + Main.addQuotes(MAP_TOKEN) + ":" + map.toJSONString() + ",";
+		String s = "{\n" + Main.addQuotes(SEED_TOKEN) + ":" + seed +",";
+	    s += "\n" + Main.addQuotes(MAP_TOKEN) + ":" + map.toJSONString() + ",";
 		int i = 0;
 		for(Truck t : trucks){
 			s += "\n" + Main.addQuotes(TRUCK_TOKEN + i) + ":" + t.toJSONString() + ",";
@@ -291,7 +295,13 @@ public class Game implements JSONString{
 	 * @throws IOException if End_Node_Identifier is not found in the file, or if TextIO.read(f) throws an exception*/
 	protected void readGame(File f) throws IOException{
 		JSONObject obj = new JSONObject(TextIO.read(f));
-
+		
+		//Read seed if possible, otherwise use -1.
+		if(obj.has(SEED_TOKEN)){
+			seed = obj.getInt(SEED_TOKEN);
+		} else{
+			seed = -1;
+		}
 		//First process map - under key with value of MAP_TOKEN.
 		JSONObject mapJSON = obj.getJSONObject(MAP_TOKEN);
 		//Read score coefficients
@@ -310,6 +320,9 @@ public class Game implements JSONString{
 			if(key.startsWith(Map.NODE_TOKEN)){
 				JSONObject nodeJSON = mapJSON.getJSONObject(key);
 				Node n = new Node(this, nodeJSON.getString(MapElement.NAME_TOKEN), null);
+				Circle c = n.getCircle();
+				c.setX1(nodeJSON.getInt(MapElement.X_TOKEN));
+				c.setY1(nodeJSON.getInt(MapElement.Y_TOKEN));
 				map.getNodes().add(n);
 				if(n.getName().equals(Map.TRUCK_HOME_NAME))
 					map.setTruckHome(n);

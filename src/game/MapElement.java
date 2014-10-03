@@ -14,6 +14,10 @@ import org.json.JSONString;
  */
 public interface MapElement extends JSONString, Colorable, UserData{
 
+	/** The key for the x field for JSON implementations. */
+	public static final String X_TOKEN = "x";
+	/** The key for the y field for JSON implementations. */
+	public static final String Y_TOKEN = "y";
 	/** The key for the name field for JSON implementations. */
 	public static final String NAME_TOKEN = "name";
 	/** The key for the color field for JSON implementations.  */

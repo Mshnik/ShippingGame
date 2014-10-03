@@ -360,7 +360,9 @@ public class Node implements MapElement{
 	 * to take care of themselves
 	 */
 	public String toJSONString(){
-		return "{\n" + Main.addQuotes(MapElement.NAME_TOKEN) + ":" + Main.addQuotes(name) + "\n}";
+		return "{\n" + Main.addQuotes(MapElement.NAME_TOKEN) + ":" + Main.addQuotes(name) + ",\n"
+				+ Main.addQuotes(X_TOKEN) + ":"+ circle.getX1() + ",\n"
+				+ Main.addQuotes(Y_TOKEN) + ":" + circle.getY1() + "\n}";
 	}
 
 }

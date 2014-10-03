@@ -12,13 +12,14 @@ import org.json.JSONObject;
 import org.json.JSONString;
 
 /**
- * The MapGenerator class is a library of static functions for randomly
+ * The GameGenerator class is a library of static functions for randomly
  * generating maps from seeds.
  * 
  * @author eperdew
+ * @author MPatashnik
  * 
  */
-public class MapGenerator {
+public class GameGenerator {
 	
 	protected static final String SCORE_TOKEN = "scoreCoeff";
 	protected static final String NODE_TOKEN = "node-";
@@ -47,23 +48,23 @@ public class MapGenerator {
 	private static final int ON_COLOR_MULTIPLIER_MIN = 1;
 	private static final int ON_COLOR_MULTIPLIER_MAX = 5;
 
-	private MapGenerator() { }
+	private GameGenerator() { }
 
 	/**
 	 * Returns a new random map seeded using the default {@code Random}
 	 * constructor
 	 */
-	public static JSONObject randomMap() {
-		return randomMap(new Random());
+	public static Game randomGame() {
+		return randomGame(new Random());
 	}
 
 	/** Returns a new random map seeded with {@code seed} */
-	public static JSONObject randomMap(long seed) {
-		return randomMap(new Random(seed));
+	public static Game randomGame(long seed) {
+		return randomGame(new Random(seed));
 	}
 
 	/** Returns a new random map using the {@code Random} parameter {@code r} */
-	private static JSONObject randomMap(Random r) {
+	private static Game randomGame(Random r) {
 		int numCities = r.nextInt(MAX_NODES - MIN_NODES + 1) + MIN_NODES;
 		int WAIT_COST = -1
 				* (r.nextInt(WAIT_COST_MAX - WAIT_COST_MIN + 1) + WAIT_COST_MIN);
