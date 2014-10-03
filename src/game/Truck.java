@@ -68,26 +68,24 @@ public class Truck implements MapElement, Runnable{
 	private final Game game;		//The game this truck belongs to
 	private Thread thread;			//The thread this truck is running in
 
-	/** Constructor for the Truck Class. Uses a default color
+	/** Constructor for the Truck Class. Uses a default random color
 	 * @param g - the Game this Truck belongs to
 	 * @param name - The name of this truck
-	 * @param startLocation - The starting location of this truck
 	 * 
 	 * Speed defaults to EFFICIENT_SPEED
 	 */
-	protected Truck(Game g, Thread t, String name, Node startLocation){
-		this(g, name, startLocation, Score.getRandomColor());
+	protected Truck(Game g, Thread t, String name){
+		this(g, name, Score.getRandomColor());
 	}
 
 	/** Constructor for the Truck Class.
 	 * @param g - the Game this truck belongs to
 	 * @param name - The name of this truck
-	 * @param startLocation - The starting location of this truck
 	 * @param c - The color of this truck.
 	 * 
 	 * Speed defaults to EFFICIENT_SPEED
 	 */
-	protected Truck(Game g, String name, Node startLocation, Color c){
+	protected Truck(Game g, String name, Color c){
 		this.name = name;
 		this.game = g;
 
@@ -98,7 +96,7 @@ public class Truck implements MapElement, Runnable{
 		parcelLock = new Semaphore(1);
 		travelLock = new Semaphore(1);
 
-		location = startLocation;
+		location = game.getMap().getTruckHome();
 		travelingTo = null;
 		goingTo = null;
 		status = Status.WAITING;

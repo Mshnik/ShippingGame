@@ -50,7 +50,7 @@ public class GUI extends JFrame{
 	/** The color for menu items when they are active */
 	public static final Color ACTIVE_COLOR = Color.BLACK;
 
-	private static final Dimension MAIN_WINDOW_SIZE = new Dimension(1000, 800);
+	public static final Dimension MAIN_WINDOW_SIZE = new Dimension(1000, 800);
 
 	private GUI self;
 	private Game game;

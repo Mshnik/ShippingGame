@@ -66,12 +66,12 @@ public class Map implements JSONString{
 
 	/** Returns a random node in this map */
 	public Node getRandomNode(){
-		return Main.randomElement(nodes, null);
+		return Main.randomElement(nodes, null, null);
 	}
 
 	/** Returns a random edge in this map */
 	public Edge getRandomEdge(){
-		return Main.randomElement(edges, null);
+		return Main.randomElement(edges, null, null);
 	}
 
 	/** Returns a HashSet containing all the Nodes in this map. Allows addition and removal of Nodes to this map */
