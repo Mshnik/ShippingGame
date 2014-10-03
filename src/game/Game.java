@@ -5,9 +5,13 @@ import gui.TextIO;
 
 import java.awt.Color;
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.Iterator;
+import java.util.Random;
+import java.util.Scanner;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -31,9 +35,9 @@ public class Game implements JSONString{
 	public static final String MAP_DIRECTORY = "Maps/";
 	public static final String MAP_EXTENSION = ".txt";
 
-	protected int seed;		//The seed this game was generated from. -1 if none/custom.
-	private final File file;	//The file this game was loaded from. Null if none.
-	private final String managerClass; //The name of the class the manager was created from.
+	protected long seed;		//The seed this game was generated from. -1 if none/custom.
+	private File file;	//The file this game was loaded from. Null if none.
+	private String managerClass; //The name of the class the manager was created from.
 
 	private GUI gui;
 	private Manager manager;
@@ -43,7 +47,7 @@ public class Game implements JSONString{
 	private HashSet<Parcel> parcels;
 	private Map map;
 	private ArrayList<Truck> trucks;
-
+	
 	/** Creates a game instance with a set Map, read from File f. Uses Default for all other fields */
 	public Game(String managerClassname, File f){
 		managerClass = managerClassname;
@@ -298,7 +302,7 @@ public class Game implements JSONString{
 		
 		//Read seed if possible, otherwise use -1.
 		if(obj.has(SEED_TOKEN)){
-			seed = obj.getInt(SEED_TOKEN);
+			seed = obj.getLong(SEED_TOKEN);
 		} else{
 			seed = -1;
 		}
@@ -352,7 +356,7 @@ public class Game implements JSONString{
 				JSONObject truck = obj.getJSONObject(key);
 				Color c = new Color(truck.getInt(MapElement.COLOR_TOKEN));
 				String name = truck.getString(MapElement.NAME_TOKEN);
-				Truck t = new Truck(this, name, map.getTruckHome(), c);
+				Truck t = new Truck(this, name, c);
 				trucks.add(t);
 			} else if( key.startsWith(PARCEL_TOKEN)){
 				JSONObject parcel = obj.getJSONObject(key);
@@ -383,5 +387,177 @@ public class Game implements JSONString{
 
 		String n = MAP_DIRECTORY + fileName + ".txt";
 		TextIO.write(n, toJSONString());
+	}
+	
+	////////////////////////////////////////////////////////////////////////////////////////////////////
+	////////////////////////////////////////////////////////////////////////////////////////////////////
+	////////////////////////////////////// Random Game Generation //////////////////////////////////////
+	////////////////////////////////////////////////////////////////////////////////////////////////////
+	////////////////////////////////////////////////////////////////////////////////////////////////////
+	/**
+	 * Library for random game generation.
+	 * Implemented inside game class to allow construction based on these methods.
+	 * 
+	 * @author eperdew
+	 * @author MPatashnik
+	 * 
+	 */
+
+	private static final int MIN_NODES = 5;
+	private static final int MAX_NODES = 100;
+	
+	private static final double AVERAGE_DEGREE = 3;
+	private static final int MIN_EDGE_LENGTH = 15;
+	private static final int MAX_EDGE_LENGTH = 100;
+	
+	private static final int WIDTH = GUI.MAIN_WINDOW_SIZE.width;
+	private static final int HEIGHT = GUI.MAIN_WINDOW_SIZE.height;
+
+	private static final int MIN_TRUCKS = 1;
+	private static final int MAX_TRUCKS = 5;
+	
+	private static final int MIN_PARCELS = 3;
+	private static final int MAX_PARCELS = 100;
+	
+	private static final int WAIT_COST_MIN = 1;
+	private static final int WAIT_COST_MAX = 3;
+
+	private static final int PICKUP_COST_MIN = 50;
+	private static final int PICKUP_COST_MAX = 150;
+
+	private static final int DROPOFF_COST_MIN = 50;
+	private static final int DROPOFF_COST_MAX = 150;
+
+	private static final int PAYOFF_MIN = 3000;
+	private static final int PAYOFF_MAX = 10000;
+
+	private static final int ON_COLOR_MULTIPLIER_MIN = 1;
+	private static final int ON_COLOR_MULTIPLIER_MAX = 5;
+	
+	/**
+	 * Returns a new random map seeded via random seed.
+	 */
+	public static Game randomGame() {
+		return randomGame((long)(Math.random() * Long.MAX_VALUE));
+	}
+
+	/** Returns a new random map seeded with {@code seed} */
+	public static Game randomGame(long seed) {
+		return new Game(new Random(seed), seed);
+	}
+	
+	/** Returns a new random map using the {@code Random} parameter {@code r} */
+	private Game(Random r, long seed) {
+		//Set unused fields in a random game - either unused or set later
+		file = null;
+		managerClass = null;
+		manager = null;
+		gui = null;
+		running = false;
+		this.seed = seed;
+		//Create new score object
+		score = new Score(this);
+		
+		final int numCities = r.nextInt(MAX_NODES - MIN_NODES + 1) + MIN_NODES;
+		final int WAIT_COST = -1
+				* (r.nextInt(WAIT_COST_MAX - WAIT_COST_MIN + 1) + WAIT_COST_MIN);
+		final int PICKUP_COST = -1
+				* (r.nextInt(PICKUP_COST_MAX - PICKUP_COST_MIN + 1) + PICKUP_COST_MIN);
+		final int DROPOFF_COST = -1
+				* (r.nextInt(DROPOFF_COST_MAX - DROPOFF_COST_MIN + 1) + DROPOFF_COST_MIN);
+		final int PAYOFF = r.nextInt(PAYOFF_MAX - PAYOFF_MIN + 1) + PAYOFF_MIN;
+		final int ON_COLOR_MULTIPLIER = r.nextInt(ON_COLOR_MULTIPLIER_MAX
+				- ON_COLOR_MULTIPLIER_MIN + 1)
+				+ ON_COLOR_MULTIPLIER_MIN;
+		final int[] scoreCoeffs = {WAIT_COST,PICKUP_COST,DROPOFF_COST,PAYOFF,ON_COLOR_MULTIPLIER};
+		
+		//Initialize collections
+		map = new Map(scoreCoeffs);
+		parcels = new HashSet<Parcel>();
+		trucks = new ArrayList<Truck>();
+		
+		ArrayList<String> cities = cityNames();
+		//Create nodes and add to map
+		for (int i = 0; i < numCities + 1; i++) {
+			String name;
+			if(i == 0){
+				name = Map.TRUCK_HOME_NAME;
+			} else{
+				name = cities.remove((int)(Math.random()*cities.size()));
+			}
+			Node n = new Node(this, name, null);
+			Circle c = n.getCircle();
+			c.setX1(r.nextInt(WIDTH + 1));
+			c.setY1(r.nextInt(HEIGHT + 1));
+			if(n.getName().equals(Map.TRUCK_HOME_NAME)){
+				map.setTruckHome(n);
+			}
+			map.getNodes().add(n);
+		}
+		//Add intial edges, make sure every node has degree at least 2.
+		//Do this by connecting every edge in order, creating an outer loop
+		Iterator<Node> i1 = map.getNodes().iterator();
+		Iterator<Node> i2 = map.getNodes().iterator();
+		Node first = i2.next(); //First node in collection
+		while(i2.hasNext()){
+			Node from = i1.next();
+			Node to = i2.next();
+			int length = r.nextInt(MAX_EDGE_LENGTH - MIN_EDGE_LENGTH + 1) + MIN_EDGE_LENGTH;
+			Edge e = new Edge(this, from, to, length);
+			map.getEdges().add(e);
+		}
+		//Add final edge connecting the circle
+		map.getEdges().add(new Edge(this, i1.next(), first, r.nextInt(MAX_EDGE_LENGTH - MIN_EDGE_LENGTH + 1) + MIN_EDGE_LENGTH));
+		
+		//Add edges to the map to satisfy the average degree constraint
+		while (map.getEdges().size() < (map.getNodes().size()*AVERAGE_DEGREE)/2){
+			Node from = Main.randomElement(map.getNodes(), null, r);
+			Node to = from;
+			while (from == to || from.isConnectedTo(to)){
+				from = Main.randomElement(map.getNodes(), null, r);
+			}
+			int length = r.nextInt(MAX_EDGE_LENGTH - MIN_EDGE_LENGTH + 1) + MIN_EDGE_LENGTH;
+			Edge e = new Edge(this, from, to, length);
+			map.getEdges().add(e);
+		}
+		
+		//Add trucks
+		final int numb_trucks = r.nextInt(MAX_TRUCKS - MIN_TRUCKS + 1) + MIN_TRUCKS;
+		for(int i = 0; i < numb_trucks; i++){
+			Truck t = new Truck(this, "TRUCK-" + (i+1), Score.COLOR[r.nextInt(Score.COLOR.length)]);
+			trucks.add(t);
+		}
+		
+		//Add parcels
+		final int numb_parcels = r.nextInt(MAX_PARCELS - MIN_PARCELS + 1) + MIN_PARCELS;
+		for(int i = 0; i < numb_parcels; i++){
+			Node start = Main.randomElement(map.getNodes(), null, r);
+			Node dest = start;
+			while(dest == start){
+				dest = Main.randomElement(map.getNodes(), null, r);
+			}
+			Color c = Score.COLOR[r.nextInt(Score.COLOR.length)];
+			Parcel p = new Parcel(this, start, dest, c);
+			parcels.add(p);
+		}
+	}
+	
+	/** Returns an array of the city names listed in MapGeneration/cities.txt */
+	private static ArrayList<String> cityNames(){
+		File f = new File("MapGeneration/cities.txt");
+		Scanner read = null;
+		try {
+			read = new Scanner(f);
+		}
+		catch (FileNotFoundException e){
+			System.out.println("cities.txt not found. Aborting as empty list of city names...");
+			return new ArrayList<String>();
+		}
+		ArrayList<String> result = new ArrayList<String>();
+		while(read.hasNext()){
+			result.add(read.nextLine());
+		}
+		read.close();
+		return result;
 	}
 }

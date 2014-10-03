@@ -74,7 +74,7 @@ public class Truck implements MapElement, Runnable{
 	 * 
 	 * Speed defaults to EFFICIENT_SPEED
 	 */
-	protected Truck(Game g, Thread t, String name){
+	protected Truck(Game g, String name){
 		this(g, name, Score.getRandomColor());
 	}
 
