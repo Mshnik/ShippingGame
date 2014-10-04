@@ -185,15 +185,19 @@ public class GUI extends JFrame{
 		JMenuItem mntmRandom = new JMenuItem("New Random Game...");
 		mntmRandom.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
+				final String CANCEL = "null";
 				long returnVal = -1;
-				while(returnVal == -1){
-					String s = "";
+				String s = "";
+				while(returnVal == -1 && ! s.equals(CANCEL)){
 					try{
 						s = JOptionPane.showInputDialog(null, "Enter seed for random game (any long)");
 						returnVal = Long.parseLong(s);
 					}catch(NumberFormatException e){
 						System.out.println(s);
 					}
+				}
+				if(s.equals(CANCEL)){
+					return;
 				}
 				System.out.println("Generating game with seed " + returnVal);
 				Game oldGame =  game;
