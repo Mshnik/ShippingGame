@@ -18,7 +18,7 @@ public class MyManager extends Manager {
 
 	@Override
 	public void truckNotification(Truck t, Notification message){
-		if(game.isRunning()){
+		if(getGame().isRunning()){
 			switch(message){
 			case WAITING:
 				if(t.getGoingTo() == null)

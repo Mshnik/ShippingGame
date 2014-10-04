@@ -202,6 +202,7 @@ public class GUI extends JFrame{
 				Game oldGame =  game;
 				game = Game.randomGame(returnVal);
 				game.setManager(oldGame.getManagerClassname());
+				game.getManager().setGame(game);
 				game.setGUI(self);
 				oldGame.kill();
 				drawingPanel.removeAll();

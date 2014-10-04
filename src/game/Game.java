@@ -65,7 +65,9 @@ public class Game implements JSONString{
 
 	/** Allows for setting a manager post construction - only permissible if manager
 	 * and mangerClassname are currently null.
-	 * Returns true if the manager is set this way, false otherwise
+	 * Also sets the game of the constructed manager to this.
+	 * Returns true if the manager is set this way, false otherwise.
+	 * 
 	 */
 	public boolean setManager(String managerClassname){
 		if(managerClass != null || manager != null)
@@ -73,6 +75,7 @@ public class Game implements JSONString{
 		managerClass = managerClassname;
 		try {
 			manager = (Manager)Main.createUserManager(managerClassname);
+			manager.setGame(this);
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
@@ -432,7 +435,7 @@ public class Game implements JSONString{
 	private static final int HEIGHT = GUI.MAIN_WINDOW_SIZE.height;
 
 	private static final int MIN_TRUCKS = 1;
-	private static final int MAX_TRUCKS = 5;
+	private static final int MAX_TRUCKS = 1;
 
 	private static final int MIN_PARCELS = 3;
 	private static final int MAX_PARCELS = 10;
