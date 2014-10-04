@@ -1,5 +1,4 @@
 package student;
-import java.util.ArrayList;
 import game.*;
 
 /** A sample implementation of the Manager class - almost random (a tiny bit smarter)
@@ -11,13 +10,10 @@ public class MyManager extends Manager {
 
 	private Game game;
 
-	private ArrayList<Truck> trucks = new ArrayList<Truck>();
-
 
 	@Override
 	public void run() {
 		game = getGame();
-		trucks = game.getTrucks();
 	}
 
 	@Override

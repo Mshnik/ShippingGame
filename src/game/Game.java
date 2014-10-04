@@ -14,8 +14,6 @@ import java.util.Collection;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Random;
-import java.util.Scanner;
-import java.util.concurrent.Semaphore;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -525,9 +523,15 @@ public class Game implements JSONString{
 			int length = r.nextInt(MAX_EDGE_LENGTH - MIN_EDGE_LENGTH + 1) + MIN_EDGE_LENGTH;
 			Edge e = new Edge(this, from, to, length);
 			map.getEdges().add(e);
+			from.addExit(e);
+			to.addExit(e);
 		}
 		//Add final edge connecting the circle
-		map.getEdges().add(new Edge(this, i1.next(), first, r.nextInt(MAX_EDGE_LENGTH - MIN_EDGE_LENGTH + 1) + MIN_EDGE_LENGTH));
+		Node last = i1.next();
+		Edge e = new Edge(this, last, first, r.nextInt(MAX_EDGE_LENGTH - MIN_EDGE_LENGTH + 1) + MIN_EDGE_LENGTH);
+		map.getEdges().add(e);
+		first.addExit(e);
+		last.addExit(e);
 
 		//Add edges to the map to satisfy the average degree constraint
 		while (map.getEdges().size() < (map.getNodes().size()*AVERAGE_DEGREE)/2){
@@ -537,8 +541,10 @@ public class Game implements JSONString{
 				from = randomElement(map.getNodes(), r);
 			}
 			int length = r.nextInt(MAX_EDGE_LENGTH - MIN_EDGE_LENGTH + 1) + MIN_EDGE_LENGTH;
-			Edge e = new Edge(this, from, to, length);
+			e = new Edge(this, from, to, length);
 			map.getEdges().add(e);
+			from.addExit(e);
+			to.addExit(e);
 		}
 
 		//Add trucks
@@ -559,6 +565,9 @@ public class Game implements JSONString{
 			Color c = Score.COLOR[r.nextInt(Score.COLOR.length)];
 			Parcel p = new Parcel(this, start, dest, c);
 			parcels.add(p);
+			try {
+				start.addParcel(p);
+			} catch (InterruptedException e1) {}
 		}
 	}
 	
@@ -566,7 +575,7 @@ public class Game implements JSONString{
 	private static <T> T randomElement(Collection<T> elms, Random r){
 		Iterator<T> it = elms.iterator();
 		T val = null;
-		int rand = r.nextInt(elms.size() + 1);
+		int rand = r.nextInt(elms.size()) + 1;
 		for(int i = 0; i < rand; i++){
 			val = it.next();
 		}
