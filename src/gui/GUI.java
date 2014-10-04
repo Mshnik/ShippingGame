@@ -57,17 +57,14 @@ public class GUI extends JFrame{
 
 	private JPanel drawingPanel;
 
-	private boolean editMode;
-
 	private JLabel lblUpdate;
 	private JLabel lblScore;
 	private JMenuBar menuBar;
+	private JMenuItem mntmReset;
 
 	/** GUI constructor. Creates a window to show a game */
-	protected GUI() {
+	public GUI(Game g) {
 		self = this;
-
-		editMode = false;
 
 		setMinimumSize(MAIN_WINDOW_SIZE);
 		setDefaultCloseOperation(EXIT_ON_CLOSE);
@@ -130,12 +127,12 @@ public class GUI extends JFrame{
 						oldGame.kill();
 						drawingPanel.removeAll();
 						drawMap();
+						mntmReset.setEnabled(true);
 					}
 				}
 			}
 		});
 		mnFile.add(mntmLoadGame);
-
 		JMenuItem mntmQuit = new JMenuItem("Quit");
 		mntmQuit.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
@@ -153,19 +150,24 @@ public class GUI extends JFrame{
 		JMenuItem mntmStart = new JMenuItem("Start");
 		mntmStart.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
-				if(game != null && !game.isRunning() && ! editMode)
+				if(game != null && !game.isRunning())
 					game.start();
 			}
 		});
 		mnGame.add(mntmStart);
 
-		JMenuItem mntmReset = new JMenuItem("Reset");
+		mntmReset = new JMenuItem("Reset");
 		mntmReset.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
 				int returnVal = JOptionPane.showConfirmDialog(null, "Are You Sure You Want to Reset?");
 				if(returnVal == JOptionPane.YES_OPTION){
 					Game oldGame =  game;
-					game = new Game(oldGame.getManagerClassname(), oldGame.getFile());
+					if(oldGame.getFile() != null)
+						game = new Game(oldGame.getManagerClassname(), oldGame.getFile());
+					else{
+						game = Game.randomGame(oldGame.getSeed());
+						game.setManager(oldGame.getManagerClassname());
+					}
 					game.setGUI(self);
 					oldGame.kill();
 					drawingPanel.removeAll();
@@ -175,7 +177,39 @@ public class GUI extends JFrame{
 				}
 			}
 		});
+//		if(g.getFile() == null && g.getSeed() == -1){
+//			mntmReset.setEnabled(false);
+//		}
 		mnGame.add(mntmReset);
+
+		JMenuItem mntmRandom = new JMenuItem("New Random Game...");
+		mntmRandom.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent arg0) {
+				long returnVal = -1;
+				while(returnVal == -1){
+					String s = "";
+					try{
+						s = JOptionPane.showInputDialog(null, "Enter seed for random game (any long)");
+						returnVal = Long.parseLong(s);
+					}catch(NumberFormatException e){
+						System.out.println(s);
+					}
+				}
+				System.out.println("Generating game with seed " + returnVal);
+				Game oldGame =  game;
+				game = Game.randomGame(returnVal);
+				game.setManager(oldGame.getManagerClassname());
+				game.setGUI(self);
+				oldGame.kill();
+				drawingPanel.removeAll();
+				drawMap();
+				setUpdateMessage("Game Reset");
+				updateScore(game.getScoreValue());
+				mntmReset.setEnabled(true);
+				
+			}
+		});
+		mnGame.add(mntmRandom);
 
 		JMenuItem mntmPrintJSON = new JMenuItem("Print Game JSON");
 		mntmPrintJSON.addActionListener(new ActionListener() {
@@ -187,6 +221,13 @@ public class GUI extends JFrame{
 
 		JMenu mnGUI = new JMenu("GUI");
 		menuBar.add(mnGUI);
+		JMenuItem mntmRepaint = new JMenuItem("Repaint");
+		mntmRepaint.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				drawingPanel.repaint();
+			}
+		});
+		mnGUI.add(mntmRepaint);
 
 		JLabel lblEdgeColoring = new JLabel(" Edge Coloring");
 		lblEdgeColoring.setFont(new Font("Lucida Grande", Font.PLAIN, 14));
@@ -196,13 +237,14 @@ public class GUI extends JFrame{
 
 		JRadioButtonMenuItem d = addEdgeStyleCheckbox("Default", Line.ColorPolicy.DEFAULT, mnGUI, edgeStyleGroup);
 		d.setSelected(true);
-
 		addEdgeStyleCheckbox("Highlight Travel", Line.ColorPolicy.HIGHLIGHT_TRAVEL, mnGUI, edgeStyleGroup);
 		addEdgeStyleCheckbox("Gradient", Line.ColorPolicy.DISTANCE_GRADIENT, mnGUI, edgeStyleGroup);
 
 		setVisible(true);
 		pack();
 		repaint();
+		
+		setGame(g);
 	}
 
 	/** Creates and adds to the gui a checkbox with the given text for edge paint style.
@@ -225,12 +267,6 @@ public class GUI extends JFrame{
 		edgeStyleGroup.add(r);
 		mnGUI.add(r);
 		return r;
-	}
-
-	/** GUI Constructor. Creates a window to show game g */
-	public GUI(Game g){
-		this();
-		setGame(g);
 	}
 
 	/** Draws all elements of the game on the threads. Used when the game is started */

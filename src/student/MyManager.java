@@ -18,14 +18,6 @@ public class MyManager extends Manager {
 	public void run() {
 		game = getGame();
 		trucks = game.getTrucks();
-		for(Truck t : trucks){
-			Node n = game.getMap().getTruckHome();
-			for(int i = 0; i < 10; i++){
-				Edge e = n.getRandomExit();
-				t.addToTravel(e);
-				n = e.getOther(n);
-			}
-		}
 	}
 
 	@Override
