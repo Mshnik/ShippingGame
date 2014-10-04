@@ -9,7 +9,6 @@ import game.Vector;
 import java.awt.BasicStroke;
 import java.awt.Color;
 import java.awt.Dimension;
-import java.awt.Font;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.Point;
@@ -236,7 +235,6 @@ public class Circle extends JPanel{
 		g2d.setColor(getColor());
 		if(filled) g2d.fill(circle2d);
 		g2d.draw(circle2d);
-		g2d.setFont(new Font("Arial", Font.PLAIN, 13));
 		g2d.drawString(represents.getMappedName(), represents.getRelativeX() + PANEL_BUFFER, represents.getRelativeY() + PANEL_BUFFER);
 		
 		if(represents instanceof Node){
