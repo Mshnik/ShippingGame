@@ -10,10 +10,12 @@ import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Random;
 import java.util.Scanner;
+import java.util.concurrent.Semaphore;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -529,10 +531,10 @@ public class Game implements JSONString{
 
 		//Add edges to the map to satisfy the average degree constraint
 		while (map.getEdges().size() < (map.getNodes().size()*AVERAGE_DEGREE)/2){
-			Node from = Main.randomElement(map.getNodes(), null, r);
+			Node from = randomElement(map.getNodes(), r);
 			Node to = from;
 			while (from == to || from.isConnectedTo(to)){
-				from = Main.randomElement(map.getNodes(), null, r);
+				from = randomElement(map.getNodes(), r);
 			}
 			int length = r.nextInt(MAX_EDGE_LENGTH - MIN_EDGE_LENGTH + 1) + MIN_EDGE_LENGTH;
 			Edge e = new Edge(this, from, to, length);
@@ -549,15 +551,26 @@ public class Game implements JSONString{
 		//Add parcels
 		final int numb_parcels = r.nextInt(MAX_PARCELS - MIN_PARCELS + 1) + MIN_PARCELS;
 		for(int i = 0; i < numb_parcels; i++){
-			Node start = Main.randomElement(map.getNodes(), null, r);
+			Node start = randomElement(map.getNodes(), r);
 			Node dest = start;
 			while(dest == start){
-				dest = Main.randomElement(map.getNodes(), null, r);
+				dest = randomElement(map.getNodes(), r);
 			}
 			Color c = Score.COLOR[r.nextInt(Score.COLOR.length)];
 			Parcel p = new Parcel(this, start, dest, c);
 			parcels.add(p);
 		}
+	}
+	
+	/** Returns a random element from the given collection using the given randomer */
+	private static <T> T randomElement(Collection<T> elms, Random r){
+		Iterator<T> it = elms.iterator();
+		T val = null;
+		int rand = r.nextInt(elms.size() + 1);
+		for(int i = 0; i < rand; i++){
+			val = it.next();
+		}
+		return val;
 	}
 
 	/** Returns an array of the city names listed in MapGeneration/cities.txt */

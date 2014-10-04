@@ -177,7 +177,7 @@ public class Node implements MapElement{
 	/** Returns a random parcel at this node 
 	 * @throws InterruptedException */
 	public Parcel getRandomParcel() throws InterruptedException{
-		return Main.randomElement(parcels, parcelLock, null);
+		return Main.randomElement(parcels, parcelLock);
 	}
 
 	/** Returns true if parcel p is on this node, false otherwise 

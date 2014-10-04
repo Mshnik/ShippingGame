@@ -5,7 +5,6 @@ import gui.GUI;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Iterator;
-import java.util.Random;
 import java.util.concurrent.Semaphore;
 
 /** Game starting methods. Also serves as a util holder */
@@ -100,20 +99,18 @@ public class Main {
 		return "\"" + s + "\"";
 	}
 	
+	
 	/** Returns a random element of the given collection. Locks lock before doing processing.
 	 * If lock is null, doesn't do any locking. 
 	 * Uses the given random object for random selection. If null, creates new random object */
-	public static <T> T randomElement(Collection<T> elms, Semaphore lock, Random r){
+	public static <T> T randomElement(Collection<T> elms, Semaphore lock){
 		if(lock != null)
 			try {
 				lock.acquire();
 			} catch (InterruptedException e) {}
 		Iterator<T> it = elms.iterator();
 		T val = null;
-		if(r == null)
-			r = new Random();
-		final int rand = r.nextInt(elms.size() - 1) + 1;
-		for(int i = 0; i < rand; i++){
+		for(int i = 0; i < (int)(Math.random() * elms.size() - 1) + 1; i++){
 			val = it.next();
 		}
 		if(lock != null) lock.release();
