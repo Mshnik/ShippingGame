@@ -48,7 +48,7 @@ public class MyManager extends Manager {
 				}
 				break;
 			case LOCATION_CHANGED: 
-				if(t.getLocation().equals(game.getMap().getTruckHome()) && game.getParcels().isEmpty())
+				if(t.getLocation().equals(game.getMap().getTruckHome()) && game.getMap().getParcels().isEmpty())
 					break;
 
 				if(t.getLoad() != null && t.getLoad().getDestination().equals(t.getLocation()))

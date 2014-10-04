@@ -165,15 +165,14 @@ public class GUI extends JFrame{
 					if(oldGame.getFile() != null)
 						game = new Game(oldGame.getManagerClassname(), oldGame.getFile());
 					else{
-						game = Game.randomGame(oldGame.getSeed());
-						game.setManager(oldGame.getManagerClassname());
+						game = new Game(oldGame.getManagerClassname(), oldGame.getMap().getSeed());
 					}
 					game.setGUI(self);
 					oldGame.kill();
 					drawingPanel.removeAll();
 					drawMap();
 					setUpdateMessage("Game Reset");
-					updateScore(game.getScoreValue());
+					updateScore(game.getMap().getScoreValue());
 				}
 			}
 		});
@@ -182,7 +181,7 @@ public class GUI extends JFrame{
 //		}
 		mnGame.add(mntmReset);
 
-		JMenuItem mntmRandom = new JMenuItem("New Random Game...");
+		JMenuItem mntmRandom = new JMenuItem("New Random Map...");
 		mntmRandom.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
 				long returnVal = -1;
@@ -200,15 +199,13 @@ public class GUI extends JFrame{
 				}
 				System.out.println("Generating game with seed " + returnVal);
 				Game oldGame =  game;
-				game = Game.randomGame(returnVal);
-				game.setManager(oldGame.getManagerClassname());
-				game.getManager().setGame(game);
+				game = new Game(oldGame.getManagerClassname(), returnVal);
 				game.setGUI(self);
 				oldGame.kill();
 				drawingPanel.removeAll();
 				drawMap();
 				setUpdateMessage("Game Reset");
-				updateScore(game.getScoreValue());
+				updateScore(game.getMap().getScoreValue());
 				mntmReset.setEnabled(true);
 				
 			}
@@ -218,7 +215,7 @@ public class GUI extends JFrame{
 		JMenuItem mntmPrintJSON = new JMenuItem("Print Game JSON");
 		mntmPrintJSON.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				System.out.println(self.game.toJSONString());
+				System.out.println(self.game.getMap().toJSONString());
 			}
 		});
 		mnGame.add(mntmPrintJSON);
@@ -295,7 +292,7 @@ public class GUI extends JFrame{
 		}
 
 		//Set Locations the parcels on the map
-		for(Parcel p : game.getParcels()){
+		for(Parcel p : game.getMap().getParcels()){
 			p.getCircle().setX1(p.getLocation().getCircle().getX1());
 			p.getCircle().setY1(p.getLocation().getCircle().getY1());
 			drawingPanel.remove(p.getCircle());
@@ -303,7 +300,7 @@ public class GUI extends JFrame{
 		}
 
 		//Draw the trucks on the map
-		for(Truck t : game.getTrucks()){
+		for(Truck t : game.getMap().getTrucks()){
 			Circle c = t.getCircle();
 			c.setBounds(drawingPanel.getBounds());
 			c.setX1(t.getLocation().getCircle().getX1());
@@ -319,7 +316,7 @@ public class GUI extends JFrame{
 			drawingPanel.setComponentZOrder(n.getCircle(), z);
 			z++;
 		}
-		for(Parcel p : game.getParcels()){
+		for(Parcel p : game.getMap().getParcels()){
 			drawingPanel.setComponentZOrder(p.getCircle(), z);
 			z++;
 		}
@@ -327,7 +324,7 @@ public class GUI extends JFrame{
 			drawingPanel.setComponentZOrder(e.getLine(), z);
 			z++;
 		}
-		for(Truck t : game.getTrucks()){
+		for(Truck t : game.getMap().getTrucks()){
 			drawingPanel.setComponentZOrder(t.getCircle(), z);
 			z++;
 		}

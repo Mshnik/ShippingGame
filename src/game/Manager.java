@@ -76,15 +76,25 @@ public abstract class Manager implements Runnable{
 	public final Map getMap(){
 		return game.getMap();
 	}
+	
+	/** Returns the Nodes in this Game */
+	public final HashSet<Node> getNodes(){
+		return game.getMap().getNodes();
+	}
+	
+	/** Returns the Edges in this Game */
+	public final HashSet<Edge> getEdges(){
+		return game.getMap().getEdges();
+	}
 
 	/** Returns the Trucks in this Game */
 	public final ArrayList<Truck> getTrucks(){
-		return game.getTrucks();
+		return game.getMap().getTrucks();
 	}
 
 	/** Returns the Parcels in this Game */
 	public final HashSet<Parcel> getParcels(){
-		return game.getParcels();
+		return game.getMap().getParcels();
 	}
 
 	/** Sets the game this manager is watching to g */

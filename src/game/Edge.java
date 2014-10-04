@@ -161,8 +161,6 @@ public class Edge implements MapElement{
 			throw new IllegalArgumentException("lengthOfRoad value " + lengthOfRoad + " is an illegal value.");
 
 		length = lengthOfRoad;
-		game.getMap().maxLength = Math.max(game.getMap().maxLength, length);
-		game.getMap().minLength = Math.min(game.getMap().minLength, length);
 	}
 
 	/** Returns true if Node node is one of the exits of this Edge, false otherwise */

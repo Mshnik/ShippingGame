@@ -150,7 +150,7 @@ public class Truck implements MapElement, Runnable{
 	private void fixLastTravelTime(){
 		long now = System.currentTimeMillis();
 		long diff = now - lastTravelTime;
-		game.getScore().changeScore(game.getMap().WAIT_COST * (int)(diff / WAIT_TIME));
+		game.getMap().getScore().changeScore(game.getMap().WAIT_COST * (int)(diff / WAIT_TIME));
 		lastTravelTime = now;
 	}
 
@@ -415,7 +415,7 @@ public class Truck implements MapElement, Runnable{
 			}
 			parcelLock.release();
 
-			game.getScore().changeScore(game.getMap().PICKUP_COST);
+			game.getMap().getScore().changeScore(game.getMap().PICKUP_COST);
 			game.getManager().truckNotification(this, Manager.Notification.PICKED_UP_PARCEL);
 		}
 	}
@@ -445,7 +445,7 @@ public class Truck implements MapElement, Runnable{
 		}
 		load = null;
 		parcelLock.release();
-		game.getScore().changeScore(game.getMap().DROPOFF_COST);
+		game.getMap().getScore().changeScore(game.getMap().DROPOFF_COST);
 		game.getManager().truckNotification(this, Manager.Notification.DROPPED_OFF_PARCEL);
 
 	}
@@ -564,12 +564,12 @@ public class Truck implements MapElement, Runnable{
 				int remaining = r.getLength() - progress;
 				if(remaining >= speed){
 					progress += speed;
-					game.getScore().changeScore(Score.cost(speed));
+					game.getMap().getScore().changeScore(Score.cost(speed));
 				}
 				//Otherwise, go the remaining fraction, only deduct a correct percent of those points.
 				else{
 					progress += remaining;
-					game.getScore().changeScore(Score.cost(speed) * remaining / speed);
+					game.getMap().getScore().changeScore(Score.cost(speed) * remaining / speed);
 				}
 				speedLock.release();
 				double percent = (double)progress / (double)r.getLength();
@@ -600,7 +600,7 @@ public class Truck implements MapElement, Runnable{
 			if(location.getParcels().size() > 0)
 				game.getManager().truckNotification(this, Manager.Notification.PARCEL_AT_NODE);
 
-			if(game.getParcels().isEmpty() && game.isAllTrucksHome())
+			if(game.getMap().getParcels().isEmpty() && game.getMap().isAllTrucksHome())
 				game.finish();
 		}
 	}

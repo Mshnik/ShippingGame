@@ -146,7 +146,7 @@ public class Node implements MapElement{
 	 * @throws InterruptedException */
 	protected void addParcel(Parcel p) throws InterruptedException{
 		parcelLock.acquire();
-		game.getParcels().add(p);
+		game.getMap().getParcels().add(p);
 		parcels.add(p);
 		parcelLock.release();
 	}
@@ -272,7 +272,7 @@ public class Node implements MapElement{
 		for(Parcel p : parcels){
 			p.updateGUILocation(x, y);
 		}
-		for(Truck t : game.getTrucks()){
+		for(Truck t : game.getMap().getTrucks()){
 			if(t.getLocation() == this)
 				t.updateGUILocation(x, y);
 		}
@@ -319,7 +319,7 @@ public class Node implements MapElement{
 	/** Returns true if any truck is traveling towards this node, false otherwise 
 	 * @throws InterruptedException */
 	public boolean isTruckTravelingHere() throws InterruptedException{
-		for(Truck t : game.getTrucks()){
+		for(Truck t : game.getMap().getTrucks()){
 			if(t.getTravelingTo() != null && t.getTravelingTo().equals(this))
 				return true;
 		}

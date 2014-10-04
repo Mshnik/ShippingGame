@@ -180,7 +180,8 @@ public class Parcel implements MapElement{
 
 	/** Used when game notifies this parcel that it has reached its destination */
 	private void reachedDestination(){
-		game.deliverParcel(this, holder.getLocation(), holder);
+		game.getMap().deliverParcel(this, holder.getLocation(), holder);
+		game.getGUI().getDrawingPanel().remove(getCircle());
 		return;
 	}
 

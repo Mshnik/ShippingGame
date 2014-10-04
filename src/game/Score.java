@@ -105,29 +105,22 @@ public class Score {
 	}
 
 	private int score; //The score maintained by this score object
-	private Game game; //The game this score belongs to
 
-	/** Constructor. Creates an instance to keep track of the score 
-	 * @param g - the Game this Score belongs to*/
-	protected Score(Game g){
+	/** Constructor. Creates an instance to keep track of the score */
+	protected Score(){
 		score = 0;
-		game = g;
 	}
 
 	/** Constructor. Creates an instance to keep track of the score.
-	 * @param g - the Game this Score belongs to
 	 * @param score - the Initial score of this Game
 	 */
-	protected Score(Game g, int score){
-		this(g);
+	protected Score(int score){
 		this.score = score;
-		game.getGUI().updateScore(score);
 	}
 
 	/** Adds addToScore to score */
 	protected void changeScore(int addToScore){
 		score += addToScore;
-		game.getGUI().updateScore(score);
 	}
 
 	/** Returns the current score */
