@@ -105,22 +105,26 @@ public class Score {
 	}
 
 	private int score; //The score maintained by this score object
+	private final Map map;   //The map this is representing the score for
 
 	/** Constructor. Creates an instance to keep track of the score */
-	protected Score(){
+	protected Score(Map m){
+		map = m;
 		score = 0;
 	}
 
 	/** Constructor. Creates an instance to keep track of the score.
 	 * @param score - the Initial score of this Game
 	 */
-	protected Score(int score){
+	protected Score(Map m, int score){
+		this(m);
 		this.score = score;
 	}
 
 	/** Adds addToScore to score */
 	protected void changeScore(int addToScore){
 		score += addToScore;
+		map.getGame().getGUI().updateScore(score);
 	}
 
 	/** Returns the current score */
@@ -131,5 +135,11 @@ public class Score {
 	/** Returns the current score */
 	public int value(){
 		return getScore();
+	}
+	
+	@Override
+	/** Returns the current score value as the string version of this score. */
+	public String toString(){
+		return "" + getScore();
 	}
 }

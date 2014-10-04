@@ -76,15 +76,17 @@ public class Map implements JSONString{
 		}
 		//Read score coefficients
 		JSONArray scoreJSON = obj.getJSONArray(Map.SCORE_TOKEN);
-		int[] coeffs = new int[scoreJSON.length()];
-		WAIT_COST = coeffs[0];
-		PICKUP_COST = coeffs[1];
-		DROPOFF_COST = coeffs[2];
-		PAYOFF = coeffs[3];
-		ON_COLOR_MULTIPLIER = coeffs[4];
+		WAIT_COST = scoreJSON.getInt(0);
+		PICKUP_COST = scoreJSON.getInt(1);
+		DROPOFF_COST = scoreJSON.getInt(2);
+		PAYOFF = scoreJSON.getInt(3);
+		ON_COLOR_MULTIPLIER = scoreJSON.getInt(4);
+		score = new Score(this);
 
 		trucks = new ArrayList<Truck>();
 		parcels = new HashSet<Parcel>();
+		nodes = new HashSet<Node>();
+		edges = new HashSet<Edge>();
 
 		//Read in all nodes of map
 		for(String key : obj.keySet()){
@@ -143,6 +145,11 @@ public class Map implements JSONString{
 		updateMinMaxLength();
 	}
 
+	/** Returns the game this is in use for */
+	public Game getGame(){
+		return game;
+	}
+	
 	/** Returns the seed this game was generated from. If non-random, returns -1 */
 	public long getSeed(){
 		return seed;
@@ -470,7 +477,7 @@ public class Map implements JSONString{
 		this.seed = seed;
 		game = g;
 		//Create new score object
-		score = new Score();
+		score = new Score(this);
 
 		final int numCities = r.nextInt(MAX_NODES - MIN_NODES + 1) + MIN_NODES;
 		WAIT_COST = -1
