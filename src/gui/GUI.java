@@ -185,10 +185,9 @@ public class GUI extends JFrame{
 		JMenuItem mntmRandom = new JMenuItem("New Random Game...");
 		mntmRandom.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
-				final String CANCEL = "null";
 				long returnVal = -1;
 				String s = "";
-				while(returnVal == -1 && ! s.equals(CANCEL)){
+				while(returnVal == -1 && s != null){
 					try{
 						s = JOptionPane.showInputDialog(null, "Enter seed for random game (any long)");
 						returnVal = Long.parseLong(s);
@@ -196,7 +195,7 @@ public class GUI extends JFrame{
 						System.out.println(s);
 					}
 				}
-				if(s.equals(CANCEL)){
+				if(s == null){
 					return;
 				}
 				System.out.println("Generating game with seed " + returnVal);
