@@ -41,7 +41,7 @@ public class Edge implements MapElement{
 
 	private Line line; //Graphical representation of this Edge
 	
-	private final Game game;	//The game this Edge belongs to
+	private final Map map;	//The map this Edge belongs to
 
 	/** Constructor. Accepts a non-null Node array of length 2 to be exits and an integer length
 	 * lengthOfRoad must be positive and non-zero
@@ -50,8 +50,8 @@ public class Edge implements MapElement{
 	 * 		if lengthOfRoad is less than 1 and not equal to Edge.DUMMY_LENGTH
 	 * 		if either of the nodes are null
 	 * 		if exits[0] and exits[1] are the same node*/
-	protected Edge(Game g, Node exits[], int lengthOfRoad) throws IllegalArgumentException{
-		this(g, exits[0], exits[1], lengthOfRoad);
+	protected Edge(Map m, Node exits[], int lengthOfRoad) throws IllegalArgumentException{
+		this(m, exits[0], exits[1], lengthOfRoad);
 
 		if(exits.length != 2)
 			throw new IllegalArgumentException("Incorrectly sized Node Array Passed into Edge Constructor");
@@ -63,7 +63,7 @@ public class Edge implements MapElement{
 	 * 		if lengthOfRoad is less than 1 and not equal to Edge.DUMMY_LENGTH
 	 * 		if either of the nodes are null
 	 * 		if firstExit and secondExit are the same node*/
-	protected Edge(Game g, Node firstExit, Node secondExit, int lengthOfRoad) throws IllegalArgumentException{
+	protected Edge(Map m, Node firstExit, Node secondExit, int lengthOfRoad) throws IllegalArgumentException{
 
 		if(firstExit == null)
 			throw new IllegalArgumentException("First Node Passed into Edge constructor is null");
@@ -77,7 +77,7 @@ public class Edge implements MapElement{
 		if(lengthOfRoad <= 0 && lengthOfRoad != DUMMY_LENGTH)
 			throw new IllegalArgumentException("lengthOfRoad value " + lengthOfRoad + " is an illegal value.");
 
-		game = g;
+		map = m;
 		exits = new Node[2];
 		exits[0] = firstExit;
 		exits[1] = secondExit;
@@ -92,8 +92,8 @@ public class Edge implements MapElement{
 	}
 
 	/** Returns the Game this Edge belongs to. */
-	public Game getGame(){
-		return game;
+	public Map getMap(){
+		return map;
 	}
 	
 	/** Returns the exits of this line, a length 2 array of Nodes */

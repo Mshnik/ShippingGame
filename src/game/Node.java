@@ -23,8 +23,8 @@ import java.util.concurrent.Semaphore;
  **/
 public class Node implements MapElement{
 
-	private final Game game;
-
+	private final Map map;		//The map this Node is contained in
+	
 	/** Threads need to get this to view/edit parcels at this node */
 	private Semaphore parcelLock;
 
@@ -45,8 +45,8 @@ public class Node implements MapElement{
 	 * @param g - the Game this Node belongs to
 	 * @param name - the name of this Node
 	 * @param circle - The (draggable) circle object to draw for this Node*/
-	protected Node(Game g, String name, DraggableCircle c){
-		this(g, name, c, null);
+	protected Node(Map m, String name, DraggableCircle c){
+		this(m, name, c, null);
 	}
 
 	/** Constructor for a named Node with starting exits exits.
@@ -54,8 +54,8 @@ public class Node implements MapElement{
 	 * @param name - the name of this Node
 	 * @param exits - the exits of this node
 	 */
-	protected Node(Game g, String name, DraggableCircle c, Collection<Edge> exits){
-		this.game = g;
+	protected Node(Map m, String name, DraggableCircle c, Collection<Edge> exits){
+		map = m;
 		this.name = name;
 		if(exits != null)
 			this.exits.addAll(exits);
@@ -72,9 +72,9 @@ public class Node implements MapElement{
 		truckLock = new Semaphore(1);
 	}
 
-	/** Returns the game this Node belongs to */
-	public Game getGame(){
-		return game;
+	/** Returns the map this Node belongs to */
+	public Map getMap(){
+		return map;
 	}
 
 	/** Returns the name of this Node */
@@ -146,7 +146,7 @@ public class Node implements MapElement{
 	 * @throws InterruptedException */
 	protected void addParcel(Parcel p) throws InterruptedException{
 		parcelLock.acquire();
-		game.getMap().getParcels().add(p);
+		map.getParcels().add(p);
 		parcels.add(p);
 		parcelLock.release();
 	}
@@ -195,7 +195,7 @@ public class Node implements MapElement{
 	 * @param length the length of the Edge
 	 */
 	protected void connectTo(Node other, int length){
-		Edge r = new Edge(game, this, other, length);
+		Edge r = new Edge(map, this, other, length);
 		addExit(r);
 		other.addExit(r);
 	}
@@ -272,7 +272,7 @@ public class Node implements MapElement{
 		for(Parcel p : parcels){
 			p.updateGUILocation(x, y);
 		}
-		for(Truck t : game.getMap().getTrucks()){
+		for(Truck t : map.getTrucks()){
 			if(t.getLocation() == this)
 				t.updateGUILocation(x, y);
 		}
@@ -319,7 +319,7 @@ public class Node implements MapElement{
 	/** Returns true if any truck is traveling towards this node, false otherwise 
 	 * @throws InterruptedException */
 	public boolean isTruckTravelingHere() throws InterruptedException{
-		for(Truck t : game.getMap().getTrucks()){
+		for(Truck t : map.getTrucks()){
 			if(t.getTravelingTo() != null && t.getTravelingTo().equals(this))
 				return true;
 		}

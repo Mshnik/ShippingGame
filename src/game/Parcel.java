@@ -17,8 +17,8 @@ import java.util.concurrent.Semaphore;
  */
 public class Parcel implements MapElement{
 
-	/** The game this Parcel belongs to */
-	private final Game game;
+	/** The map this Parcel belongs to */
+	private final Map map;
 
 	/** The node this parcel started the game on */
 	private Node start;
@@ -47,8 +47,8 @@ public class Parcel implements MapElement{
 	 * @param start - the Node where this Parcel starts
 	 * @param destionation - the Node where this Parcel goes 
 	 * @throws IllegalArgumentException - if start.equals(destination)*/
-	protected Parcel(Game g, Node start, Node destination) throws IllegalArgumentException{
-		this(g, start, destination, Score.getRandomColor());
+	protected Parcel(Map m, Node start, Node destination) throws IllegalArgumentException{
+		this(m, start, destination, Score.getRandomColor());
 	}
 
 	/** Constructor. Sets start and destination cities, and assigns color
@@ -56,8 +56,8 @@ public class Parcel implements MapElement{
 	 * @param start - the Node where this Parcel starts
 	 * @param destionation - the Node where this Parcel goes 
 	 * @throws IllegalArgumentException - if start.equals(destination)*/
-	protected Parcel(Game g, Node start, Node destination, Color color) throws IllegalArgumentException{
-		game = g;
+	protected Parcel(Map m, Node start, Node destination, Color color) throws IllegalArgumentException{
+		map = m;
 
 		if(start.equals(destination))
 			throw new IllegalArgumentException("Illegal Cities passed into Parcel Constructor.");
@@ -72,8 +72,8 @@ public class Parcel implements MapElement{
 	}
 
 	/** Returns the game this Parcel belongs to */
-	public Game getGame(){
-		return game;
+	public Map getMap(){
+		return map;
 	}
 
 	/** Returns the start Node of this Parcel */
@@ -180,8 +180,7 @@ public class Parcel implements MapElement{
 
 	/** Used when game notifies this parcel that it has reached its destination */
 	private void reachedDestination(){
-		game.getMap().deliverParcel(this, holder.getLocation(), holder);
-		game.getGUI().getDrawingPanel().remove(getCircle());
+		map.deliverParcel(this, holder.getLocation(), holder);
 		return;
 	}
 

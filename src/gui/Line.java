@@ -154,7 +154,7 @@ public class Line  extends JPanel{
 	}
 
 	private Color getDistGradientColor(){
-		Map m = represents.getGame().getMap();
+		Map m = represents.getMap();
 		if(m.getMaxLength() == Edge.DEFAULT_MAX_LENGTH || m.getMinLength() == Edge.DEFAULT_MIN_LENGTH)
 			return DEFAULT_COLOR;
 		

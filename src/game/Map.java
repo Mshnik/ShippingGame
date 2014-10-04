@@ -90,7 +90,7 @@ public class Map implements JSONString{
 		for(String key : obj.keySet()){
 			if(key.startsWith(Map.NODE_TOKEN)){
 				JSONObject nodeJSON = obj.getJSONObject(key);
-				Node n = new Node(game, nodeJSON.getString(MapElement.NAME_TOKEN), null);
+				Node n = new Node(this, nodeJSON.getString(MapElement.NAME_TOKEN), null);
 				Circle c = n.getCircle();
 				c.setX1(nodeJSON.getInt(MapElement.X_TOKEN));
 				c.setY1(nodeJSON.getInt(MapElement.Y_TOKEN));
@@ -109,7 +109,7 @@ public class Map implements JSONString{
 				Node firstExit = getNode((String)exitArr.get(0));
 				Node secondExit = getNode((String)exitArr.get(1));
 
-				Edge e = new Edge(game, firstExit, secondExit, length);
+				Edge e = new Edge(this, firstExit, secondExit, length);
 				getEdges().add(e);
 				firstExit.addExit(e);
 				secondExit.addExit(e);
@@ -123,7 +123,7 @@ public class Map implements JSONString{
 				JSONObject truck = obj.getJSONObject(key);
 				Color c = new Color(truck.getInt(MapElement.COLOR_TOKEN));
 				String name = truck.getString(MapElement.NAME_TOKEN);
-				Truck t = new Truck(game, name, c);
+				Truck t = new Truck(game, name, c, getTruckHome());
 				trucks.add(t);
 			} else if( key.startsWith(PARCEL_TOKEN)){
 				JSONObject parcel = obj.getJSONObject(key);
@@ -131,7 +131,7 @@ public class Map implements JSONString{
 				Node start = getNode(parcel.getString(MapElement.LOCATION_TOKEN));
 				Node dest = getNode(parcel.getString(MapElement.DESTINATION_TOKEN));
 
-				Parcel p = new Parcel(game, start, dest, c);
+				Parcel p = new Parcel(this, start, dest, c);
 				parcels.add(p);
 				try {
 					start.addParcel(p);
@@ -268,6 +268,7 @@ public class Map implements JSONString{
 		} catch (InterruptedException e) {
 			e.printStackTrace();
 		}
+		game.getGUI().getDrawingPanel().remove(p.getCircle());
 	}
 
 	/** Returns a HashSet containing all the Edges in this map. Allows addition and removal of Edges to this map */
@@ -498,7 +499,7 @@ public class Map implements JSONString{
 			} else{
 				name = cities.remove((int)(Math.random()*cities.size()));
 			}
-			Node n = new Node(game, name, null);
+			Node n = new Node(this, name, null);
 			Circle c = n.getCircle();
 			c.setX1(r.nextInt(WIDTH + 1));
 			c.setY1(r.nextInt(HEIGHT + 1));
@@ -516,14 +517,14 @@ public class Map implements JSONString{
 			Node from = i1.next();
 			Node to = i2.next();
 			int length = r.nextInt(MAX_EDGE_LENGTH - MIN_EDGE_LENGTH + 1) + MIN_EDGE_LENGTH;
-			Edge e = new Edge(game, from, to, length);
+			Edge e = new Edge(this, from, to, length);
 			getEdges().add(e);
 			from.addExit(e);
 			to.addExit(e);
 		}
 		//Add final edge connecting the circle
 		Node last = i1.next();
-		Edge e = new Edge(game, last, first, r.nextInt(MAX_EDGE_LENGTH - MIN_EDGE_LENGTH + 1) + MIN_EDGE_LENGTH);
+		Edge e = new Edge(this, last, first, r.nextInt(MAX_EDGE_LENGTH - MIN_EDGE_LENGTH + 1) + MIN_EDGE_LENGTH);
 		getEdges().add(e);
 		first.addExit(e);
 		last.addExit(e);
@@ -536,7 +537,7 @@ public class Map implements JSONString{
 				from = randomElement(getNodes(), r);
 			}
 			int length = r.nextInt(MAX_EDGE_LENGTH - MIN_EDGE_LENGTH + 1) + MIN_EDGE_LENGTH;
-			e = new Edge(game, from, to, length);
+			e = new Edge(this, from, to, length);
 			getEdges().add(e);
 			from.addExit(e);
 			to.addExit(e);
@@ -545,7 +546,7 @@ public class Map implements JSONString{
 		//Add trucks
 		final int numb_trucks = r.nextInt(MAX_TRUCKS - MIN_TRUCKS + 1) + MIN_TRUCKS;
 		for(int i = 0; i < numb_trucks; i++){
-			Truck t = new Truck(game, "TRUCK-" + (i+1), Score.COLOR[r.nextInt(Score.COLOR.length)]);
+			Truck t = new Truck(game, "TRUCK-" + (i+1), Score.COLOR[r.nextInt(Score.COLOR.length)], getTruckHome());
 			trucks.add(t);
 		}
 
@@ -558,7 +559,7 @@ public class Map implements JSONString{
 				dest = randomElement(getNodes(), r);
 			}
 			Color c = Score.COLOR[r.nextInt(Score.COLOR.length)];
-			Parcel p = new Parcel(game, start, dest, c);
+			Parcel p = new Parcel(this, start, dest, c);
 			parcels.add(p);
 			try {
 				start.addParcel(p);
