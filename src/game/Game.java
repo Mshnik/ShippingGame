@@ -7,16 +7,10 @@ import java.io.IOException;
 
 import org.json.JSONObject;
 
-/** The Game Class is the controlling class for the ShippingGame Project.
- * Each game contains a collection of Parcels that need to be delivered from their
- * starting Node to their desired destination node. In order to do this, each game
- * also has a collection of Trucks that are able to pick up and move Parcels along edges between nodes.
- * <br><br>
- * Games also contain an instance of a Map that holds all of the Nodes and Edges in this game. The manager
- * may use this map to determine where trucks should go and what edges should be used to get there.
- * <br><br>
- * Finally, each Game contains a Score object, that manages the points in the Game and holds the current value
- * when the final score is announced
+/** The Game Class is the controlling class for the ShippingGame Project. It manages the go-between
+ * between the map, which stores the state of the game, and the gui, which visually displays it.
+ * Finally, the game class maintains the managers, the user written classes that fill in the 
+ * truck's missing behavior
  * @author MPatashnik
  *
  */
@@ -31,7 +25,8 @@ public class Game{
 	private GUI gui;
 	private Manager manager;
 
-	private boolean running;
+	private boolean running; //True if the game is currently in progress
+	private boolean finished; //True if the game is over
 	private Map map;
 
 	/** Creates a game instance with a set Map, read from File f. Uses Default for all other fields */
@@ -40,6 +35,7 @@ public class Game{
 		setManager(managerClassname);
 		manager.setGame(this);
 		running = false;
+		finished = false;
 		gui = null;
 		try {
 			JSONObject obj = new JSONObject(TextIO.read(f));
@@ -55,6 +51,7 @@ public class Game{
 		setManager(managerClassname);
 		manager.setGame(this);
 		running = false;
+		finished = false;
 		gui = null;
 		map = Map.randomMap(this, seed);
 	}
@@ -78,9 +75,15 @@ public class Game{
 		return true;
 	}
 
-	/** Returns true if this game is currently running, false otherwise */
+	/** Returns true if this game is currently running (in progress, not completed), 
+	 * false otherwise */
 	public boolean isRunning(){
 		return running;
+	}
+	
+	/** Returns true if this game is finished, false otherwise */
+	public boolean isFinished(){
+		return finished;
 	}
 
 	/** Sets the value of running. Also informs gui of changes */
@@ -89,6 +92,11 @@ public class Game{
 		gui.updateRunning();
 	}
 
+	/** Sets the value of finished. */
+	protected void setFinished(boolean f){
+		finished = f;
+	}
+	
 	/** Sets the map to map m */
 	protected void setMap(Map m){
 		map = m;
@@ -109,7 +117,8 @@ public class Game{
 		return managerClass;
 	}
 
-	/** Returns the file this game was created from. Returns null if this was created, not loaded */
+	/** Returns the file this game was created from. Returns null if this was created (randomly), 
+	 * not loaded */
 	public File getFile(){
 		return file;
 	}
@@ -117,7 +126,7 @@ public class Game{
 	/** Starts the game by having each truck begin running, then having the manager begin running.
 	 * Make sure not to do this twice. */
 	public void start(){
-		if(! running){
+		if(! running && !finished){
 			setRunning(true);
 			for(Truck t : map.getTrucks()){
 				Thread th = new Thread(t);
@@ -153,8 +162,9 @@ public class Game{
 
 	/** Ends this game prematurely by halting trucks and manager */
 	public void kill(){
-		if(running){
+		if(running && !finished){
 			setRunning(false);
+			setFinished(true);
 			for(Truck t : map.getTrucks()){
 				t.gameOver();
 			}
@@ -169,6 +179,7 @@ public class Game{
 	 */
 	protected void finish(){
 		setRunning(false);	
+		setFinished(true);
 		gui.setUpdateMessage("Game Finished!");
 		gui.repaint();
 		
@@ -204,7 +215,7 @@ public class Game{
 	 * @throws IOException
 	 * @throws RuntimeException if the game is not in its pre-start state when this method is called */
 	public void writeGame(String fileName) throws IOException, RuntimeException{
-		if(isRunning())
+		if(isRunning() || isFinished())
 			throw new RuntimeException("Can't Write Game File if the game is running.");
 
 

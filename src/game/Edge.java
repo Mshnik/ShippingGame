@@ -18,7 +18,6 @@ import java.util.concurrent.Semaphore;
  * There are no public Edge constructors, so classes outside of the gameFiles package will not be able to construct additional Edge objects
  * <br><br>
  * 
- * The Edge Class also has public static methods, which pertains to the minimum and maximum lengths of all Edges.
  * @author MPatashnik
  *
  */

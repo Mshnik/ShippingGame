@@ -20,7 +20,12 @@ import org.json.JSONObject;
 import org.json.JSONString;
 
 /** The Map Class is a container for the HashSets of Edges and Nodes that make up
- * the playing field of the game. It also allows for easy access to random nodes and edges.
+ * the playing field of the game, as well as the parcels and trucks that are part of the game. 
+ * 
+ * Each map contains a collection of Parcels that need to be delivered from their
+ * starting Node to their desired destination node. In order to do this, each game
+ * also has a collection of Trucks that are able to pick up and move Parcels along edges between nodes.
+ * 
  * @author MPatashnik
  *
  */
@@ -65,7 +70,7 @@ public class Map implements JSONString{
 	 */
 	public final int ON_COLOR_MULTIPLIER;
 
-	/** Intializes the map from the given serialized version of the map for game g */
+	/** Initializes the map from the given serialized version of the map for game g */
 	protected Map(Game g, JSONObject obj){
 		game = g;
 		//Read seed if possible, otherwise use -1.
@@ -356,7 +361,7 @@ public class Map implements JSONString{
 
 
 	@Override
-	/** Returns a String representation of this Map, with all edges and Nodes */
+	/** Returns a String representation of this Map, including edges and nodes */
 	public String toString(){
 		String output = "";
 		Iterator<Node> nodesIterator = nodes.iterator();
@@ -385,7 +390,14 @@ public class Map implements JSONString{
 	private static final String PARCEL_TOKEN = "parcel-";
 
 	@Override
-	/** Returns a JSON-compliant version of toString() */
+	/** Returns a JSON-compliant version of toString().
+	 * A full serialized version of the map, including:
+	 * > Seed
+	 * > Cost constants
+	 * > Nodes
+	 * > Edges
+	 * > Trucks
+	 * > Parcels */
 	public String toJSONString() {		
 		String s = "{\n" + Main.addQuotes(SEED_TOKEN) + ":" + seed +",";
 		s += Main.addQuotes(SCORE_TOKEN) + ":[" + WAIT_COST + "," 
