@@ -1,7 +1,7 @@
 package gui;
 import game.Edge;
-import game.Map;
-import game.MapElement;
+import game.Board;
+import game.BoardElement;
 
 import java.awt.BasicStroke;
 import java.awt.Color;
@@ -49,14 +49,14 @@ public class Line  extends JPanel{
 
 	private Color color;
 
-	private MapElement represents;
+	private BoardElement represents;
 
 	/** Constructor for the Line class. The line is colored black.
 	 * @param c1 - the Circle that marks the first end of this line
 	 * @param c2 - the Circle that marks the second end of this line
 	 * @param represents - the MapElement this Line represents when drawn on the GUI
 	 */
-	public Line(Circle c1, Circle c2, MapElement represents){
+	public Line(Circle c1, Circle c2, BoardElement represents){
 		this.setC1(c1);
 		this.setC2(c2);
 		this.represents = represents;
@@ -134,11 +134,7 @@ public class Line  extends JPanel{
 			color = DEFAULT_COLOR;
 			break;
 		case HIGHLIGHT_TRAVEL:
-			boolean b = true;
-			try{
-				b = represents.trucksHere() > 0;
-			}catch(InterruptedException e){}
-			if(b)
+			if(represents.trucksHere() > 0)
 				color = TRAVELING_COLOR;
 			else
 				color = DEFAULT_COLOR;
@@ -154,7 +150,7 @@ public class Line  extends JPanel{
 	}
 
 	private Color getDistGradientColor(){
-		Map m = represents.getMap();
+		Board m = represents.getBoard();
 		if(m.getMaxLength() == Edge.DEFAULT_MAX_LENGTH || m.getMinLength() == Edge.DEFAULT_MIN_LENGTH)
 			return DEFAULT_COLOR;
 		
@@ -184,7 +180,7 @@ public class Line  extends JPanel{
 	}
 
 	/** Returns the MapElement this object represents */
-	protected MapElement getRepresents(){
+	protected BoardElement getRepresents(){
 		return represents;
 	}
 

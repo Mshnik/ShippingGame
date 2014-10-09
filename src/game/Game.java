@@ -27,7 +27,7 @@ public class Game{
 
 	private boolean running; //True if the game is currently in progress
 	private boolean finished; //True if the game is over
-	private Map map;
+	private Board board;
 
 	/** Creates a game instance with a set Map, read from File f. Uses Default for all other fields */
 	public Game(String managerClassname, File f){
@@ -39,7 +39,7 @@ public class Game{
 		gui = null;
 		try {
 			JSONObject obj = new JSONObject(TextIO.read(f));
-			map = new Map(this, obj);
+			board = new Board(this, obj);
 		} catch (IOException e1) {
 			e1.printStackTrace();
 		}
@@ -53,7 +53,7 @@ public class Game{
 		running = false;
 		finished = false;
 		gui = null;
-		map = Map.randomMap(this, seed);
+		board = Board.randomBoard(this, seed);
 	}
 
 	/** Allows for setting a manager post construction - only permissible if manager
@@ -71,6 +71,7 @@ public class Game{
 			manager.setGame(this);
 		} catch (Exception e) {
 			e.printStackTrace();
+			return false;
 		}
 		return true;
 	}
@@ -98,16 +99,16 @@ public class Game{
 	}
 	
 	/** Sets the map to map m */
-	protected void setMap(Map m){
-		map = m;
+	protected void setMap(Board m){
+		board = m;
 	}
 
-	/** Returns the map of this game, including all of the nodes and all of the edges */
-	public Map getMap(){
-		return map;
+	/** Returns the board of this game, @see Board for what information is contained therein */
+	public Board getBoard(){
+		return board;
 	}
 
-	/** Returns the manager for this Game */
+	/** Returns the manager for this Game. */
 	public Manager getManager(){
 		return manager;
 	}
@@ -118,34 +119,45 @@ public class Game{
 	}
 
 	/** Returns the file this game was created from. Returns null if this was created (randomly), 
-	 * not loaded */
+	 * and thus not loaded */
 	public File getFile(){
 		return file;
 	}
+	
+	/** Returns the seed this game was generated from. Returns -1 if this game was loaded from
+	 * a non-randomly generated file.
+	 */
+	public long getSeed(){
+		return board.getSeed();
+	}
 
-	/** Starts the game by having each truck begin running, then having the manager begin running.
-	 * Make sure not to do this twice. */
+	/** Starts the game by the manager run, then having each truck begin running.
+	 * Additional calls to this method after the first call do nothing. */
 	public void start(){
 		if(! running && !finished){
 			setRunning(true);
-			for(Truck t : map.getTrucks()){
+			
+			Thread m = new Thread(manager);
+			manager.setThread(m);
+			m.start();
+			
+			for(Truck t : board.getTrucks()){
 				Thread th = new Thread(t);
 				t.setThread(th);
 				th.start();
 			}
 
-			Thread m = new Thread(manager);
-			manager.setThread(m);
-			m.start();
+			
 		}
 	}
 
-	/** Returns the threads for this game */
+	/** Returns the GUI that represents this game */
 	protected GUI getGUI(){
 		return gui;
 	}
 
-	/** Sets the threads of this game to GUI g */
+	/** Sets the GUI that draws this game to {@code g}.
+	 * Students - don't call this */
 	public void setGUI(GUI g){
 		gui = g;
 	}
@@ -160,34 +172,37 @@ public class Game{
 		gui.setUpdateMessage(newUpdate);
 	}
 
-	/** Ends this game prematurely by halting trucks and manager */
+	/** Ends this game prematurely by halting trucks and manager.
+	 * This will interrupt the manager and truck threads. */
 	public void kill(){
-		if(running && !finished){
-			setRunning(false);
+		halt(false);
+	}
+	
+	/** Ends this game correctly when the last parcel is delivered. */
+	protected void finish(){
+		halt(true);
+	}
+	
+	/** Call to end the game. Correct game ending if {@code gameActuallyOver},
+	 * premature halting otherwise.
+	 * Multiple calls to this method won't do anything additional.
+	 */
+	private void halt(boolean gameActuallyOver){
+		if(! finished){
+			setRunning(false);	
 			setFinished(true);
-			for(Truck t : map.getTrucks()){
+			if(gameActuallyOver)
+				gui.setUpdateMessage("Game Finished!");
+			else
+				gui.setUpdateMessage("Game Halted.");
+			gui.repaint();
+			
+			for(Truck t : board.getTrucks()){
 				t.gameOver();
 			}
-
+	
 			manager.gameOver();
 		}
-	}
-
-	/** Called when the game is finished, all the parcels are delivered.
-	 * Cleans up the game and announces the score and time.
-	 * Halts all trucks
-	 */
-	protected void finish(){
-		setRunning(false);	
-		setFinished(true);
-		gui.setUpdateMessage("Game Finished!");
-		gui.repaint();
-		
-		for(Truck t : map.getTrucks()){
-			t.gameOver();
-		}
-
-		manager.gameOver();
 	}
 
 	/** Returns a file for the string map filename. Throws an IllegalArgumentException
@@ -204,7 +219,7 @@ public class Game{
 
 		File f = new File(MAP_DIRECTORY + filename);
 		if(! f.exists())
-			throw new IllegalArgumentException("File " + f + " for filename " + filename + " DNE!");
+			throw new IllegalArgumentException("File " + f + " for filename " + filename + " Does Not Exist.");
 
 		return f;
 	}
@@ -212,14 +227,13 @@ public class Game{
 	/** Writes this Game to a text file that can be loaded and re-played later.
 	 * Can only be used if the game has not yet started or finished.
 	 * If either of these is true, throws a runtime exception
-	 * @throws IOException
+	 * @throws IOException - If the file writing goes bad.
 	 * @throws RuntimeException if the game is not in its pre-start state when this method is called */
 	public void writeGame(String fileName) throws IOException, RuntimeException{
 		if(isRunning() || isFinished())
 			throw new RuntimeException("Can't Write Game File if the game is running.");
 
-
 		String n = MAP_DIRECTORY + fileName + ".txt";
-		TextIO.write(n, map.toJSONString());
+		TextIO.write(n, board.toJSONString());
 	}
 }

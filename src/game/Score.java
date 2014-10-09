@@ -91,15 +91,7 @@ public class Score {
 		if(speed < Truck.EFFICIENT_SPEED)
 			return -(speed + 1);
 		else if (speed > Truck.EFFICIENT_SPEED)
-			while(true){
-				try {
-					return -(speed + Main.fib(speed - Truck.EFFICIENT_SPEED));
-				} catch (InterruptedException e) {
-					try {
-						Thread.sleep(5); //Give a short break before trying again.
-					} catch (InterruptedException e1) {}	
-				}
-			}
+			return -(speed + Main.fib(speed - Truck.EFFICIENT_SPEED));
 		else
 			return -(speed);
 	}
@@ -136,7 +128,7 @@ public class Score {
 	public int value(){
 		return getScore();
 	}
-	
+
 	@Override
 	/** Returns the current score value as the string version of this score. */
 	public String toString(){

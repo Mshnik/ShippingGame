@@ -22,7 +22,7 @@ import java.util.concurrent.Semaphore;
  * @author MPatashnik
  *
  */
-public class Edge implements MapElement{
+public class Edge implements BoardElement{
 
 	/** The length of "Blank" Edges. Should be later changed to an actual length value */
 	protected static final int DUMMY_LENGTH = Integer.MIN_VALUE;
@@ -41,7 +41,7 @@ public class Edge implements MapElement{
 
 	private Line line; //Graphical representation of this Edge
 	
-	private final Map map;	//The map this Edge belongs to
+	private final Board board;	//The board this Edge belongs to
 
 	/** Constructor. Accepts a non-null Node array of length 2 to be exits and an integer length
 	 * lengthOfRoad must be positive and non-zero
@@ -50,7 +50,7 @@ public class Edge implements MapElement{
 	 * 		if lengthOfRoad is less than 1 and not equal to Edge.DUMMY_LENGTH
 	 * 		if either of the nodes are null
 	 * 		if exits[0] and exits[1] are the same node*/
-	protected Edge(Map m, Node exits[], int lengthOfRoad) throws IllegalArgumentException{
+	protected Edge(Board m, Node exits[], int lengthOfRoad) throws IllegalArgumentException{
 		this(m, exits[0], exits[1], lengthOfRoad);
 
 		if(exits.length != 2)
@@ -63,7 +63,7 @@ public class Edge implements MapElement{
 	 * 		if lengthOfRoad is less than 1 and not equal to Edge.DUMMY_LENGTH
 	 * 		if either of the nodes are null
 	 * 		if firstExit and secondExit are the same node*/
-	protected Edge(Map m, Node firstExit, Node secondExit, int lengthOfRoad) throws IllegalArgumentException{
+	protected Edge(Board m, Node firstExit, Node secondExit, int lengthOfRoad) throws IllegalArgumentException{
 
 		if(firstExit == null)
 			throw new IllegalArgumentException("First Node Passed into Edge constructor is null");
@@ -77,7 +77,7 @@ public class Edge implements MapElement{
 		if(lengthOfRoad <= 0 && lengthOfRoad != DUMMY_LENGTH)
 			throw new IllegalArgumentException("lengthOfRoad value " + lengthOfRoad + " is an illegal value.");
 
-		map = m;
+		board = m;
 		exits = new Node[2];
 		exits[0] = firstExit;
 		exits[1] = secondExit;
@@ -91,9 +91,9 @@ public class Edge implements MapElement{
 		line = new Line(null, null, this);
 	}
 
-	/** Returns the Map this Edge belongs to. */
-	public Map getMap(){
-		return map;
+	/** Returns the Board this Edge belongs to. */
+	public Board getBoard(){
+		return board;
 	}
 	
 	/** Returns the exits of this line, a length 2 array of Nodes */
@@ -254,9 +254,9 @@ public class Edge implements MapElement{
 	/** Returns exits of this and the length for its JSON string */
 	@Override
 	public String toJSONString(){
-		return "{\n" + Main.addQuotes(MapElement.LOCATION_TOKEN) + ":[" 
+		return "{\n" + Main.addQuotes(BoardElement.LOCATION_TOKEN) + ":[" 
 				     + Main.addQuotes(exits[0].getName()) + "," + Main.addQuotes(exits[1].getName()) + "]," +
-				"\n" + Main.addQuotes(MapElement.LENGTH_TOKEN) + ":" + length + 
+				"\n" + Main.addQuotes(BoardElement.LENGTH_TOKEN) + ":" + length + 
 				"\n}";
 	}
 
@@ -274,13 +274,13 @@ public class Edge implements MapElement{
 		return "" + length;
 	}
 
-	/** Returns the x location the mapped name of this Edge relative to the top left corner of the line */
+	/** Returns the x location the boardped name of this Edge relative to the top left corner of the line */
 	@Override
 	public int getRelativeX() {
 		return line.getXMid() - line.getX1() + Line.LINE_THICKNESS;
 	}
 
-	/** Returns the y location the mapped name of this Edge relative to the top left corner of the line */
+	/** Returns the y location the boardped name of this Edge relative to the top left corner of the line */
 	@Override
 	public int getRelativeY() {
 		return line.getYMid() - line.getY1() + Line.LINE_THICKNESS*3;

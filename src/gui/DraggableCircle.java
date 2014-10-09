@@ -5,7 +5,7 @@ import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.awt.event.MouseMotionListener;
 
-import game.MapElement;
+import game.BoardElement;
 
 /** A circle that can be dragged by the user on the gui */
 public class DraggableCircle extends Circle {
@@ -16,7 +16,7 @@ public class DraggableCircle extends Circle {
 	private Point clickPoint; //The point the user clicked within the circle before dragging began
 	private MouseMotionListener motionListener; //The listener for dragging
 	
-	public DraggableCircle(MapElement represents, int x, int y, int diameter) {
+	public DraggableCircle(BoardElement represents, int x, int y, int diameter) {
 		super(represents, x, y, diameter);
 		
 		clickListener = new MouseListener(){

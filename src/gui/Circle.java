@@ -1,5 +1,5 @@
 package gui;
-import game.MapElement;
+import game.BoardElement;
 import game.Node;
 import game.Parcel;
 import game.Score;
@@ -44,7 +44,7 @@ public class Circle extends JPanel{
 	/** The minimum amount of distance between Circles in pixels when they are drawn on the GUI */
 	public static final int BUFFER_RADUIS = DEFAULT_DIAMETER * 5;
 
-	MapElement represents;
+	BoardElement represents;
 
 	private int x1;
 	private int y1;
@@ -65,7 +65,7 @@ public class Circle extends JPanel{
 	 * @param y - y coordinate of center
 	 * @param diameter - the diameter of the circle
 	 */
-	public Circle(MapElement represents, int x, int y, int diameter){
+	public Circle(BoardElement represents, int x, int y, int diameter){
 		this(represents, x, y, diameter, null, false);
 	}
 
@@ -76,7 +76,7 @@ public class Circle extends JPanel{
 	 * @param color - the Color of this circle
 	 * @param filled - whether or not this circle is filled when it is drawn
 	 */
-	public Circle(MapElement represents, int x, int y, int diameter, Color color, boolean filled){
+	public Circle(BoardElement represents, int x, int y, int diameter, Color color, boolean filled){
 		this.represents = represents;
 		
 		//Set preliminary bounds
@@ -186,7 +186,7 @@ public class Circle extends JPanel{
 	}
 
 	/** Returns the MapElement this object represents */
-	protected MapElement getRepresents(){
+	protected BoardElement getRepresents(){
 		return represents;
 	}
 

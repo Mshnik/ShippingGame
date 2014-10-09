@@ -15,14 +15,14 @@ import java.util.concurrent.Semaphore;
  * @author MPatashnik
  *
  */
-public class Parcel implements MapElement{
+public class Parcel implements BoardElement{
 
-	/** The map this Parcel belongs to */
-	private final Map map;
+	/** The board this Parcel belongs to */
+	private final Board board;
 
 	/** The node this parcel started the game on */
 	private Node start;
-	/** This parcel's current location on the map */
+	/** This parcel's current location on the board */
 	private Node location;
 	/** The node this parcel wants to be dropped off at */
 	private Node destination;
@@ -47,7 +47,7 @@ public class Parcel implements MapElement{
 	 * @param start - the Node where this Parcel starts
 	 * @param destionation - the Node where this Parcel goes 
 	 * @throws IllegalArgumentException - if start.equals(destination)*/
-	protected Parcel(Map m, Node start, Node destination) throws IllegalArgumentException{
+	protected Parcel(Board m, Node start, Node destination) throws IllegalArgumentException{
 		this(m, start, destination, Score.getRandomColor());
 	}
 
@@ -56,8 +56,8 @@ public class Parcel implements MapElement{
 	 * @param start - the Node where this Parcel starts
 	 * @param destionation - the Node where this Parcel goes 
 	 * @throws IllegalArgumentException - if start.equals(destination)*/
-	protected Parcel(Map m, Node start, Node destination, Color color) throws IllegalArgumentException{
-		map = m;
+	protected Parcel(Board m, Node start, Node destination, Color color) throws IllegalArgumentException{
+		board = m;
 
 		if(start.equals(destination))
 			throw new IllegalArgumentException("Illegal Cities passed into Parcel Constructor.");
@@ -71,9 +71,9 @@ public class Parcel implements MapElement{
 		parcelLock = new Semaphore(1);
 	}
 
-	/** Returns the game this Parcel belongs to */
-	public Map getMap(){
-		return map;
+	/** Returns the board this Parcel belongs to */
+	public Board getBoard(){
+		return board;
 	}
 
 	/** Returns the start Node of this Parcel */
@@ -180,7 +180,7 @@ public class Parcel implements MapElement{
 
 	/** Used when game notifies this parcel that it has reached its destination */
 	private void reachedDestination(){
-		map.deliverParcel(this, holder.getLocation(), holder);
+		board.deliverParcel(this, holder.getLocation(), holder);
 		return;
 	}
 
@@ -193,9 +193,9 @@ public class Parcel implements MapElement{
 	@Override
 	/** Returns this' start location and its color for JSON string */
 	public String toJSONString(){
-		return "{\n" + Main.addQuotes(MapElement.LOCATION_TOKEN) + ":" + Main.addQuotes(location.getName()) + "," +
-				"\n" + Main.addQuotes(MapElement.DESTINATION_TOKEN) + ":" + Main.addQuotes(destination.getName()) + "," +
-				"\n" + Main.addQuotes(MapElement.COLOR_TOKEN) + ":" + color.getRGB() + 
+		return "{\n" + Main.addQuotes(BoardElement.LOCATION_TOKEN) + ":" + Main.addQuotes(location.getName()) + "," +
+				"\n" + Main.addQuotes(BoardElement.DESTINATION_TOKEN) + ":" + Main.addQuotes(destination.getName()) + "," +
+				"\n" + Main.addQuotes(BoardElement.COLOR_TOKEN) + ":" + color.getRGB() + 
 				"\n}";
 	}
 

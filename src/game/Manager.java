@@ -4,6 +4,7 @@ import java.util.HashSet;
 
 /** The Manager Class determines the the behavior of the Trucks.
  * In addition to having a getGame() method, other getters are available for ease of use.
+ * These methods are all final, thus cannot be overwritten in subclasses.
  * <br><br>
  * As the Manager Class is abstract, it is up to the user to extend it and define its behavior,
  * which ultimately is the way the user plays the game.
@@ -31,7 +32,7 @@ public abstract class Manager implements Runnable{
 	}
 
 	@Override
-	/** Behavior for the Manager and all trucks. To be Overridden in subclasses */
+	/** Behavior for the Manager and all trucks. To be overridden in subclasses */
 	public abstract void run();
 
 	/** Message options from a truck to a manager include the following:
@@ -46,7 +47,7 @@ public abstract class Manager implements Runnable{
 	 *  <p> STATUS_CHANGED - Sent whenever a truck's traveling/waiting status changes. This occurs whenever a truck begins traveling
 	 *  		or stops traveling
 	 *  <p> PARCEL_AT_NODE - Sent whenever a truck arrives at a node that contains at least one parcel. A PARCEL_AT_NODE notification
-	 *  		is always fired after a LOCATION_CHANGED notification
+	 *  		is fired after a LOCATION_CHANGED notification
 	 *  <p> PICKED_UP_PARCEL - A subset of LOAD_CHANGED notifications. Sent whenever a truck picks up a parcel
 	 *  <p> DROPPED_OFF_PARCEL - A subset of LOAD_CHANGED notifications. Sent whenever a truck picks up a parcel
 	 */
@@ -62,8 +63,8 @@ public abstract class Manager implements Runnable{
 	}
 
 	/** Allows Trucks to notify the manager that something has occurred. 
-	 * Notifications may be sent even if the game has not yet started, so consider filtering calls
-	 * based on game.isRunning().
+	 * Method should provide the calling truck with additional information pertaining to the
+	 * message sent.
 	 * 
 	 * @see Manager.Notification The notification enum for types of messages
 	 */
@@ -89,29 +90,29 @@ public abstract class Manager implements Runnable{
 		return game;
 	}
 
-	/** Returns the Map for this Game */
-	public final Map getMap(){
-		return game.getMap();
+	/** Returns the Board for this Game */
+	public final Board getBoard(){
+		return game.getBoard();
 	}
 	
 	/** Returns the Nodes in this Game */
 	public final HashSet<Node> getNodes(){
-		return game.getMap().getNodes();
+		return getBoard().getNodes();
 	}
 	
 	/** Returns the Edges in this Game */
 	public final HashSet<Edge> getEdges(){
-		return game.getMap().getEdges();
+		return getBoard().getEdges();
 	}
 
 	/** Returns the Trucks in this Game */
 	public final ArrayList<Truck> getTrucks(){
-		return game.getMap().getTrucks();
+		return getBoard().getTrucks();
 	}
 
 	/** Returns the Parcels in this Game */
 	public final HashSet<Parcel> getParcels(){
-		return game.getMap().getParcels();
+		return getBoard().getParcels();
 	}
 
 	/** Sets the game this manager is watching to g.

@@ -49,26 +49,37 @@ public class Main {
 		if(!Manager.class.isAssignableFrom(c))
 			throw new IllegalArgumentException("Class " + userManagerClass + " Does not Extend Manager Class");
 		
-		return c.newInstance();//assuming you aren't worried about constructor .
+		return c.newInstance();//OK because default constructor is only constructor that should be used.
 	}
 	
-	/** Returns the sum of the natural numbers from 1 to i */
+	/** Returns the sum of the natural numbers from {@code 1} to {@code i}, recursively!
+	 * Returns 0 for {@code i <= 0} */
 	public static int sumTo(int i){
 		if(i <= 0)
 			return 0;
-		return i + sumTo(i-1);
+		return sumToHelper(i,0);
 	}
 	
-	//Part of fib series calculated thus far. Bit of memoization for speed.
+	/** Helper for sumTo method such that it's tail recursive */
+	private static int sumToHelper(int i, int s){
+		if(i == 0) return s;
+		return sumToHelper(i-1, s+i);
+	}
+	
+	/** Part of fib series calculated thus far. Bit of memoization for speed. */
 	private static ArrayList<Integer> fibCalc = new ArrayList<Integer>();
 	
-	//Lock that ensures that fibCalc arrayList is added to/accessed correctly.
+	/** Lock that ensures that fibCalc arrayList is added to/accessed correctly. */
 	private static Semaphore fibLock = new Semaphore(1);
 	
-	/** Returns the ith fibonachi number (0 indexed), starting with 0,1,1,2 ... Returns -1 if given number is negative 
-	 * @throws InterruptedException */
-	public static int fib(int i) throws InterruptedException{
-		fibLock.acquire();
+	/** Returns the ith fibonachi number (0 indexed), starting with 0,1,1,2 ... 
+	 * Returns -1 if given number is negative or if the calling thread is interrupted */
+	public static int fib(int i){
+		try {
+			fibLock.acquire();
+		} catch (InterruptedException e) {
+			return -1;
+		}
 		if (i < 0){
 			fibLock.release();
 			return -1;
@@ -85,7 +96,11 @@ public class Main {
 		int f = fib(i-2) + fib(i-1);
 		
 		//Acquire before checking size/adding.
-		fibLock.acquire();
+		try {
+			fibLock.acquire();
+		} catch (InterruptedException e) {
+			return -1;
+		}
 		//Check that we're storing it in the correct place.
 		if (fibCalc.size() == i)		
 			fibCalc.add(f);
@@ -93,20 +108,21 @@ public class Main {
 		return f;
 	}
 	
-	/** Returns the given string with quotes added around it */
+	/** Returns the given string with quotes added around it.
+	 * Used in JSON creation methods throughout project */
 	public static String addQuotes(String s){
 		return "\"" + s + "\"";
 	}
 	
-	
 	/** Returns a random element of the given collection. Locks lock before doing processing.
-	 * If lock is null, doesn't do any locking. 
-	 * Uses the given random object for random selection. If null, creates new random object */
+	 * If lock is null, doesn't do any locking. Returns null if calling thread is interrupted. */
 	public static <T> T randomElement(Collection<T> elms, Semaphore lock){
 		if(lock != null)
 			try {
 				lock.acquire();
-			} catch (InterruptedException e) {}
+			} catch (InterruptedException e) {
+				return null;
+			}
 		Iterator<T> it = elms.iterator();
 		T val = null;
 		for(int i = 0; i < (int)(Math.random() * elms.size() - 1) + 1; i++){

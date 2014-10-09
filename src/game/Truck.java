@@ -22,7 +22,7 @@ import java.util.concurrent.Semaphore;
  * this change, allowing for input at that time.
  * @author MPatashnik
  */
-public class Truck implements MapElement, Runnable{
+public class Truck implements BoardElement, Runnable{
 
 	/** The Two States that a Truck can be in at any time - either Waiting (staying on its location
 	 * and awaiting further travel instructions) or Traveling (currently moving from node to node
@@ -150,7 +150,7 @@ public class Truck implements MapElement, Runnable{
 	private void fixLastTravelTime(){
 		long now = System.currentTimeMillis();
 		long diff = now - lastTravelTime;
-		getManager().getScoreObject().changeScore(game.getMap().WAIT_COST * (int)(diff / WAIT_TIME));
+		getManager().getScoreObject().changeScore(getBoard().WAIT_COST * (int)(diff / WAIT_TIME));
 		lastTravelTime = now;
 	}
 
@@ -165,8 +165,8 @@ public class Truck implements MapElement, Runnable{
 	}
 	
 	/** Returns the map this Truck belongs to */
-	public Map getMap(){
-		return game.getMap();
+	public Board getBoard(){
+		return game.getBoard();
 	}
 
 	/** Sets the thread this truck is running in */
@@ -425,7 +425,7 @@ public class Truck implements MapElement, Runnable{
 			}
 			parcelLock.release();
 
-			getManager().getScoreObject().changeScore(game.getMap().PICKUP_COST);
+			getManager().getScoreObject().changeScore(getBoard().PICKUP_COST);
 			game.getManager().truckNotification(this, Manager.Notification.PICKED_UP_PARCEL);
 		}
 	}
@@ -455,7 +455,7 @@ public class Truck implements MapElement, Runnable{
 		}
 		load = null;
 		parcelLock.release();
-		getManager().getScoreObject().changeScore(game.getMap().DROPOFF_COST);
+		getManager().getScoreObject().changeScore(getBoard().DROPOFF_COST);
 		game.getManager().truckNotification(this, Manager.Notification.DROPPED_OFF_PARCEL);
 
 	}
@@ -610,7 +610,7 @@ public class Truck implements MapElement, Runnable{
 			if(location.getParcels().size() > 0)
 				game.getManager().truckNotification(this, Manager.Notification.PARCEL_AT_NODE);
 
-			if(game.getMap().getParcels().isEmpty() && game.getMap().isAllTrucksHome())
+			if(getBoard().getParcels().isEmpty() && getBoard().isAllTrucksHome())
 				game.finish();
 		}
 	}
@@ -683,8 +683,8 @@ public class Truck implements MapElement, Runnable{
 	 * Just the basic truck info pertaining to map creation - location and load not included.
 	 */	
 	public String toJSONString() {
-		return "{\n" + Main.addQuotes(MapElement.NAME_TOKEN) + ":" + Main.addQuotes(name) + "," +
-				"\n" + Main.addQuotes(MapElement.COLOR_TOKEN) + ":" + color.getRGB() + 
+		return "{\n" + Main.addQuotes(BoardElement.NAME_TOKEN) + ":" + Main.addQuotes(name) + "," +
+				"\n" + Main.addQuotes(BoardElement.COLOR_TOKEN) + ":" + color.getRGB() + 
 				"\n}";
 	}
 }

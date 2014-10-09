@@ -165,7 +165,7 @@ public class GUI extends JFrame{
 					if(oldGame.getFile() != null)
 						game = new Game(oldGame.getManagerClassname(), oldGame.getFile());
 					else{
-						game = new Game(oldGame.getManagerClassname(), oldGame.getMap().getSeed());
+						game = new Game(oldGame.getManagerClassname(), oldGame.getBoard().getSeed());
 					}
 					game.setGUI(self);
 					oldGame.kill();
@@ -215,7 +215,7 @@ public class GUI extends JFrame{
 		JMenuItem mntmPrintJSON = new JMenuItem("Print Game JSON");
 		mntmPrintJSON.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				System.out.println(self.game.getMap().toJSONString());
+				System.out.println(self.game.getBoard().toJSONString());
 			}
 		});
 		mnGame.add(mntmPrintJSON);
@@ -256,8 +256,8 @@ public class GUI extends JFrame{
 			public void itemStateChanged(ItemEvent event) {
 				if (event.getStateChange() == ItemEvent.SELECTED) {
 					Line.setColorPolicy(k);
-					if(game != null && game.getMap() != null){
-						for(Edge ed : game.getMap().getEdges()){
+					if(game != null && game.getBoard() != null){
+						for(Edge ed : game.getBoard().getEdges()){
 							ed.getLine().updateToColorPolicy();
 						}
 					}
@@ -273,7 +273,7 @@ public class GUI extends JFrame{
 	/** Draws all elements of the game on the threads. Used when the game is started */
 	private void drawMap(){
 		//Put nodes on map
-		for(Node n : game.getMap().getNodes()){
+		for(Node n : game.getBoard().getNodes()){
 			Circle c = n.getCircle();
 			//Remove, re-add from drawing panel
 			drawingPanel.remove(c);
@@ -281,7 +281,7 @@ public class GUI extends JFrame{
 		}
 
 		//Draw the edges on the map
-		for(Edge r : game.getMap().getEdges()){
+		for(Edge r : game.getBoard().getEdges()){
 			Line l = r.getLine();
 			l.setC1(r.getExits()[0].getCircle());
 			l.setC2(r.getExits()[1].getCircle());
@@ -292,7 +292,7 @@ public class GUI extends JFrame{
 		}
 
 		//Set Locations the parcels on the map
-		for(Parcel p : game.getMap().getParcels()){
+		for(Parcel p : game.getBoard().getParcels()){
 			p.getCircle().setX1(p.getLocation().getCircle().getX1());
 			p.getCircle().setY1(p.getLocation().getCircle().getY1());
 			drawingPanel.remove(p.getCircle());
@@ -300,7 +300,7 @@ public class GUI extends JFrame{
 		}
 
 		//Draw the trucks on the map
-		for(Truck t : game.getMap().getTrucks()){
+		for(Truck t : game.getBoard().getTrucks()){
 			Circle c = t.getCircle();
 			c.setBounds(drawingPanel.getBounds());
 			c.setX1(t.getLocation().getCircle().getX1());
@@ -312,19 +312,19 @@ public class GUI extends JFrame{
 		//Fix the z-ordering of elements on the panel
 		//Higher z painted first -> lower z paint over higher z
 		int z = 0;
-		for(Node n : game.getMap().getNodes()){
+		for(Node n : game.getBoard().getNodes()){
 			drawingPanel.setComponentZOrder(n.getCircle(), z);
 			z++;
 		}
-		for(Parcel p : game.getMap().getParcels()){
+		for(Parcel p : game.getBoard().getParcels()){
 			drawingPanel.setComponentZOrder(p.getCircle(), z);
 			z++;
 		}
-		for(Edge e : game.getMap().getEdges()){
+		for(Edge e : game.getBoard().getEdges()){
 			drawingPanel.setComponentZOrder(e.getLine(), z);
 			z++;
 		}
-		for(Truck t : game.getMap().getTrucks()){
+		for(Truck t : game.getBoard().getTrucks()){
 			drawingPanel.setComponentZOrder(t.getCircle(), z);
 			z++;
 		}
@@ -337,7 +337,7 @@ public class GUI extends JFrame{
 		game = g;
 		game.setGUI(this);
 		drawMap();
-		game.getMap().updateMinMaxLength();
+		game.getBoard().updateMinMaxLength();
 	}
 
 	/** Returns the panel that the map is drawn on */

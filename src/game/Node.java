@@ -21,16 +21,15 @@ import java.util.concurrent.Semaphore;
  *  
  *  @author MPatashnik
  **/
-public class Node implements MapElement{
+public class Node implements BoardElement{
 
-	private final Map map;		//The map this Node is contained in
+	private final Board board;		//The board this Node is contained in
 	
 	/** Threads need to get this to view/edit parcels at this node */
 	private Semaphore parcelLock;
 
 	private Semaphore truckLock; //Lock that trucks must acquire in order to make changes to this edge.
 
-	private int truckHereCount; 			   //A count of the trucks here (mappings in truckHere to true)
 	private HashMap<Truck, Boolean> truckHere; //Maps truck -> is here
 
 	private String name;
@@ -45,7 +44,7 @@ public class Node implements MapElement{
 	 * @param g - the Game this Node belongs to
 	 * @param name - the name of this Node
 	 * @param circle - The (draggable) circle object to draw for this Node*/
-	protected Node(Map m, String name, DraggableCircle c){
+	protected Node(Board m, String name, DraggableCircle c){
 		this(m, name, c, null);
 	}
 
@@ -54,8 +53,8 @@ public class Node implements MapElement{
 	 * @param name - the name of this Node
 	 * @param exits - the exits of this node
 	 */
-	protected Node(Map m, String name, DraggableCircle c, Collection<Edge> exits){
-		map = m;
+	protected Node(Board m, String name, DraggableCircle c, Collection<Edge> exits){
+		board = m;
 		this.name = name;
 		if(exits != null)
 			this.exits.addAll(exits);
@@ -65,16 +64,15 @@ public class Node implements MapElement{
 		else
 			circle = c;
 
-		truckHereCount = 0;
 		truckHere = new HashMap<Truck, Boolean>();
 
 		parcelLock = new Semaphore(1);
 		truckLock = new Semaphore(1);
 	}
 
-	/** Returns the map this Node belongs to */
-	public Map getMap(){
-		return map;
+	/** Returns the board this Node belongs to */
+	public Board getBoard(){
+		return board;
 	}
 
 	/** Returns the name of this Node */
@@ -146,7 +144,7 @@ public class Node implements MapElement{
 	 * @throws InterruptedException */
 	protected void addParcel(Parcel p) throws InterruptedException{
 		parcelLock.acquire();
-		map.getParcels().add(p);
+		board.getParcels().add(p);
 		parcels.add(p);
 		parcelLock.release();
 	}
@@ -195,7 +193,7 @@ public class Node implements MapElement{
 	 * @param length the length of the Edge
 	 */
 	protected void connectTo(Node other, int length){
-		Edge r = new Edge(map, this, other, length);
+		Edge r = new Edge(board, this, other, length);
 		addExit(r);
 		other.addExit(r);
 	}
@@ -248,10 +246,6 @@ public class Node implements MapElement{
 	/** Tells the node if a Truck is currently on it or not. Gets its truckLock to prevent Truck thread collision */
 	protected void setTruckHere(Truck t, Boolean isHere) throws InterruptedException{
 		truckLock.acquire();
-		if(truckHere.containsKey(t) && ! truckHere.get(t) && isHere)
-			truckHereCount++;
-		else if(! truckHere.containsKey(t) || truckHere.get(t) && ! isHere)
-			truckHereCount--;
 		truckHere.put(t, isHere);
 		truckLock.release();
 	}
@@ -272,7 +266,7 @@ public class Node implements MapElement{
 		for(Parcel p : parcels){
 			p.updateGUILocation(x, y);
 		}
-		for(Truck t : map.getTrucks()){
+		for(Truck t : board.getTrucks()){
 			if(t.getLocation() == this)
 				t.updateGUILocation(x, y);
 		}
@@ -297,9 +291,14 @@ public class Node implements MapElement{
 	}
 
 	@Override
-	/** Returns true if a truck is currently at this node, false otherwise */
-	public boolean isTruckHere(Truck t) throws InterruptedException{
-		truckLock.acquire();
+	/** Returns true if a truck is currently at this node, false otherwise.
+	 * Returns false if the calling thread is interrupted */
+	public boolean isTruckHere(Truck t){
+		try {
+			truckLock.acquire();
+		} catch (InterruptedException e) {
+			return false;
+		}
 		Boolean b = truckHere.get(t);
 		if(b == null)
 			b = false;
@@ -308,18 +307,25 @@ public class Node implements MapElement{
 	}
 
 	@Override
-	/** Returns the number of trucks here */
-	public int trucksHere() throws InterruptedException{
-		truckLock.acquire();
-		int i = truckHereCount;
+	/** Returns the number of trucks here
+	 * Returns -1 if the calling thread is interrupted */
+	public int trucksHere(){
+		try {
+			truckLock.acquire();
+		} catch (InterruptedException e) {
+			return -1;
+		}
+		int i = 0;
+		for(Boolean b : truckHere.values()){
+			if(b) i++;
+		}
 		truckLock.release();
 		return i;
 	}
 
-	/** Returns true if any truck is traveling towards this node, false otherwise 
-	 * @throws InterruptedException */
-	public boolean isTruckTravelingHere() throws InterruptedException{
-		for(Truck t : map.getTrucks()){
+	/** Returns true if any truck is traveling towards this node, false otherwise */
+	public boolean isTruckTravelingHere(){
+		for(Truck t : board.getTrucks()){
 			if(t.getTravelingTo() != null && t.getTravelingTo().equals(this))
 				return true;
 		}
@@ -357,10 +363,10 @@ public class Node implements MapElement{
 
 	@Override
 	/** Returns just this' name for the JSONString - relies on JSONs of Edges and parcels
-	 * to take care of themselves
+	 * to take care of themselves.
 	 */
 	public String toJSONString(){
-		return "{\n" + Main.addQuotes(MapElement.NAME_TOKEN) + ":" + Main.addQuotes(name) + ",\n"
+		return "{\n" + Main.addQuotes(BoardElement.NAME_TOKEN) + ":" + Main.addQuotes(name) + ",\n"
 				+ Main.addQuotes(X_TOKEN) + ":"+ circle.getX1() + ",\n"
 				+ Main.addQuotes(Y_TOKEN) + ":" + circle.getY1() + "\n}";
 	}

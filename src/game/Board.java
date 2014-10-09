@@ -19,34 +19,34 @@ import org.json.JSONArray;
 import org.json.JSONObject;
 import org.json.JSONString;
 
-/** The Map Class is a container for the HashSets of Edges and Nodes that make up
+/** The Board Class is a container for the HashSets of Edges and Nodes that make up
  * the playing field of the game, as well as the parcels and trucks that are part of the game. 
  * 
- * Each map contains a collection of Parcels that need to be delivered from their
+ * Each board contains a collection of Parcels that need to be delivered from their
  * starting Node to their desired destination node. In order to do this, each game
  * also has a collection of Trucks that are able to pick up and move Parcels along edges between nodes.
  * 
  * @author MPatashnik
  *
  */
-public class Map implements JSONString{
+public class Board implements JSONString{
 
-	private long seed;		//The seed this map was generated from. -1 if none/custom.
+	private long seed;		//The seed this board was generated from. -1 if none/custom.
 
 	private Node truckHome;			//The node at which all trucks start
 	protected static final String TRUCK_HOME_NAME = "Truck Depot"; //Name of truckhome
 
-	private HashSet<Edge> edges;    //All edges in this map
+	private HashSet<Edge> edges;    //All edges in this board
 
 	protected int minLength;			//Min length among all edges
 	protected int maxLength;			//Max length among all edges
 
-	private HashSet<Node> nodes;    //All nodes in this map
+	private HashSet<Node> nodes;    //All nodes in this board
 
-	private ArrayList<Truck> trucks; //The trucks in this map
-	private HashSet<Parcel> parcels; //The parcels in this map
+	private ArrayList<Truck> trucks; //The trucks in this board
+	private HashSet<Parcel> parcels; //The parcels in this board
 
-	private final Game game; //The game this map belongs to
+	private final Game game; //The game this board belongs to
 
 	/** The score cost of idling for a frame, per truck.
 	 * So you are losing points at a slow rate constantly,
@@ -69,8 +69,8 @@ public class Map implements JSONString{
 	 */
 	public final int ON_COLOR_MULTIPLIER;
 
-	/** Initializes the map from the given serialized version of the map for game g */
-	protected Map(Game g, JSONObject obj){
+	/** Initializes the board from the given serialized version of the board for game g */
+	protected Board(Game g, JSONObject obj){
 		game = g;
 		//Read seed if possible, otherwise use -1.
 		if(obj.has(SEED_TOKEN)){
@@ -79,7 +79,7 @@ public class Map implements JSONString{
 			seed = -1;
 		}
 		//Read score coefficients
-		JSONArray scoreJSON = obj.getJSONArray(Map.SCORE_TOKEN);
+		JSONArray scoreJSON = obj.getJSONArray(Board.SCORE_TOKEN);
 		WAIT_COST = scoreJSON.getInt(0);
 		PICKUP_COST = scoreJSON.getInt(1);
 		DROPOFF_COST = scoreJSON.getInt(2);
@@ -91,26 +91,26 @@ public class Map implements JSONString{
 		nodes = new HashSet<Node>();
 		edges = new HashSet<Edge>();
 
-		//Read in all nodes of map
+		//Read in all nodes of board
 		for(String key : obj.keySet()){
-			if(key.startsWith(Map.NODE_TOKEN)){
+			if(key.startsWith(Board.NODE_TOKEN)){
 				JSONObject nodeJSON = obj.getJSONObject(key);
-				Node n = new Node(this, nodeJSON.getString(MapElement.NAME_TOKEN), null);
+				Node n = new Node(this, nodeJSON.getString(BoardElement.NAME_TOKEN), null);
 				Circle c = n.getCircle();
-				c.setX1(nodeJSON.getInt(MapElement.X_TOKEN));
-				c.setY1(nodeJSON.getInt(MapElement.Y_TOKEN));
+				c.setX1(nodeJSON.getInt(BoardElement.X_TOKEN));
+				c.setY1(nodeJSON.getInt(BoardElement.Y_TOKEN));
 				getNodes().add(n);
-				if(n.getName().equals(Map.TRUCK_HOME_NAME))
+				if(n.getName().equals(Board.TRUCK_HOME_NAME))
 					setTruckHome(n);
 			}
 		}
-		//Read in all edges of map
+		//Read in all edges of board
 		for(String key : obj.keySet()){
-			if(key.startsWith(Map.EDGE_TOKEN)){
+			if(key.startsWith(Board.EDGE_TOKEN)){
 				JSONObject edgeJSON = obj.getJSONObject(key);
-				JSONArray exitArr = edgeJSON.getJSONArray(MapElement.LOCATION_TOKEN);
+				JSONArray exitArr = edgeJSON.getJSONArray(BoardElement.LOCATION_TOKEN);
 
-				int length = edgeJSON.getInt(MapElement.LENGTH_TOKEN);
+				int length = edgeJSON.getInt(BoardElement.LENGTH_TOKEN);
 				Node firstExit = getNode((String)exitArr.get(0));
 				Node secondExit = getNode((String)exitArr.get(1));
 
@@ -120,21 +120,21 @@ public class Map implements JSONString{
 				secondExit.addExit(e);
 			}
 		}
-		//Map reading finished.
+		//board reading finished.
 
 		//Read in the trucks and parcels
 		for(String key : obj.keySet()){
 			if (key.startsWith(TRUCK_TOKEN)){
 				JSONObject truck = obj.getJSONObject(key);
-				Color c = new Color(truck.getInt(MapElement.COLOR_TOKEN));
-				String name = truck.getString(MapElement.NAME_TOKEN);
+				Color c = new Color(truck.getInt(BoardElement.COLOR_TOKEN));
+				String name = truck.getString(BoardElement.NAME_TOKEN);
 				Truck t = new Truck(game, name, c, getTruckHome());
 				trucks.add(t);
 			} else if( key.startsWith(PARCEL_TOKEN)){
 				JSONObject parcel = obj.getJSONObject(key);
-				Color c = new Color(parcel.getInt(MapElement.COLOR_TOKEN));
-				Node start = getNode(parcel.getString(MapElement.LOCATION_TOKEN));
-				Node dest = getNode(parcel.getString(MapElement.DESTINATION_TOKEN));
+				Color c = new Color(parcel.getInt(BoardElement.COLOR_TOKEN));
+				Node start = getNode(parcel.getString(BoardElement.LOCATION_TOKEN));
+				Node dest = getNode(parcel.getString(BoardElement.DESTINATION_TOKEN));
 
 				Parcel p = new Parcel(this, start, dest, c);
 				parcels.add(p);
@@ -158,27 +158,27 @@ public class Map implements JSONString{
 		return seed;
 	}
 
-	/** Returns a random node in this map */
+	/** Returns a random node in this board */
 	public Node getRandomNode(){
 		return Main.randomElement(nodes, null);
 	}
 
-	/** Returns a random edge in this map */
+	/** Returns a random edge in this board */
 	public Edge getRandomEdge(){
 		return Main.randomElement(edges, null);
 	}
 
-	/** Returns a HashSet containing all the Nodes in this map. Allows addition and removal of Nodes to this map */
+	/** Returns a HashSet containing all the Nodes in this board. Allows addition and removal of Nodes to this board */
 	public HashSet<Node> getNodes(){
 		return nodes;
 	}
 
-	/** Returns the number of Nodes in this map */
+	/** Returns the number of Nodes in this board */
 	public int getNodesSize(){
 		return nodes.size();
 	}
 
-	/** Returns the Node named name in this map if it exists, null otherwise */
+	/** Returns the Node named name in this board if it exists, null otherwise */
 	public Node getNode(String name){
 		for(Node n : nodes){
 			if(n.getName().equals(name))
@@ -194,21 +194,21 @@ public class Map implements JSONString{
 	}
 
 	/** Sets the TruckHome node that Trucks must return to before the game can be ended to Node n
-	 * @throws IllegalArgumentException - if n is not in this map
+	 * @throws IllegalArgumentException - if n is not in this board
 	 */
 	protected void setTruckHome(Node n) throws IllegalArgumentException{
 		if(nodes.contains(n))
 			truckHome = n;
 		else
-			throw new IllegalArgumentException("Can't set Truck Home to a Node that isn't contained in this map.");
+			throw new IllegalArgumentException("Can't set Truck Home to a Node that isn't contained in this board.");
 	}
 
-	/** Returns the trucks in this game */
+	/** Returns the trucks in this board */
 	public ArrayList<Truck> getTrucks(){
 		return trucks;
 	}
 
-	/** Returns the trucks in this game that are currently on the Truck Home node 
+	/** Returns the trucks in this board that are currently on the Truck Home node 
 	 * @throws InterruptedException */
 	public ArrayList<Truck> getTrucksHome() throws InterruptedException{
 		ArrayList<Truck> homeTrucks = new ArrayList<Truck>();
@@ -219,7 +219,7 @@ public class Map implements JSONString{
 		return homeTrucks;
 	}
 
-	/** Returns true if any alive Truck in this game is currently on the TruckHome node, false otherwise 
+	/** Returns true if any alive Truck in this board is currently on the TruckHome node, false otherwise 
 	 * @throws InterruptedException */
 	public boolean isTruckHome() throws InterruptedException{
 		for(Truck t : getTrucks())
@@ -229,7 +229,7 @@ public class Map implements JSONString{
 		return false;
 	}
 
-	/** Returns true if all alive Truck in this game are currently on the TruckHome node, false otherwise 
+	/** Returns true if all alive Truck in this board are currently on the TruckHome node, false otherwise 
 	 * @throws InterruptedException */
 	public boolean isAllTrucksHome() throws InterruptedException{
 		for(Truck t : getTrucks())
@@ -239,7 +239,7 @@ public class Map implements JSONString{
 		return true;
 	}
 
-	/** Returns the parcels in this Game */
+	/** Returns the parcels in this board */
 	public HashSet<Parcel> getParcels(){
 		return parcels;
 	}
@@ -271,12 +271,12 @@ public class Map implements JSONString{
 		game.getGUI().getDrawingPanel().remove(p.getCircle());
 	}
 
-	/** Returns a HashSet containing all the Edges in this map. Allows addition and removal of Edges to this map */
+	/** Returns a HashSet containing all the Edges in this board. Allows addition and removal of Edges to this board */
 	public HashSet<Edge> getEdges(){
 		return edges;
 	}
 
-	/** Returns the number of Edges in this map */
+	/** Returns the number of Edges in this board */
 	public int getEdgesSize(){
 		return edges.size();
 	}
@@ -285,7 +285,7 @@ public class Map implements JSONString{
 	 * edges in edges, false otherwise.
 	 * 
 	 * Used for GUI intersection detection, not useful outside of the GUI context.
-	 * Has nothing to say about the non-GUI version of the map
+	 * Has nothing to say about the non-GUI version of the board
 	 */
 	public boolean isIntersection(){
 		for(Edge r : edges){
@@ -315,12 +315,12 @@ public class Map implements JSONString{
 		}
 	}
 
-	/** Returns the maximum length of all edges on the map */
+	/** Returns the maximum length of all edges on the board */
 	public int getMaxLength(){
 		return maxLength;
 	}
 
-	/** Returns the minimum length of all edges on the map */
+	/** Returns the minimum length of all edges on the board */
 	public int getMinLength(){
 		return minLength;
 	}
@@ -329,7 +329,7 @@ public class Map implements JSONString{
 	 * If no two edges intersect, returns null.
 	 * 
 	 * Used for GUI intersection detection, not useful outside of the GUI context.
-	 * Has nothing to say about the non-GUI version of the map
+	 * Has nothing to say about the non-GUI version of the board
 	 */
 	public Edge[] getAIntersection(){
 		for(Edge r : edges){
@@ -349,7 +349,7 @@ public class Map implements JSONString{
 
 
 	@Override
-	/** Returns a String representation of this Map, including edges and nodes */
+	/** Returns a String representation of this board, including edges and nodes */
 	public String toString(){
 		String output = "";
 		Iterator<Node> nodesIterator = nodes.iterator();
@@ -379,7 +379,7 @@ public class Map implements JSONString{
 
 	@Override
 	/** Returns a JSON-compliant version of toString().
-	 * A full serialized version of the map, including:
+	 * A full serialized version of the board, including:
 	 * > Seed
 	 * > Cost constants
 	 * > Nodes
@@ -417,12 +417,12 @@ public class Map implements JSONString{
 	
 	////////////////////////////////////////////////////////////////////////////////////////////////////
 	////////////////////////////////////////////////////////////////////////////////////////////////////
-	/////////////////////////////////////// Random Map Generation //////////////////////////////////////
+	/////////////////////////////////////// Random board Generation //////////////////////////////////////
 	////////////////////////////////////////////////////////////////////////////////////////////////////
 	////////////////////////////////////////////////////////////////////////////////////////////////////
 	/**
-	 * Library for random map generation.
-	 * Implemented inside map class to allow construction based on these methods.
+	 * Library for random board generation.
+	 * Implemented inside board class to allow construction based on these methods.
 	 * 
 	 * @author eperdew
 	 * @author MPatashnik
@@ -461,19 +461,19 @@ public class Map implements JSONString{
 	private static final int ON_COLOR_MULTIPLIER_MAX = 5;
 
 	/**
-	 * Returns a new random map seeded via random seed.
+	 * Returns a new random board seeded via random seed.
 	 */
-	public static Map randomMap(Game g) {
-		return randomMap(g, (long)(Math.random() * Long.MAX_VALUE));
+	public static Board randomBoard(Game g) {
+		return randomBoard(g, (long)(Math.random() * Long.MAX_VALUE));
 	}
 
-	/** Returns a new random map seeded with {@code seed} */
-	public static Map randomMap(Game g, long seed) {
-		return new Map(g, new Random(seed), seed);
+	/** Returns a new random board seeded with {@code seed} */
+	public static Board randomBoard(Game g, long seed) {
+		return new Board(g, new Random(seed), seed);
 	}
 
-	/** Returns a new random map using the {@code Random} parameter {@code r} */
-	private Map(Game g, Random r, long seed) {
+	/** Returns a new random board using the {@code Random} parameter {@code r} */
+	private Board(Game g, Random r, long seed) {
 		this.seed = seed;
 		game = g;
 
@@ -496,11 +496,11 @@ public class Map implements JSONString{
 		trucks = new ArrayList<Truck>();
 
 		ArrayList<String> cities = cityNames();
-		//Create nodes and add to map
+		//Create nodes and add to board
 		for (int i = 0; i < numCities; i++) {
 			String name;
 			if(i == 0){
-				name = Map.TRUCK_HOME_NAME;
+				name = Board.TRUCK_HOME_NAME;
 			} else{
 				name = cities.remove((int)(Math.random()*cities.size()));
 			}
@@ -509,7 +509,7 @@ public class Map implements JSONString{
 			c.setX1(r.nextInt(WIDTH + 1));
 			c.setY1(r.nextInt(HEIGHT + 1));
 			getNodes().add(n);
-			if(n.getName().equals(Map.TRUCK_HOME_NAME)){
+			if(n.getName().equals(Board.TRUCK_HOME_NAME)){
 				setTruckHome(n);
 			}
 		}
@@ -534,7 +534,7 @@ public class Map implements JSONString{
 		first.addExit(e);
 		last.addExit(e);
 
-		//Add edges to the map to satisfy the average degree constraint
+		//Add edges to the board to satisfy the average degree constraint
 		while (getEdges().size() < (getNodes().size()*AVERAGE_DEGREE)/2){
 			Node from = randomElement(getNodes(), r);
 			Node to = from;
@@ -584,9 +584,9 @@ public class Map implements JSONString{
 		return val;
 	}
 
-	/** Returns an array of the city names listed in MapGeneration/cities.txt */
+	/** Returns an array of the city names listed in BoardGeneration/cities.txt */
 	private static ArrayList<String> cityNames(){
-		File f = new File("MapGeneration/cities.txt");
+		File f = new File("BoardGeneration/cities.txt");
 		BufferedReader read;
 		try {
 			read = new BufferedReader(new FileReader(f));

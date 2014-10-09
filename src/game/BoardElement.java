@@ -4,15 +4,15 @@ import java.awt.Color;
 
 import org.json.JSONString;
 
-/** The MapElement interface can be implemented by any class that wants to be drawn on the GUI in ShippingGame.
- * Through the implementation of the MapElement interface, the implementing class will return values on what
+/** The BoardElement interface can be implemented by any class that wants to be drawn on the GUI in ShippingGame.
+ * Through the implementation of the BoardElement interface, the implementing class will return values on what
  * string name to draw on the GUI, where to draw that name, what color it is, and if a truck is currently on it.
  * 
- * All map elements must also be JSON-able, and override the toJSONString method.
- * All map elements must be able to store and return user data stored in them.
+ * All board elements must also be JSON-able, and override the toJSONString method.
+ * All board elements must be able to store and return user data stored in them.
  * @author MPatashnik
  */
-public interface MapElement extends JSONString, Colorable, UserData{
+public interface BoardElement extends JSONString, Colorable, UserData{
 
 	/** The key for the x field for JSON implementations. */
 	public static final String X_TOKEN = "x";
@@ -30,7 +30,7 @@ public interface MapElement extends JSONString, Colorable, UserData{
 	/** The key for the length field for JSON implementations. */
 	public static final String LENGTH_TOKEN = "length";
 	
-	/** The Name this Object has when drawn on the map */
+	/** The Name this Object has when drawn on the board */
 	public String getMappedName();
 	
 	/** Returns the x coordinate of this Object's string drawing relative to the object */
@@ -39,21 +39,21 @@ public interface MapElement extends JSONString, Colorable, UserData{
 	/** Returns the y coordinate of this Object's string drawing relative to the object */
 	public int getRelativeY();
 	
-	/** Returns true if t is currently at/on this MapElement, false otherwise.
-	 * Probably will require a lock - throws InterruptedException if lock access is bad. */
-	public boolean isTruckHere(Truck t) throws InterruptedException;
+	/** Returns true if t is currently at/on this BoardElement, false otherwise.
+	 * Probably will require a lock maintained internally. */
+	public boolean isTruckHere(Truck t);
 	
 	/** Returns a count of the trucks here 
-	 * Probably will require a lock*/
-	public int trucksHere() throws InterruptedException;
+	 * Probably will require a lock maintained internally. */
+	public int trucksHere();
 	
-	/** Returns the Color of this MapElement */
+	/** Returns the Color of this BoardElement */
 	public Color getColor();
 	
 	/** Update the location of this on the gui */
 	public void updateGUILocation(int x, int y);
 	
-	/** Returns the map this mapElement belongs to */
-	public Map getMap();
+	/** Returns the board this BoardElement belongs to */
+	public Board getBoard();
 	
 }
