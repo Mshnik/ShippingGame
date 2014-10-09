@@ -165,7 +165,7 @@ public class GUI extends JFrame{
 					if(oldGame.getFile() != null)
 						game = new Game(oldGame.getManagerClassname(), oldGame.getFile());
 					else{
-						game = new Game(oldGame.getManagerClassname(), oldGame.getBoard().getSeed());
+						game = new Game(oldGame.getManagerClassname(), oldGame.getBoard().seed);
 					}
 					game.setGUI(self);
 					oldGame.kill();

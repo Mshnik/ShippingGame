@@ -25,9 +25,9 @@ public class Game{
 	private GUI gui;
 	private Manager manager;
 
-	private boolean running; //True if the game is currently in progress
+	private boolean running;  //True if the game is currently in progress
 	private boolean finished; //True if the game is over
-	private Board board;
+	private Board board;      //The board for this game
 
 	/** Creates a game instance with a set Board, read from File f. Uses Default for all other fields */
 	public Game(String managerClassname, File f){
@@ -124,7 +124,7 @@ public class Game{
 	 * a non-randomly generated file.
 	 */
 	public long getSeed(){
-		return board.getSeed();
+		return board.seed;
 	}
 
 	/** Starts the game by the manager run, then having each truck begin running.

@@ -157,7 +157,7 @@ public class Line  extends JPanel{
 		Edge e = (Edge)represents;
 		int max = m.getMaxLength();
 		int min = m.getMinLength();
-		double v = (double)(e.getLength() - min)/ ((double)(max - min));
+		double v = (double)(e.length - min)/ ((double)(max - min));
 
 		return new Color( (int)( (double)GRADIENT_LONG_COLOR.getRed() * v) + (int)( (double)GRADIENT_SHORT_COLOR.getRed() * (1-v)),
 				(int)( (double)GRADIENT_LONG_COLOR.getGreen() * v) + (int)( (double)GRADIENT_SHORT_COLOR.getGreen() * (1-v)),

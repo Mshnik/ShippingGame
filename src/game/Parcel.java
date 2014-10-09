@@ -21,26 +21,21 @@ public class Parcel implements BoardElement{
 	private final Board board;
 
 	/** The node this parcel started the game on */
-	private Node start;
+	public final Node start;
+	
 	/** This parcel's current location on the board */
 	private Node location;
-	/** The node this parcel wants to be dropped off at */
-	private Node destination;
+	
+	/** The node this parcel wants to be dropped off at to be delivered */
+	public final Node destination;
 
-	/** The color of this Parcel */
-	private Color color;
+	private Color color; //The color of this Parcel
+	private Circle circle; //The GUI Circle that represents this Parcel on the gui
 
-	/** The GUI Circle that represents this Parcel on the gui */
-	private Circle circle;
+	private Semaphore parcelLock; //A lock for this object, preventing it from being picked up by two trucks, etc.
 
-	/** A lock for this object, preventing it from being picked up by two trucks, etc. */
-	private Semaphore parcelLock;
-
-	/** Data (if any) stored by the user in this parcel */
-	private Object userData;
-
-	/** The truck (if any) that is carrying this Parcel. null if none */
-	private Truck holder;
+	private Object userData; //Data (if any) stored by the user in this parcel
+	private Truck holder; //The truck (if any) that is carrying this Parcel. null if none
 
 	/** Constructor. Sets start and destination cities, then assigns a random color
 	 * @Param m - The Board this parcel belongs to
@@ -76,21 +71,6 @@ public class Parcel implements BoardElement{
 		return board;
 	}
 
-	/** Returns the start Node of this Parcel */
-	public Node getStart(){
-		return start;
-	}
-
-	/** Sets the location of a parcel.
-	 * @param start - the new location of this parcel
-	 * @throws IllegalArgumentException - if start is equal to the current destination
-	 */
-	protected void setStart(Node start) throws IllegalArgumentException{
-		if(start == null || start.equals(destination))
-			throw new IllegalArgumentException("Start Node passed into setStart same as current Destination");
-		this.start = start;
-	}
-
 	/** Returns the current location for this Parcel */
 	public Node getLocation() {
 		return location;
@@ -101,21 +81,6 @@ public class Parcel implements BoardElement{
 	 */
 	protected void setLocation(Node newLocation){
 		this.location = newLocation;
-	}
-
-	/** Returns the destination Node for this Parcel */
-	public Node getDestination() {
-		return destination;
-	}
-
-	/** Sets the destination location of a parcel.
-	 * @param destination - the new destination location of this parcel
-	 * @throws IllegalArgumentException - if destination is equal to the current start
-	 */
-	protected void setDestination(Node destination) {
-		if(destination == null || location.equals(destination))
-			throw new IllegalArgumentException("Destination Node passed into setDestination same as current Start");
-		this.destination = destination;
 	}
 
 	/** Returns the color of this Parcel. Because the color of a parcel has game significance,

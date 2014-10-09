@@ -96,7 +96,9 @@ public class Score {
 	}
 
 	private int score; //The score maintained by this score object
-	private final Manager manager;   //The manager this is representing the score for
+	
+	/** The manager this Score object keeps track of the score for */
+	public final Manager manager;
 
 	/** Constructor. Creates an instance to keep track of the score */
 	protected Score(Manager m){

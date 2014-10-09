@@ -110,7 +110,7 @@ public class Flexor {
 
 				//If connected, calculate spring force
 				if(n.isConnectedTo(n2)){
-					double graphDist = n.getConnect(n2).getLength();
+					double graphDist = n.getConnect(n2).length;
 					double force = c1 * Math.log(Math.pow(graphDist,0.5) * c2 /dist);
 					a.mult(force);
 					//System.out.println("force " + force);

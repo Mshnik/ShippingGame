@@ -47,13 +47,13 @@ public abstract class AbstractSolution extends Manager{
 					if (!n.equals(current.node)){
 						NodeWrapper wrap = unprocessed.get(n);
 						if(wrap == null){
-							wrap = new NodeWrapper(n, current.getDistance() + e.getLength(), current);
+							wrap = new NodeWrapper(n, current.getDistance() + e.length, current);
 							unprocessed.put(n, wrap);
 							queue.add(wrap);
 						}else{
-							boolean set = wrap.checkDistance(current.getDistance() + e.getLength());
+							boolean set = wrap.checkDistance(current.getDistance() + e.length);
 							if(set){
-								wrap.setDistance(current.getDistance() + e.getLength());
+								wrap.setDistance(current.getDistance() + e.length);
 								wrap.resetPath(current);
 							}
 						}

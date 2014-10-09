@@ -31,7 +31,8 @@ import org.json.JSONString;
  */
 public class Board implements JSONString{
 
-	private long seed;		//The seed this board was generated from. -1 if none/custom.
+	/** The random seed this Board was generated from: -1 if this was loaded from a non-random file */
+	public final long seed;
 
 	private Node truckHome;			//The node at which all trucks start
 	protected static final String TRUCK_HOME_NAME = "Truck Depot"; //Name of truckhome
@@ -46,7 +47,8 @@ public class Board implements JSONString{
 	private ArrayList<Truck> trucks; //The trucks in this board
 	private HashSet<Parcel> parcels; //The parcels in this board
 
-	private final Game game; //The game this board belongs to
+	/** The game this board is for */
+	public final Game game;
 
 	/** The score cost of idling for a frame, per truck.
 	 * So you are losing points at a slow rate constantly,
@@ -148,16 +150,6 @@ public class Board implements JSONString{
 		updateMinMaxLength();
 	}
 
-	/** Returns the game this is in use for */
-	public Game getGame(){
-		return game;
-	}
-
-	/** Returns the seed this game was generated from. If non-random, returns -1 */
-	public long getSeed(){
-		return seed;
-	}
-
 	/** Returns a random node in this board */
 	public Node getRandomNode(){
 		return Main.randomElement(nodes, null);
@@ -249,7 +241,7 @@ public class Board implements JSONString{
 	 * @param t - The Truck that is delivering Parcel p. Must currently be holding p and be at n
 	 * @throws IllegalArgumentException - if any of the above parameter requirements aren't met*/
 	protected void deliverParcel(Parcel p, Node n, Truck t){
-		if(p.getDestination() != n)
+		if(p.destination != n)
 			throw new IllegalArgumentException("Parcel " + p + "'s final destination is not " + n.name + ". Cannot Deliver Here");
 		if(t.getLocation() != n)
 			throw new IllegalArgumentException("Truck " + t + "Is not currently at " + n.name + ". Cannot Deliver Here");
@@ -307,8 +299,8 @@ public class Board implements JSONString{
 		maxLength = Edge.DEFAULT_MAX_LENGTH;
 
 		for(Edge e : edges){
-			minLength = Math.min(minLength, e.getLength());
-			maxLength = Math.max(maxLength, e.getLength());
+			minLength = Math.min(minLength, e.length);
+			maxLength = Math.max(maxLength, e.length);
 		}
 	}
 
@@ -356,7 +348,7 @@ public class Board implements JSONString{
 			Iterator<Edge> roadsIterator = n.getTrueExits().iterator();
 			while(roadsIterator.hasNext()){
 				Edge r = roadsIterator.next();
-				output += r.getOther(n).name+"-"+r.getLength();
+				output += r.getOther(n).name+"-"+r.length;
 				if(roadsIterator.hasNext())
 					output += "\t";
 			}

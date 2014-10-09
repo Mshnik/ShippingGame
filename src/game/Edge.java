@@ -27,7 +27,9 @@ public class Edge implements BoardElement{
 	public static final int DEFAULT_MAX_LENGTH = 0;					//Min val an edge can have for length
 
 	private Node[] exits;	//The Nodes this edge connects. Always has length 2.
-	private int length;		//The length of this edge. Not correlated with the graphical distance
+	
+	/** Returns the length (weight) of this Edge. Uncorrelated with its graphical length on the GUI */
+	public final int length;		
 
 	private Semaphore truckLock; //Lock that trucks must acquire in order to make changes to this edge.
 
@@ -132,16 +134,6 @@ public class Edge implements BoardElement{
 			throw new IllegalArgumentException("Two Nodes Passed into Edge constructor refer to the same node");
 
 		exits = newExits;
-	}
-
-	/** Returns the length (weight) of this Edge. Uncorrelated with its graphical length on the GUI */
-	public int getLength(){
-		return length;
-	}
-	
-	/** @see getLength() */
-	public int getWeight(){
-		return getLength();
 	}
 
 	/** Returns true if Node {@code node} is one of the exits of this Edge, false otherwise */

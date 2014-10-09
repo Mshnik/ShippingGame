@@ -45,7 +45,7 @@ public class MyManager extends Manager {
 				if(t.getLocation().equals(game.getBoard().getTruckHome()) && game.getBoard().getParcels().isEmpty())
 					break;
 
-				if(t.getLoad() != null && t.getLoad().getDestination().equals(t.getLocation()))
+				if(t.getLoad() != null && t.getLoad().destination.equals(t.getLocation()))
 					try{
 						t.dropoffLoad();
 					} catch(Exception e){}

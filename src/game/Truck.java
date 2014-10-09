@@ -52,7 +52,7 @@ public class Truck implements BoardElement, Runnable{
 	
 	private String name;			//The name of this truck
 	private Circle circle;			//The circle that represents this Graphically
-	private Color color = Circle.DEFAULT_TRUCK_COLOR;
+	private Color color;			//The color of this truck
 
 	private Queue<Edge> travel; 	//This truck's queue of travel directions, FIFO.
 
@@ -76,7 +76,9 @@ public class Truck implements BoardElement, Runnable{
 
 	private Object userData;
 
-	private final Game game;		//The game this truck belongs to
+	/** The game this truck belongs to */
+	public final Game game;
+	
 	private Thread thread;			//The thread this truck is running in. Should have TRUCK in its name
 
 	/** Constructor for the Truck Class. Uses a default random color
@@ -165,11 +167,6 @@ public class Truck implements BoardElement, Runnable{
 		long diff = now - lastTravelTime;
 		getManager().getScoreObject().changeScore(getBoard().WAIT_COST * (int)(diff / WAIT_TIME));
 		lastTravelTime = now;
-	}
-
-	/** Returns the game this Truck belongs to */
-	public Game getGame(){
-		return game;
 	}
 	
 	/** Returns the manager that is managing this truck */
@@ -577,13 +574,13 @@ public class Truck implements BoardElement, Runnable{
 
 			int progress = 0;
 			long startTravelTime = System.currentTimeMillis();
-			while(progress < r.getLength()){
+			while(progress < r.length){
 				Thread.sleep(FRAME);
 
 				//Get the speed lock, begin speed and cost computations
 				speedLock.acquire();
 				//If we can go the full speed's units, do that
-				int remaining = r.getLength() - progress;
+				int remaining = r.length - progress;
 				if(remaining >= speed){
 					progress += speed;
 					getManager().getScoreObject().changeScore(Score.cost(speed));
@@ -594,7 +591,7 @@ public class Truck implements BoardElement, Runnable{
 					getManager().getScoreObject().changeScore(Score.cost(speed) * remaining / speed);
 				}
 				speedLock.release();
-				double percent = (double)progress / (double)r.getLength();
+				double percent = (double)progress / (double)r.length;
 
 				//Update Truck's location on the GUI
 				updateGUILocation( (int) (percent * there.getX1() + (1-percent) * here.getX1()), 
