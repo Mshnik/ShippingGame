@@ -172,7 +172,7 @@ public class GUI extends JFrame{
 					drawingPanel.removeAll();
 					drawMap();
 					setUpdateMessage("Game Reset");
-					updateScore(game.getMap().getScoreValue());
+					updateScore(game.getManager().getScore());
 				}
 			}
 		});
@@ -205,7 +205,7 @@ public class GUI extends JFrame{
 				drawingPanel.removeAll();
 				drawMap();
 				setUpdateMessage("Game Reset");
-				updateScore(game.getMap().getScoreValue());
+				updateScore(game.getManager().getScore());
 				mntmReset.setEnabled(true);
 				
 			}

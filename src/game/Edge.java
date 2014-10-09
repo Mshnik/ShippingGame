@@ -5,9 +5,10 @@ import java.awt.Color;
 import java.util.HashMap;
 import java.util.concurrent.Semaphore;
 
-/** The Edge Class in ShippingGame allows creation of the connections between Nodes that Trucks can Travel along
- * Each Edge is connected to exactly two Nodes, and the getFirstExit() and getSecondExit() methods allow access to these
- * Nodes. Each Edge also has a length, which is the amount of time (in units that are converted to milliseconds) it takes
+/** The Edge Class in ShippingGame allows creation of the connections between Nodes that Trucks can travel along.
+ * Each Edge is bidirectional and is connected to exactly two Nodes. 
+ * The getFirstExit() and getSecondExit() methods allow access to these Nodes. 
+ * Each Edge is weighted (has a length), which is the amount of time (in units that are converted to milliseconds) it takes
  * for a Truck to cross this Edge. One useful method to highlight is the getOther(Node) method, which returns the other exit
  * of the Edge given either exit. <br><br>
  * 
@@ -90,7 +91,7 @@ public class Edge implements MapElement{
 		line = new Line(null, null, this);
 	}
 
-	/** Returns the Game this Edge belongs to. */
+	/** Returns the Map this Edge belongs to. */
 	public Map getMap(){
 		return map;
 	}
@@ -111,7 +112,8 @@ public class Edge implements MapElement{
 	}
 
 	/** Returns the exits of this line, a length 2 array of Nodes. Copies the nodes into a new array to
-	 * prevent interference with the exits of this node.
+	 * prevent interference with the exits of this node. (Setting the values of the return of this method
+	 * will not alter the Edge object).
 	 */
 	public Node[] getExits(){
 		Node[] newExits = new Node[2];
@@ -147,9 +149,14 @@ public class Edge implements MapElement{
 		exits = newExits;
 	}
 
-	/** Returns the length of this Edge. Uncorrelated with its graphical length on the GUI */
+	/** Returns the length (weight) of this Edge. Uncorrelated with its graphical length on the GUI */
 	public int getLength(){
 		return length;
+	}
+	
+	/** @see getLength() */
+	public int getWeight(){
+		return getLength();
 	}
 
 	/** Sets the length of this Edge. Uncorrelated with its graphical length on the GUI
@@ -162,7 +169,7 @@ public class Edge implements MapElement{
 		length = lengthOfRoad;
 	}
 
-	/** Returns true if Node node is one of the exits of this Edge, false otherwise */
+	/** Returns true if Node {@code node} is one of the exits of this Edge, false otherwise */
 	public boolean isExit(Node node){
 		if(exits[0].equals(node) || exits[1].equals(node))
 			return true;
@@ -170,7 +177,7 @@ public class Edge implements MapElement{
 			return false;
 	}
 
-	/** Returns true if this Edge and Edge r share a Node exit, false otherwise */
+	/** Returns true if this Edge and Edge r share a Node exit, false otherwise. */
 	public boolean sharesExit(Edge r){
 		if(exits[0].equals(r.getTrueExits()[0]))
 			return true;
@@ -184,8 +191,8 @@ public class Edge implements MapElement{
 		return false;
 	}
 
-	/** Returns the other exit that is not equal to Node n.
-	 *  Returns null if n is neither of the nodes in exits */
+	/** Returns the other exit that is not equal to Node {@code n}.
+	 *  Returns null if {@code n} is neither of the nodes in exits */
 	public Node getOther(Node n){
 		if(exits[0].equals(n))
 			return exits[1];
@@ -195,7 +202,7 @@ public class Edge implements MapElement{
 		return null;
 	}
 
-	/** Returns the Line that represents this edge graphically */
+	/** Returns the Line that represents this edge graphically. */
 	public Line getLine(){
 		return line;
 	}
@@ -211,14 +218,15 @@ public class Edge implements MapElement{
 	}
 
 	/** Returns the color of this Edge, as it is pained on the GUI. Color
-	 * of edges has no game significance.
+	 * of edges has no game significance, thus this value may be changed during gameplay.
 	 */
 	public Color getColor(){
 		return line.getColor();
 	}
 
 	@Override
-	/** Two Edges are equal if they have the same exits */
+	/** Two Edges are equal if they have the same exits, even if they have different lengths.
+	 * This makes sure that only one edge connects each pair of nodes in duplicate-free collections  */
 	public boolean equals(Object e){
 		if(e == null)
 			return false;
@@ -229,20 +237,22 @@ public class Edge implements MapElement{
 				|| ( exits[0].equals( ((Edge)e).getTrueExits()[0]) && exits[1].equals( ((Edge)e).getTrueExits()[1]) );
 	}
 
+	/** An Edge's hashCode is equal to the sum of the hashCodes of its first exit and its second exit.
+	 * {@code getFirstExit().hashCode() + getSecondExit().hashCode()} */
 	@Override
-	/** An Edge's hashCode is equal to the sum of the hashCodes of its first exit and its second exit */
 	public int hashCode(){
 		return exits[0].hashCode() + exits[1].hashCode();
 	}
 
+	/** Returns a String representation of this object:
+	 * {@code getFirstExit().getName() + " to " + getSecondExit().getName()} */
 	@Override
-	/** Returns a String representation of this object */
 	public String toString(){
 		return exits[0].getName() + " to " + exits[1].getName(); 
 	}
 	
-	@Override
 	/** Returns exits of this and the length for its JSON string */
+	@Override
 	public String toJSONString(){
 		return "{\n" + Main.addQuotes(MapElement.LOCATION_TOKEN) + ":[" 
 				     + Main.addQuotes(exits[0].getName()) + "," + Main.addQuotes(exits[1].getName()) + "]," +
@@ -258,28 +268,33 @@ public class Edge implements MapElement{
 		truckLock.release();
 	}
 
+	/** Returns a String to print when this object is drawn on a GUI */
 	@Override
-	/** Returns a String to map when this object is drawn on a GUI */
 	public String getMappedName() {
 		return "" + length;
 	}
 
-	@Override
 	/** Returns the x location the mapped name of this Edge relative to the top left corner of the line */
+	@Override
 	public int getRelativeX() {
 		return line.getXMid() - line.getX1() + Line.LINE_THICKNESS;
 	}
 
-	@Override
 	/** Returns the y location the mapped name of this Edge relative to the top left corner of the line */
+	@Override
 	public int getRelativeY() {
 		return line.getYMid() - line.getY1() + Line.LINE_THICKNESS*3;
 	}
 
+	/** Returns true if the given truck is currently traveling this edge, false otherwise.
+	 * Also returns false if the calling thread is interrupted. */
 	@Override
-	/** Returns true if the given truck is currently traveling this edge, false otherwise */
-	public boolean isTruckHere(Truck t) throws InterruptedException{
-		truckLock.acquire();
+	public boolean isTruckHere(Truck t){
+		try {
+			truckLock.acquire();
+		} catch (InterruptedException e) {
+			return false;
+		}
 		Boolean b = truckHere.get(t);
 		if(b == null)
 			b = false;
@@ -287,10 +302,15 @@ public class Edge implements MapElement{
 		return b;
 	}
 	
+	/** Returns the number of trucks here - currently traveling this edge.
+	 * Returns -1 if the calling thread is interrupted */
 	@Override
-	/** Returns the number of trucks here - currently traveling this edge */
-	public int trucksHere() throws InterruptedException{
-		truckLock.acquire();
+	public int trucksHere(){
+		try {
+			truckLock.acquire();
+		} catch (InterruptedException e) {
+			return -1;
+		}
 		int i = 0;
 		for(Boolean b : truckHere.values()){
 			if(b) i++;
@@ -299,8 +319,8 @@ public class Edge implements MapElement{
 		return i;
 	}
 
-	@Override
 	/** Repaints itself. Values of x and y unused, but included to comply with interface. */
+	@Override
 	public void updateGUILocation(int x, int y) {
 		getLine().repaint();
 	}

@@ -20,13 +20,15 @@ import java.util.HashSet;
  */
 public abstract class Manager implements Runnable{
 
-	private Game game;
-	
+	private Game game;     //The game this manager is running in.
+	private Score score;   //The score object representing the score for this manager.
 	private Thread thread; //The thread this manager is running in.
 
 	/** Constructor for the Manager class.
 	 * Written to prevent public construction of Managers. */
-	protected Manager(){}
+	protected Manager(){
+		score = new Score(this);
+	}
 
 	@Override
 	/** Behavior for the Manager and all trucks. To be Overridden in subclasses */
@@ -67,6 +69,21 @@ public abstract class Manager implements Runnable{
 	 */
 	public abstract void truckNotification(Truck t, Notification message);
 	
+	/** Returns the score object - default to prevent access in subclasses */
+	final Score getScoreObject(){
+		return score;
+	}
+
+	/** Returns the value of the score*/
+	public final int getScore(){
+		return score.value();
+	}
+	
+	/** Returns the value of the score */
+	public final int getScoreValue(){
+		return getScore();
+	}
+	
 	/** Returns the Game this Manager belongs to */
 	public final Game getGame(){
 		return game;
@@ -97,7 +114,8 @@ public abstract class Manager implements Runnable{
 		return game.getMap().getParcels();
 	}
 
-	/** Sets the game this manager is watching to g */
+	/** Sets the game this manager is watching to g.
+	 * Students - don't call this */
 	public final void setGame(Game g){
 		game = g;
 	}

@@ -46,7 +46,6 @@ public class Map implements JSONString{
 	private ArrayList<Truck> trucks; //The trucks in this map
 	private HashSet<Parcel> parcels; //The parcels in this map
 
-	private Score score; //The score for this map
 	private final Game game; //The game this map belongs to
 
 	/** The score cost of idling for a frame, per truck.
@@ -86,7 +85,6 @@ public class Map implements JSONString{
 		DROPOFF_COST = scoreJSON.getInt(2);
 		PAYOFF = scoreJSON.getInt(3);
 		ON_COLOR_MULTIPLIER = scoreJSON.getInt(4);
-		score = new Score(this);
 
 		trucks = new ArrayList<Truck>();
 		parcels = new HashSet<Parcel>();
@@ -246,16 +244,6 @@ public class Map implements JSONString{
 		return parcels;
 	}
 
-	/** Returns the score object */
-	protected Score getScore(){
-		return score;
-	}
-
-	/** Returns the value of the score*/
-	public int getScoreValue(){
-		return score.value();
-	}
-
 	/** Called by Trucks to drop off parcels at nodes 
 	 * @param p - The Parcel to deliver. Must be currently held by Truck t
 	 * @param n - The Node to deliver the parcel to. Must be Parcel p's final destination
@@ -270,9 +258,9 @@ public class Map implements JSONString{
 			throw new IllegalArgumentException("Truck " + t + "Is not currently holding Parcel " + p + ". Cannot Deliver Here");
 
 		if(t.getColor().equals(p.getColor()))
-			score.changeScore(PAYOFF * ON_COLOR_MULTIPLIER);
+			t.getManager().getScoreObject().changeScore(PAYOFF * ON_COLOR_MULTIPLIER);
 		else
-			score.changeScore(PAYOFF);
+			t.getManager().getScoreObject().changeScore(PAYOFF);
 
 		parcels.remove(p);
 		try {
@@ -488,8 +476,6 @@ public class Map implements JSONString{
 	private Map(Game g, Random r, long seed) {
 		this.seed = seed;
 		game = g;
-		//Create new score object
-		score = new Score(this);
 
 		final int numCities = r.nextInt(MAX_NODES - MIN_NODES + 1) + MIN_NODES;
 		WAIT_COST = -1

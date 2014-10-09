@@ -150,13 +150,18 @@ public class Truck implements MapElement, Runnable{
 	private void fixLastTravelTime(){
 		long now = System.currentTimeMillis();
 		long diff = now - lastTravelTime;
-		game.getMap().getScore().changeScore(game.getMap().WAIT_COST * (int)(diff / WAIT_TIME));
+		getManager().getScoreObject().changeScore(game.getMap().WAIT_COST * (int)(diff / WAIT_TIME));
 		lastTravelTime = now;
 	}
 
 	/** Returns the game this Truck belongs to */
 	public Game getGame(){
 		return game;
+	}
+	
+	/** Returns the manager that is managing this truck */
+	public Manager getManager(){
+		return game.getManager();
 	}
 	
 	/** Returns the map this Truck belongs to */
@@ -420,7 +425,7 @@ public class Truck implements MapElement, Runnable{
 			}
 			parcelLock.release();
 
-			game.getMap().getScore().changeScore(game.getMap().PICKUP_COST);
+			getManager().getScoreObject().changeScore(game.getMap().PICKUP_COST);
 			game.getManager().truckNotification(this, Manager.Notification.PICKED_UP_PARCEL);
 		}
 	}
@@ -450,7 +455,7 @@ public class Truck implements MapElement, Runnable{
 		}
 		load = null;
 		parcelLock.release();
-		game.getMap().getScore().changeScore(game.getMap().DROPOFF_COST);
+		getManager().getScoreObject().changeScore(game.getMap().DROPOFF_COST);
 		game.getManager().truckNotification(this, Manager.Notification.DROPPED_OFF_PARCEL);
 
 	}
@@ -569,12 +574,12 @@ public class Truck implements MapElement, Runnable{
 				int remaining = r.getLength() - progress;
 				if(remaining >= speed){
 					progress += speed;
-					game.getMap().getScore().changeScore(Score.cost(speed));
+					getManager().getScoreObject().changeScore(Score.cost(speed));
 				}
 				//Otherwise, go the remaining fraction, only deduct a correct percent of those points.
 				else{
 					progress += remaining;
-					game.getMap().getScore().changeScore(Score.cost(speed) * remaining / speed);
+					getManager().getScoreObject().changeScore(Score.cost(speed) * remaining / speed);
 				}
 				speedLock.release();
 				double percent = (double)progress / (double)r.getLength();
