@@ -30,13 +30,7 @@ public class MyManager extends Manager {
 				if(t.getLoad() == null){
 
 					game.setUpdateMessage("Parcel Picked Up");
-					Parcel p = null;
-					try {
-						p = t.getLocation().getRandomParcel();
-					} catch (InterruptedException e) {
-						// TODO Auto-generated catch block
-						e.printStackTrace();
-					}
+					Parcel p = t.getLocation().getRandomParcel();
 					try{
 						t.pickupLoad(p);
 					} catch(Exception e){}

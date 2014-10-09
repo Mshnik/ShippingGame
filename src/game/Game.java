@@ -8,7 +8,7 @@ import java.io.IOException;
 import org.json.JSONObject;
 
 /** The Game Class is the controlling class for the ShippingGame Project. It manages the go-between
- * between the map, which stores the state of the game, and the gui, which visually displays it.
+ * between the board, which stores the state of the game, and the gui, which visually displays it.
  * Finally, the game class maintains the managers, the user written classes that fill in the 
  * truck's missing behavior
  * @author MPatashnik
@@ -29,7 +29,7 @@ public class Game{
 	private boolean finished; //True if the game is over
 	private Board board;
 
-	/** Creates a game instance with a set Map, read from File f. Uses Default for all other fields */
+	/** Creates a game instance with a set Board, read from File f. Uses Default for all other fields */
 	public Game(String managerClassname, File f){
 		file = f;
 		setManager(managerClassname);
@@ -45,7 +45,7 @@ public class Game{
 		}
 	}
 	
-	/** Creates a game instance with a random map, and the given managerClass */
+	/** Creates a game instance with a random board from the given seed, and the given managerClass */
 	public Game(String managerClassname, long seed){
 		file = null;
 		setManager(managerClassname);
@@ -93,14 +93,10 @@ public class Game{
 		gui.updateRunning();
 	}
 
-	/** Sets the value of finished. */
+	/** Sets the value of finished. Also informs gui of changes */
 	protected void setFinished(boolean f){
 		finished = f;
-	}
-	
-	/** Sets the map to map m */
-	protected void setMap(Board m){
-		board = m;
+		gui.updateRunning();
 	}
 
 	/** Returns the board of this game, @see Board for what information is contained therein */
@@ -167,7 +163,7 @@ public class Game{
 		return gui.getUpdateMessage();
 	}
 
-	/** Updates the GUI to show the given String as an update message */
+	/** Updates the GUI to show the given String as an update message for a few seconds */
 	public void setUpdateMessage(String newUpdate){
 		gui.setUpdateMessage(newUpdate);
 	}
@@ -205,8 +201,8 @@ public class Game{
 		}
 	}
 
-	/** Returns a file for the string map filename. Throws an IllegalArgumentException
-	 * if this map does not exist. 
+	/** Returns a file for the string board filename. Throws an IllegalArgumentException
+	 * if this board does not exist. 
 	 */
 	public static File gameFile(String filename) throws IllegalArgumentException{
 		//Check that filename ends with .txt. If not, strip off the bad extension(if any) and add .txt

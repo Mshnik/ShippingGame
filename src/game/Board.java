@@ -91,7 +91,7 @@ public class Board implements JSONString{
 		nodes = new HashSet<Node>();
 		edges = new HashSet<Edge>();
 
-		//Read in all nodes of board
+		//Read in all nodes of board - read all nodes before reading any edges
 		for(String key : obj.keySet()){
 			if(key.startsWith(Board.NODE_TOKEN)){
 				JSONObject nodeJSON = obj.getJSONObject(key);
@@ -100,11 +100,11 @@ public class Board implements JSONString{
 				c.setX1(nodeJSON.getInt(BoardElement.X_TOKEN));
 				c.setY1(nodeJSON.getInt(BoardElement.Y_TOKEN));
 				getNodes().add(n);
-				if(n.getName().equals(Board.TRUCK_HOME_NAME))
+				if(n.name.equals(Board.TRUCK_HOME_NAME))
 					setTruckHome(n);
 			}
 		}
-		//Read in all edges of board
+		//Read in all edges of board. Precondition - all nodes already read in
 		for(String key : obj.keySet()){
 			if(key.startsWith(Board.EDGE_TOKEN)){
 				JSONObject edgeJSON = obj.getJSONObject(key);
@@ -122,7 +122,7 @@ public class Board implements JSONString{
 		}
 		//board reading finished.
 
-		//Read in the trucks and parcels
+		//Read in the trucks and parcels - precondition - all nodes already read
 		for(String key : obj.keySet()){
 			if (key.startsWith(TRUCK_TOKEN)){
 				JSONObject truck = obj.getJSONObject(key);
@@ -152,7 +152,7 @@ public class Board implements JSONString{
 	public Game getGame(){
 		return game;
 	}
-	
+
 	/** Returns the seed this game was generated from. If non-random, returns -1 */
 	public long getSeed(){
 		return seed;
@@ -178,17 +178,17 @@ public class Board implements JSONString{
 		return nodes.size();
 	}
 
-	/** Returns the Node named name in this board if it exists, null otherwise */
+	/** Returns the Node named {@code name} in this board if it exists, null otherwise */
 	public Node getNode(String name){
 		for(Node n : nodes){
-			if(n.getName().equals(name))
+			if(n.name.equals(name))
 				return n;
 		}
 
 		return null;
 	}
 
-	/** Returns the TruckHome node that Trucks must return to before the game can be ended. */
+	/** Returns the TruckHome node in this board that Trucks must return to before the game can be ended. */
 	public Node getTruckHome(){
 		return truckHome;
 	}
@@ -203,14 +203,13 @@ public class Board implements JSONString{
 			throw new IllegalArgumentException("Can't set Truck Home to a Node that isn't contained in this board.");
 	}
 
-	/** Returns the trucks in this board */
+	/** Returns the trucks available for use in this board */
 	public ArrayList<Truck> getTrucks(){
 		return trucks;
 	}
 
-	/** Returns the trucks in this board that are currently on the Truck Home node 
-	 * @throws InterruptedException */
-	public ArrayList<Truck> getTrucksHome() throws InterruptedException{
+	/** Returns the trucks in this board that are currently on the Truck Home node */
+	public ArrayList<Truck> getTrucksHome(){
 		ArrayList<Truck> homeTrucks = new ArrayList<Truck>();
 		for(Truck t : trucks)
 			if(t.getLocation() != null && t.getLocation().equals(getTruckHome()))
@@ -220,8 +219,8 @@ public class Board implements JSONString{
 	}
 
 	/** Returns true if any alive Truck in this board is currently on the TruckHome node, false otherwise 
-	 * @throws InterruptedException */
-	public boolean isTruckHome() throws InterruptedException{
+	 */
+	public boolean isTruckHome(){
 		for(Truck t : getTrucks())
 			if(t.getLocation() != null && t.getLocation().equals(getTruckHome()))
 				return true;
@@ -230,8 +229,8 @@ public class Board implements JSONString{
 	}
 
 	/** Returns true if all alive Truck in this board are currently on the TruckHome node, false otherwise 
-	 * @throws InterruptedException */
-	public boolean isAllTrucksHome() throws InterruptedException{
+	 */
+	public boolean isAllTrucksHome(){
 		for(Truck t : getTrucks())
 			if(t.getLocation() == null || ! t.getLocation().equals(getTruckHome()))
 				return false;
@@ -239,7 +238,7 @@ public class Board implements JSONString{
 		return true;
 	}
 
-	/** Returns the parcels in this board */
+	/** Returns the parcels in this board. Returned parcels are parcels that have not yet been delivered. */
 	public HashSet<Parcel> getParcels(){
 		return parcels;
 	}
@@ -251,9 +250,9 @@ public class Board implements JSONString{
 	 * @throws IllegalArgumentException - if any of the above parameter requirements aren't met*/
 	protected void deliverParcel(Parcel p, Node n, Truck t){
 		if(p.getDestination() != n)
-			throw new IllegalArgumentException("Parcel " + p + "'s final destination is not " + n.getName() + ". Cannot Deliver Here");
+			throw new IllegalArgumentException("Parcel " + p + "'s final destination is not " + n.name + ". Cannot Deliver Here");
 		if(t.getLocation() != n)
-			throw new IllegalArgumentException("Truck " + t + "Is not currently at " + n.getName() + ". Cannot Deliver Here");
+			throw new IllegalArgumentException("Truck " + t + "Is not currently at " + n.name + ". Cannot Deliver Here");
 		if(t.getLoad() != p)
 			throw new IllegalArgumentException("Truck " + t + "Is not currently holding Parcel " + p + ". Cannot Deliver Here");
 
@@ -308,10 +307,8 @@ public class Board implements JSONString{
 		maxLength = Edge.DEFAULT_MAX_LENGTH;
 
 		for(Edge e : edges){
-			if(e.getLength() != Edge.DUMMY_LENGTH){
-				minLength = Math.min(minLength, e.getLength());
-				maxLength = Math.max(maxLength, e.getLength());
-			}
+			minLength = Math.min(minLength, e.getLength());
+			maxLength = Math.max(maxLength, e.getLength());
 		}
 	}
 
@@ -359,7 +356,7 @@ public class Board implements JSONString{
 			Iterator<Edge> roadsIterator = n.getTrueExits().iterator();
 			while(roadsIterator.hasNext()){
 				Edge r = roadsIterator.next();
-				output += r.getOther(n).getName()+"-"+r.getLength();
+				output += r.getOther(n).name+"-"+r.getLength();
 				if(roadsIterator.hasNext())
 					output += "\t";
 			}
@@ -414,12 +411,13 @@ public class Board implements JSONString{
 		}	
 		return s + "\n}";
 	}
-	
+
 	////////////////////////////////////////////////////////////////////////////////////////////////////
 	////////////////////////////////////////////////////////////////////////////////////////////////////
-	/////////////////////////////////////// Random board Generation //////////////////////////////////////
+	/////////////////////////////////////// Random board Generation ////////////////////////////////////
 	////////////////////////////////////////////////////////////////////////////////////////////////////
 	////////////////////////////////////////////////////////////////////////////////////////////////////
+
 	/**
 	 * Library for random board generation.
 	 * Implemented inside board class to allow construction based on these methods.
@@ -509,7 +507,7 @@ public class Board implements JSONString{
 			c.setX1(r.nextInt(WIDTH + 1));
 			c.setY1(r.nextInt(HEIGHT + 1));
 			getNodes().add(n);
-			if(n.getName().equals(Board.TRUCK_HOME_NAME)){
+			if(n.name.equals(Board.TRUCK_HOME_NAME)){
 				setTruckHome(n);
 			}
 		}
@@ -572,7 +570,7 @@ public class Board implements JSONString{
 		}
 		updateMinMaxLength();
 	}
-	
+
 	/** Returns a random element from the given collection using the given randomer */
 	private static <T> T randomElement(Collection<T> elms, Random r){
 		Iterator<T> it = elms.iterator();
@@ -609,5 +607,5 @@ public class Board implements JSONString{
 		}
 		return result;
 	}
-	
+
 }

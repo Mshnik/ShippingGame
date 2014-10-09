@@ -12,20 +12,16 @@ import java.util.concurrent.Semaphore;
  * for a Truck to cross this Edge. One useful method to highlight is the getOther(Node) method, which returns the other exit
  * of the Edge given either exit. <br><br>
  * 
- * The Edge Class implements MapElement and is represented on the threads by an instance of the Line class. This implementation
- * requires the creation of the four MapElement methods, which are relatively unused outside of the graphical representation of this Edge.
+ * The Edge Class implements BoardElement and is represented on the threads by an instance of the Line class. This implementation
+ * requires the creation of the four BoardElement methods, which are relatively unused outside of the graphical representation of this Edge.
  * <br><br>
  * 
- * There are no public Edge constructors, so classes outside of the gameFiles package will not be able to construct additional Edge objects
- * <br><br>
+ * There are no public Edge constructors, so classes outside of the game package will not be able to construct additional Edge objects
  * 
  * @author MPatashnik
  *
  */
 public class Edge implements BoardElement{
-
-	/** The length of "Blank" Edges. Should be later changed to an actual length value */
-	protected static final int DUMMY_LENGTH = Integer.MIN_VALUE;
 
 	public static final int DEFAULT_MIN_LENGTH = Integer.MAX_VALUE;	//Max val an edge can have for length
 	public static final int DEFAULT_MAX_LENGTH = 0;					//Min val an edge can have for length
@@ -64,30 +60,19 @@ public class Edge implements BoardElement{
 	 * 		if either of the nodes are null
 	 * 		if firstExit and secondExit are the same node*/
 	protected Edge(Board m, Node firstExit, Node secondExit, int lengthOfRoad) throws IllegalArgumentException{
-
-		if(firstExit == null)
-			throw new IllegalArgumentException("First Node Passed into Edge constructor is null");
-
-		if(secondExit == null)
-			throw new IllegalArgumentException("Second Node Passed into Edge constructor is null");
-
-		if(firstExit.equals(secondExit))
-			throw new IllegalArgumentException("Two Nodes Passed into Edge constructor refer to the same node");
-
-		if(lengthOfRoad <= 0 && lengthOfRoad != DUMMY_LENGTH)
-			throw new IllegalArgumentException("lengthOfRoad value " + lengthOfRoad + " is an illegal value.");
-
+		Node[] e = new Node[2];
+		e[0] = firstExit;
+		e[1] = secondExit;
+		setExits(e);
+		
 		board = m;
-		exits = new Node[2];
-		exits[0] = firstExit;
-		exits[1] = secondExit;
-		
 		truckLock = new Semaphore(1);
-		
 		truckHere = new HashMap<Truck, Boolean>();
 
-		setLength(lengthOfRoad);
-
+		if(lengthOfRoad <= 0)
+			throw new IllegalArgumentException("lengthOfRoad value " + lengthOfRoad + " is an illegal value.");
+		
+		length = lengthOfRoad;
 		line = new Line(null, null, this);
 	}
 
@@ -123,27 +108,27 @@ public class Edge implements BoardElement{
 	}
 
 	/** Checks that the following are satisfied, then sets the value of
-	 * the exits field to newExits
+	 * the exits field to newExits. Only used in edge construction
 	 * @param newExits - the new exits to set.
 	 * @throws IllegalArgumentException:
 	 * 		if exits is null or has length not equal to 2
 	 * 		if either of the nodes are null
 	 * 		if exits[0] and exits[1] are the same node
 	 **/
-	protected void setExits(Node[] newExits) throws IllegalArgumentException{
-		if(exits == null)
+	private void setExits(Node[] newExits) throws IllegalArgumentException{
+		if(newExits == null)
 			throw new IllegalArgumentException("Null Node Array Passed into Edge Constructor");
 
-		if(exits.length != 2)
+		if(newExits.length != 2)
 			throw new IllegalArgumentException("Incorrectly sized Node Array Passed into Edge Constructor");
 
-		if(exits[0] == null)
+		if(newExits[0] == null)
 			throw new IllegalArgumentException("First Node Passed into Edge constructor is null");
 
-		if(exits[1] == null)
+		if(newExits[1] == null)
 			throw new IllegalArgumentException("Second Node Passed into Edge constructor is null");
 
-		if(exits[0].equals(exits[1]))
+		if(newExits[0].equals(newExits))
 			throw new IllegalArgumentException("Two Nodes Passed into Edge constructor refer to the same node");
 
 		exits = newExits;
@@ -157,16 +142,6 @@ public class Edge implements BoardElement{
 	/** @see getLength() */
 	public int getWeight(){
 		return getLength();
-	}
-
-	/** Sets the length of this Edge. Uncorrelated with its graphical length on the GUI
-	 * @throws IllegalArgumentException if lengthOfRoad is less than 1 and not equal to DUMMY_LENGTH
-	 */
-	private void setLength(int lengthOfRoad) throws IllegalArgumentException{
-		if(lengthOfRoad <= 0 && lengthOfRoad != DUMMY_LENGTH)
-			throw new IllegalArgumentException("lengthOfRoad value " + lengthOfRoad + " is an illegal value.");
-
-		length = lengthOfRoad;
 	}
 
 	/** Returns true if Node {@code node} is one of the exits of this Edge, false otherwise */
@@ -245,17 +220,17 @@ public class Edge implements BoardElement{
 	}
 
 	/** Returns a String representation of this object:
-	 * {@code getFirstExit().getName() + " to " + getSecondExit().getName()} */
+	 * {@code getFirstExit().name + " to " + getSecondExit().name} */
 	@Override
 	public String toString(){
-		return exits[0].getName() + " to " + exits[1].getName(); 
+		return exits[0].name + " to " + exits[1].name; 
 	}
 	
 	/** Returns exits of this and the length for its JSON string */
 	@Override
 	public String toJSONString(){
 		return "{\n" + Main.addQuotes(BoardElement.LOCATION_TOKEN) + ":[" 
-				     + Main.addQuotes(exits[0].getName()) + "," + Main.addQuotes(exits[1].getName()) + "]," +
+				     + Main.addQuotes(exits[0].name) + "," + Main.addQuotes(exits[1].name) + "]," +
 				"\n" + Main.addQuotes(BoardElement.LENGTH_TOKEN) + ":" + length + 
 				"\n}";
 	}

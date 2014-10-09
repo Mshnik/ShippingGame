@@ -15,11 +15,11 @@ import java.util.concurrent.Semaphore;
  * until the queue is empty again. The speed at which a Truck travels can be set
  * using the setSpeed(int i) method, which determines how many units of road
  * the truck travels each frame. Trucks can be told to pick up or drop off parcels
- * when they are not traveling. <br> <br>
+ * when they are not traveling. <br><br>
  * 
  * Interaction with Trucks is done through the Truck's internal calling of the truckNotification
- * method in the Manager class. Whenever the Truck makes an action, it lets the manager know of 
- * this change, allowing for input at that time.
+ * method in the Manager class. Whenever the Truck makes an action or reaches a point of decision, 
+ * it lets the manager know of this change, allowing for input at that time.
  * @author MPatashnik
  */
 public class Truck implements BoardElement, Runnable{
@@ -32,9 +32,24 @@ public class Truck implements BoardElement, Runnable{
 	 */
 	public static enum Status {TRAVELING, WAITING};
 
-	private static final int WAIT_TIME = 5;
-	protected static final int NUMB_DEFAULT_TRAVEL_DIRECTIONS = 200;
+	/** Milliseconds per travel increment. Wait time between travel updates.
+	 * A lower value means a faster game - more penalty for computation.
+	 * A higher value means a slower game - less penalty for computation*/
+	public static final int FRAME = 40;
+	
+	/** Milliseconds between wait updates.*/
+	public static final int WAIT_TIME = 5;
 
+	/** Maximum length/frame speed that a truck can travel */
+	public static final int MAX_SPEED = 10;
+	
+	/** Most efficient length/frame speed that a truck can travel, in terms of total cost
+	 *  for traveling a given length. */
+	public static final int EFFICIENT_SPEED = 4;
+	
+	/** Minimum length/frame speed that a truck can travel. */
+	public static final int MIN_SPEED = 1;
+	
 	private String name;			//The name of this truck
 	private Circle circle;			//The circle that represents this Graphically
 	private Color color = Circle.DEFAULT_TRUCK_COLOR;
@@ -51,10 +66,6 @@ public class Truck implements BoardElement, Runnable{
 
 	private long lastTravelTime;    //System time (ms) when this truck last finished travel
 
-	public static final int MAX_SPEED = 10; //Max value for truck's speed
-	public static final int EFFICIENT_SPEED = 4; //Speed at which the travel is most efficient
-	public static final int MIN_SPEED = 1;  //Min value for truck's speed
-
 	private int speed; //The number of units this moves per frame when traveling. Must be between min and max
 	private Semaphore speedLock; 	//Lock for getting/changing speed
 	private Semaphore locLock;   	// A lock associated with the changing of locaiton, travelingTo, goingTo, etc.
@@ -66,7 +77,7 @@ public class Truck implements BoardElement, Runnable{
 	private Object userData;
 
 	private final Game game;		//The game this truck belongs to
-	private Thread thread;			//The thread this truck is running in
+	private Thread thread;			//The thread this truck is running in. Should have TRUCK in its name
 
 	/** Constructor for the Truck Class. Uses a default random color
 	 * @param g - the Game this Truck belongs to
@@ -106,11 +117,13 @@ public class Truck implements BoardElement, Runnable{
 
 	}
 
-	@Override
 	/** The Truck's main running routine. While the travel directions are empty,
 	 * Waits for more instructions in WAIT_TIME intervals. While the travel directions
-	 * are not empty, pops off the next travel direction 
+	 * are not empty, pops off the next travel direction.<br><br>
+	 * 
+	 * Called on loop until the game ends. Students - don't call this.
 	 */
+	@Override
 	public void run(){
 		lastTravelTime = System.currentTimeMillis();
 		while(game.isRunning()){
@@ -164,7 +177,7 @@ public class Truck implements BoardElement, Runnable{
 		return game.getManager();
 	}
 	
-	/** Returns the map this Truck belongs to */
+	/** Returns the board this Truck belongs to */
 	public Board getBoard(){
 		return game.getBoard();
 	}
@@ -186,7 +199,7 @@ public class Truck implements BoardElement, Runnable{
 	}
 
 	/** Returns the Truck's current location. 
-	 *  If this.status.equals(Status.TRAVELING) or thread is interrupted, returns null 
+	 *  If this.status.equals(Status.TRAVELING) or the calling thread is interrupted, returns null 
 	 */
 	public Node getLocation(){
 		if(status.equals(Status.TRAVELING))
@@ -216,8 +229,7 @@ public class Truck implements BoardElement, Runnable{
 	}
 
 	/** Returns the Truck's current destination. 
-	 * If this.status.equals(Status.WAITING) or thread is interrupted, returns null 
-	 * @throws InterruptedException */
+	 * If this.status.equals(Status.WAITING) or if the calling thread is interrupted, returns null */
 	public Node getTravelingTo(){
 		if(status.equals(Status.WAITING))
 			return null;
@@ -246,8 +258,7 @@ public class Truck implements BoardElement, Runnable{
 	}
 
 	/** Returns the edge this Truck is traveling along. 
-	 * Returns null if status.equals(Status.WAITING) or thread is interrupted 
-	 * @throws InterruptedException */
+	 * Returns null if status.equals(Status.WAITING) or if the calling thread is interrupted */
 	public Edge getTravelingAlong(){
 		try {
 			locLock.acquire();
@@ -260,7 +271,7 @@ public class Truck implements BoardElement, Runnable{
 	}
 
 	/** Returns the node this truck is coming from, the rear exit of the edge it is currently on.
-	 * Returns null if status.equals(Status.WAITING) or if the thread is interrupted
+	 * Returns null if status.equals(Status.WAITING) or if the calling thread is interrupted
 	 */
 	public Node getComingFrom(){
 		if(status.equals(Status.WAITING))
@@ -278,7 +289,8 @@ public class Truck implements BoardElement, Runnable{
 	}
 
 	/** Returns the Truck's eventual destination; the Node this Truck will be at when the current travel
-	 * queue is empty. If this.status.equals(Status.WAITING) or thread is interrupted, returns null
+	 * queue is empty. If this.status.equals(Status.WAITING) or if the calling 
+	 * thread is interrupted, returns null
 	 */
 	public Node getGoingTo(){
 		if(status.equals(Status.WAITING))
@@ -297,7 +309,7 @@ public class Truck implements BoardElement, Runnable{
 
 	/** Sets this Truck's goingTo to Node g and fires a Manager Notification.
 	 * Does not fire a Manager Notification if goingTo.equals(g)
-	 * Does nothing if thread is interrupted */
+	 * Does nothing if the calling thread is interrupted */
 	private void setGoingTo(Node g){
 		if(goingTo == null || !goingTo.equals(g)){
 			try {
@@ -340,11 +352,11 @@ public class Truck implements BoardElement, Runnable{
 	 * if no truck is being carried
 	 */
 	public Parcel getLoad(){
-		Parcel p = load;
-		return p;
+		return load;
 	}
 
-	/** Returns the Color of this Truck */
+	/** Returns the Color of this Truck. Because the color of a truck
+	 * has game significance, this will not be changed while the game is running. */
 	public Color getColor(){
 		return color;
 	}
@@ -362,7 +374,7 @@ public class Truck implements BoardElement, Runnable{
 	}
 
 	/** Returns the speed this truck will/is traveling.
-	 * Returns -1 if the thread is interrupted */
+	 * Returns -1 if the calling thread is interrupted */
 	public int getSpeed(){
 		try {
 			speedLock.acquire();
@@ -374,7 +386,7 @@ public class Truck implements BoardElement, Runnable{
 		return i;
 	}
 
-	/** Sets this trucks speed. Does not change the speed if the thread is interrupted */
+	/** Sets this trucks speed. Does not change the speed if the calling thread is interrupted */
 	public void setSpeed(int newSpeed){
 		try {
 			speedLock.acquire();
@@ -397,14 +409,14 @@ public class Truck implements BoardElement, Runnable{
 
 	/** Picks up parcel p at the current location. If there is, adds it to Truck and waits PARCEL_PICKUP_TIME seconds
 	 * @throws RuntimeException  - if load is not null (can't pick up) or if this Truck is currently traveling.
-	 * Does nothing if the thread is interrupted
-	 *  */
+	 * Does nothing (does not pick up) if the calling thread is interrupted
+	 */
 	public void pickupLoad(Parcel p) throws RuntimeException{
 		if(getStatus() == Status.TRAVELING)
 			return;
 
 		if(load != null)
-			throw new RuntimeException("Can't Pickup Parcel with non-null load. Already holding a Parcel.");
+			throw new RuntimeException("Can't Pickup Parcel with non-null load. Already holding a Parcel - " + load);
 
 		if(location.getTrueParcels().contains(p)){
 			try {
@@ -431,7 +443,7 @@ public class Truck implements BoardElement, Runnable{
 	}
 
 	/** Drops off load at the current location. Throws a RuntimeException if load is null 
-	 * Does nothing if the thread is interrupted */
+	 * Does nothing (doesn't drop off) if the calling thread is interrupted */
 	public void dropoffLoad() throws RuntimeException{
 		if(getStatus() == Status.TRAVELING)
 			return;
@@ -468,16 +480,16 @@ public class Truck implements BoardElement, Runnable{
 	/** Adds the road r to this Truck's travel plans, in a fashion that prevents thread collision 
 	 * Does nothing if the thread is interrupted*/
 	public void addToTravel(Edge r){
-		if(goingTo == null)
-			setGoingTo(r.getOther(location));
-		else
-			setGoingTo(r.getOther(goingTo));
-
 		try {
 			travelLock.acquire();
 		} catch (InterruptedException e) {
 			return;
 		}
+		
+		if(goingTo == null)
+			setGoingTo(r.getOther(location));
+		else
+			setGoingTo(r.getOther(goingTo));
 		travel.add(r);
 		travelLock.release();
 	}
@@ -496,7 +508,7 @@ public class Truck implements BoardElement, Runnable{
 	 */
 	public void setTravelPath(List<Node> path) throws RuntimeException{
 		if(path.get(0) != getLocation())
-			throw new RuntimeException("Can't travel " + path + " because " + this + " is currently at " + getLocation());
+			throw new RuntimeException("Can't start travel at " + path.get(0) + " because " + this + " is currently at " + getLocation());
 		Node prev = null;
 		for(Node n : path){
 			if(prev != null){
@@ -507,7 +519,7 @@ public class Truck implements BoardElement, Runnable{
 	}
 
 	/** Pops the front road r of this Truck's travel plans, in a fashion that prevents thread collision.
-	 * Returns null if the thread is interrupted.
+	 * Returns null if the calling thread is interrupted.
 	 *  */
 	private Edge getTravel(){
 		try {
@@ -523,7 +535,7 @@ public class Truck implements BoardElement, Runnable{
 	/** Clears the Truck's travel plans, in a fashion that prevents thread collision.
 	 * Resets goingTo (The Node the Truck will eventually end up at) to the value of the travelingTo field
 	 * (The Node the Truck is currently traveling towards) 
-	 * Does nothing if the thread is interrupted */
+	 * Does nothing (doesn't clear) if the calling thread is interrupted */
 	public void clearTravel(){
 		try {
 			travelLock.acquire();
@@ -566,7 +578,7 @@ public class Truck implements BoardElement, Runnable{
 			int progress = 0;
 			long startTravelTime = System.currentTimeMillis();
 			while(progress < r.getLength()){
-				Thread.sleep(Score.FRAME);
+				Thread.sleep(FRAME);
 
 				//Get the speed lock, begin speed and cost computations
 				speedLock.acquire();

@@ -12,8 +12,8 @@ import java.util.HashSet;
  * The run() method determines what the Manager "does" when the game begins and while it is going on.
  * As the getTrucks() method is available, the run() method is how the Manager communicates with Trucks
  * of its own volition. <br>
- * The truckNotification(Truck, int) method is called by Trucks whenever one of many situations occurs,
- * and is how Trucks communicate with the Manager, how the Manager can give instructions in reponse to
+ * The truckNotification(Truck, Notification) method is called by Trucks whenever one of many situations occurs,
+ * and is how Trucks communicate with the Manager, how the Manager can give instructions in response to
  * a change in the Truck's situation.
  * 
  * @author MPatashnik
@@ -22,7 +22,7 @@ import java.util.HashSet;
 public abstract class Manager implements Runnable{
 
 	private Game game;     //The game this manager is running in.
-	private Score score;   //The score object representing the score for this manager.
+	private final Score score;   //The score object representing the score for this manager.
 	private Thread thread; //The thread this manager is running in.
 
 	/** Constructor for the Manager class.
@@ -75,12 +75,12 @@ public abstract class Manager implements Runnable{
 		return score;
 	}
 
-	/** Returns the value of the score*/
+	/** Returns the current value of the score*/
 	public final int getScore(){
 		return score.value();
 	}
 	
-	/** Returns the value of the score */
+	/** Returns the current value of the score */
 	public final int getScoreValue(){
 		return getScore();
 	}

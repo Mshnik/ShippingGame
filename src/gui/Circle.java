@@ -35,7 +35,7 @@ public class Circle extends JPanel{
 
 	/** The default diameter of Circles in pixels when they are drawn on the GUI */ 
 	public static final int DEFAULT_DIAMETER = 25;
-	
+
 	/** Extra space to add on diameter when calculating bounds
 	 * 
 	 */
@@ -52,7 +52,7 @@ public class Circle extends JPanel{
 
 	private Color color;
 	private boolean filled;
-	
+
 	public static final Color DEFAULT_TRUCK_COLOR = Color.BLUE;
 	public static final Color DEFAULT_NODE_COLOR = Color.BLACK;
 	public static final Color DEFAULT_PARCEL_COLOR = Color.RED;
@@ -78,16 +78,16 @@ public class Circle extends JPanel{
 	 */
 	public Circle(BoardElement represents, int x, int y, int diameter, Color color, boolean filled){
 		this.represents = represents;
-		
+
 		//Set preliminary bounds
 		setBounds(0,0,DEFAULT_DIAMETER + PANEL_BUFFER, DEFAULT_DIAMETER + PANEL_BUFFER);
 		//setBorder(new LineBorder(Color.black, 2));
-		
-		
+
+
 		this.setDiameter(diameter);
 		this.setX1(x);
 		this.setY1(y);
-		
+
 		if(color != null)
 			this.color = color;
 		else{
@@ -135,13 +135,13 @@ public class Circle extends JPanel{
 	public Point getPoint(){
 		return new Point(x1, y1);
 	}
-	
+
 	/** Sets the color of this circle.
 	 * @throws IllegalArgumentException - if c is not in Score.COLORS */
 	public void setColor(Color c){
 		if(!Score.colorContains(c))
 			throw new IllegalArgumentException("Illegal Color (" + c.toString() +") passed in");
-		
+
 		color = c;
 	}
 
@@ -156,18 +156,18 @@ public class Circle extends JPanel{
 		this.diameter = diameter;
 		fixBounds();
 	}
-	
+
 	/** Changes the color according to the Color Policy */
 	public void updateColor(){
 		//Do something??
 	}
-	
+
 	/** Extra height added (either on top or bottom) to bounds to fit text */
 	private static final int TEXT_HEIGHT = 15;
-	
+
 	/** Extra width added to bounds to fit text */
 	private static final int TEXT_WIDTH = 50;
-	
+
 	/** Fixes the boundaries so that all drawings will be within the bounds.
 	 * Call after x, y, or diameter is changed. */
 	private void fixBounds(){
@@ -206,7 +206,7 @@ public class Circle extends JPanel{
 	public double getDistance(Circle c){
 		return Math.sqrt( (Math.pow(x1-c.getX1(), 2) + Math.pow(y1 - c.getY1(), 2) ) );
 	}
-	
+
 	/** Returns the vector from this circle to circle c */
 	public Vector getVectorTo(Circle c){
 		return new Vector(c.x1 - x1, c.y1 - y1);
@@ -226,28 +226,26 @@ public class Circle extends JPanel{
 
 		g2d.setStroke(new BasicStroke(LINE_THICKNESS));
 		g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING,  RenderingHints.VALUE_ANTIALIAS_ON);
-		
+
 		int heightPlus = 0;
 		if(represents instanceof Node)
 			heightPlus = TEXT_HEIGHT;
-		
+
 		Ellipse2D.Double circle2d = new Ellipse2D.Double(PANEL_BUFFER/2, PANEL_BUFFER/2 + heightPlus, getDiameter(), getDiameter());
 		g2d.setColor(getColor());
 		if(filled) g2d.fill(circle2d);
 		g2d.draw(circle2d);
 		g2d.drawString(represents.getMappedName(), represents.getRelativeX() + PANEL_BUFFER, represents.getRelativeY() + PANEL_BUFFER);
-		
+
 		if(represents instanceof Node){
 			g2d.setColor(Color.BLACK);
 			Node n = (Node)represents;
 
-			try {
-				if(! n.getParcels().isEmpty()){
-					g2d.drawString(n.getParcels().size() + "", diameter/2 + 2, diameter/2 + PANEL_BUFFER + heightPlus);
-				}
-			} catch (InterruptedException e) {}
+			if(! n.getParcels().isEmpty()){
+				g2d.drawString(n.getParcels().size() + "", diameter/2 + 2, diameter/2 + PANEL_BUFFER + heightPlus);
+			}
 		}
-		
+
 	}
 
 	@Override

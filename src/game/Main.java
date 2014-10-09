@@ -10,7 +10,7 @@ import java.util.concurrent.Semaphore;
 /** Game starting methods. Also serves as a util holder */
 public class Main {
 	
-	/** Prompts the User for a string of a ClassName of the Manager to create, then creates
+	/** Reads args for a string of a ClassName of the Manager to create, then creates
 	 * an instance of that manager class, creates the game and the threads, and starts the game.
 	 * @param args - a 1x1 array containing the name of the class of the user wants as the Manager
 	 * @throws IllegalArgumentException if args is null or has length 0.
@@ -55,7 +55,7 @@ public class Main {
 	/** Returns the sum of the natural numbers from {@code 1} to {@code i}, recursively!
 	 * Returns 0 for {@code i <= 0} */
 	public static int sumTo(int i){
-		if(i <= 0)
+		if(i < 0)
 			return 0;
 		return sumToHelper(i,0);
 	}
@@ -115,7 +115,7 @@ public class Main {
 	}
 	
 	/** Returns a random element of the given collection. Locks lock before doing processing.
-	 * If lock is null, doesn't do any locking. Returns null if calling thread is interrupted. */
+	 * If lock is null, doesn't do any locking. Returns null if calling thread is interrupted during locking. */
 	public static <T> T randomElement(Collection<T> elms, Semaphore lock){
 		if(lock != null)
 			try {
@@ -125,7 +125,7 @@ public class Main {
 			}
 		Iterator<T> it = elms.iterator();
 		T val = null;
-		for(int i = 0; i < (int)(Math.random() * elms.size() - 1) + 1; i++){
+		for(int i = 0; i < (int)(Math.random() * elms.size()) + 1; i++){
 			val = it.next();
 		}
 		if(lock != null) lock.release();

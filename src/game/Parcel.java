@@ -10,7 +10,7 @@ import java.util.concurrent.Semaphore;
  * from the game and award the player points. If the parcel matches colors
  * with the Truck carrying it, the point award for delivery is higher <br><br>
  * 
- * Only one truck can carry a parcel at a time.
+ * Only one truck can carry a parcel at a time, each truck can carry a maximum of one parcel
  * 
  * @author MPatashnik
  *
@@ -43,7 +43,7 @@ public class Parcel implements BoardElement{
 	private Truck holder;
 
 	/** Constructor. Sets start and destination cities, then assigns a random color
-	 * @Param g - The game this parcel belongs to
+	 * @Param m - The Board this parcel belongs to
 	 * @param start - the Node where this Parcel starts
 	 * @param destionation - the Node where this Parcel goes 
 	 * @throws IllegalArgumentException - if start.equals(destination)*/
@@ -52,7 +52,7 @@ public class Parcel implements BoardElement{
 	}
 
 	/** Constructor. Sets start and destination cities, and assigns color
-	 * @param g - the Game this parcel belongs to
+	 * @param m - the Board this parcel belongs to
 	 * @param start - the Node where this Parcel starts
 	 * @param destionation - the Node where this Parcel goes 
 	 * @throws IllegalArgumentException - if start.equals(destination)*/
@@ -118,7 +118,8 @@ public class Parcel implements BoardElement{
 		this.destination = destination;
 	}
 
-	/** Returns the color of this Parcel */
+	/** Returns the color of this Parcel. Because the color of a parcel has game significance,
+	 * this will not be changed after the game starts running. */
 	public Color getColor() {
 		return color;
 	}
@@ -193,8 +194,8 @@ public class Parcel implements BoardElement{
 	@Override
 	/** Returns this' start location and its color for JSON string */
 	public String toJSONString(){
-		return "{\n" + Main.addQuotes(BoardElement.LOCATION_TOKEN) + ":" + Main.addQuotes(location.getName()) + "," +
-				"\n" + Main.addQuotes(BoardElement.DESTINATION_TOKEN) + ":" + Main.addQuotes(destination.getName()) + "," +
+		return "{\n" + Main.addQuotes(BoardElement.LOCATION_TOKEN) + ":" + Main.addQuotes(location.name) + "," +
+				"\n" + Main.addQuotes(BoardElement.DESTINATION_TOKEN) + ":" + Main.addQuotes(destination.name) + "," +
 				"\n" + Main.addQuotes(BoardElement.COLOR_TOKEN) + ":" + color.getRGB() + 
 				"\n}";
 	}

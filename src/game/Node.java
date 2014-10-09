@@ -6,17 +6,16 @@ import java.awt.Color;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.Iterator;
 import java.util.concurrent.Semaphore;
 
 
-/** A Node (vertex) on the graph of the game.
+/** A Node (vertex) on the board of the game.
  *  Each Node has maintains a set of edges that exit it,
  *  A hashmap of trucks, mapping to either at this node or not at this node,
  *  and a set of Parcels that are on this node (and not loaded on a truck). <br><br>
  *  
  *  All of the methods that modify these collections are protected, but all of the getters
- *  Are public for use by the user. Additionally, convience methods such as isConnectedTo(Node n)
+ *  Are public for use by the user. Additionally, convenience methods such as isConnectedTo(Node n)
  *  are provided for user use.
  *  
  *  @author MPatashnik
@@ -25,14 +24,13 @@ public class Node implements BoardElement{
 
 	private final Board board;		//The board this Node is contained in
 	
-	/** Threads need to get this to view/edit parcels at this node */
-	private Semaphore parcelLock;
-
+	private Semaphore parcelLock;   //Threads need to get this to view/edit parcels at this node
 	private Semaphore truckLock; //Lock that trucks must acquire in order to make changes to this edge.
 
 	private HashMap<Truck, Boolean> truckHere; //Maps truck -> is here
 
-	private String name;
+	/** The name of this node. Set during construction */
+	public final String name;
 	private HashSet<Edge> exits = new HashSet<Edge>();			//Edges leaving this Node
 	private HashSet<Parcel> parcels = new HashSet<Parcel>();	//Parcels currently here and not on truck
 
@@ -41,7 +39,7 @@ public class Node implements BoardElement{
 	private Circle circle;	//Circle that represents this graphically
 
 	/** Constructor for a named Node with no starting exits but with a specific circle drawing
-	 * @param g - the Game this Node belongs to
+	 * @param m - the Board this Node belongs to
 	 * @param name - the name of this Node
 	 * @param circle - The (draggable) circle object to draw for this Node*/
 	protected Node(Board m, String name, DraggableCircle c){
@@ -49,7 +47,7 @@ public class Node implements BoardElement{
 	}
 
 	/** Constructor for a named Node with starting exits exits.
-	 * @param g - the Game this Node belongs to
+	 * @param m - the Board this Node belongs to
 	 * @param name - the name of this Node
 	 * @param exits - the exits of this node
 	 */
@@ -75,16 +73,6 @@ public class Node implements BoardElement{
 		return board;
 	}
 
-	/** Returns the name of this Node */
-	public String getName(){
-		return name;
-	}
-
-	/** Sets the name of this Node to newName */
-	protected void setName(String newName){
-		name = newName;
-	}
-
 	/** Returns the exits of this Node */
 	protected HashSet<Edge> getTrueExits(){
 		return exits;
@@ -101,12 +89,7 @@ public class Node implements BoardElement{
 
 	/** Returns a random exit from exits */
 	public Edge getRandomExit(){
-		Iterator<Edge> it = exits.iterator();
-		Edge e = null;
-		//Move forward along the iterator a random number of times.
-		for(int i = 0; i < (int)(Math.random() * exits.size()) + 1; i++)
-			e = it.next();
-		return e;
+		return Main.randomElement(exits, null);
 	}
 
 	/** Sets the value of exits to newExits */
@@ -129,7 +112,7 @@ public class Node implements BoardElement{
 		exits.addAll(newExits);
 	}
 
-	/** Returns the number of exits from this node */
+	/** Returns the number of exits from this node. */
 	public int getExitsSize(){
 		return exits.size();
 	}
@@ -141,7 +124,7 @@ public class Node implements BoardElement{
 	}
 
 	/** Adds Parcel p to parcels on this Node 
-	 * @throws InterruptedException */
+	 * @throws InterruptedException - if this is interrupted while locking */
 	protected void addParcel(Parcel p) throws InterruptedException{
 		parcelLock.acquire();
 		board.getParcels().add(p);
@@ -150,45 +133,53 @@ public class Node implements BoardElement{
 	}
 
 	/** Removes parcel p from parcels 
-	 * @throws InterruptedException */
+	 * @throws InterruptedException - if this is interrupted while locking */
 	protected void removeParcel(Parcel p) throws InterruptedException{
 		parcelLock.acquire();
 		parcels.remove(p);
 		parcelLock.release();
 	}
 
-	/** Returns the parcels on this Node */
+	/** Returns the parcels located this Node, not held by any truck */
 	protected HashSet<Parcel> getTrueParcels(){
 		return parcels;
 	}
 
 	/** Returns a copy of the HashSet containing the present parcels to prevent its editing 
-	 * @throws InterruptedException */
-	public HashSet<Parcel> getParcels() throws InterruptedException{
-		parcelLock.acquire();
+	 * Returns null if the calling thread is interrupted while locking */
+	public HashSet<Parcel> getParcels(){
+		try {
+			parcelLock.acquire();
+		} catch (InterruptedException e) {
+			return null;
+		}
 		HashSet<Parcel> parcelClone = new HashSet<Parcel>();
 		parcelClone.addAll(parcels);
 		parcelLock.release();
 		return parcelClone;
 	}
 
-	/** Returns a random parcel at this node 
-	 * @throws InterruptedException */
-	public Parcel getRandomParcel() throws InterruptedException{
+	/** Returns a random parcel at this node. 
+	 * Returns null if the calling thread is interrupted while locking*/
+	public Parcel getRandomParcel(){
 		return Main.randomElement(parcels, parcelLock);
 	}
 
 	/** Returns true if parcel p is on this node, false otherwise 
-	 * @throws InterruptedException */
-	public boolean isParcelHere(Parcel p) throws InterruptedException{
-		parcelLock.acquire();
+	 * Returns false if the calling thread is interrupted while locking */
+	public boolean isParcelHere(Parcel p){
+		try {
+			parcelLock.acquire();
+		} catch (InterruptedException e) {
+			return false;
+		}
 		boolean isHere = parcels.contains(p);
 		parcelLock.release();
 		return isHere;
 	}
 
 	/** Creates a new Edge with length length and adds it as an exit
-	 * to this Node and other Node
+	 * to this Node and other Node.
 	 * @param other the Node to connect this Node to
 	 * @param length the length of the Edge
 	 */
@@ -200,6 +191,7 @@ public class Node implements BoardElement{
 
 	/** Returns false if destination.equals(this), else  
 	 * Returns true if one of the edges in exits leads to Node destination, 
+	 * (this is connected to destination via a single edge)
 	 * false otherwise. */
 	public boolean isConnectedTo(Node destination){
 		if(destination.equals(this))
@@ -223,7 +215,7 @@ public class Node implements BoardElement{
 	}
 
 	/** Returns the userData stored in this Node. May be null if the user has not yet given this Node userData 
-	 * @throws InterruptedException */
+	 */
 	public Object getUserData(){
 		return userData;
 	}
@@ -281,11 +273,12 @@ public class Node implements BoardElement{
 		if(! (n instanceof Node) )
 			return false;
 
-		return name.equals( ((Node)n).getName());
+		return name.equals( ((Node)n).name);
 	}
 
 	@Override
-	/** A Node's hashCode is equal to the hashCode of its name */
+	/** A Node's hashCode is equal to the hashCode of its name.
+	 * This is guaranteed to be unique within the context of a single game. */
 	public int hashCode(){
 		return name.hashCode();
 	}
@@ -346,7 +339,7 @@ public class Node implements BoardElement{
 	@Override
 	/** Returns the string that is mapped when this Node is drawn */
 	public String getMappedName() {
-		return getName();
+		return name;
 	}
 
 	@Override

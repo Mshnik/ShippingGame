@@ -1,18 +1,15 @@
 package game;
 import java.awt.Color;
 
-/** The Score Class is a convenient way to monitor the score of a Game. <br>
- * All expected score increases and decreases are specified as public static final variables in the
- * Score class. All variables are meant to be added - costs are represented as negative numbers. <br>
+/** The Score Class is a convenient way to monitor the score of a Game for a given Manager. <br>
  * The method that allows changing the value of the score is protected, so only files in the gameFiles
  * package are able to change the score. This prevents the user from altering the score, though the
- * getScore() method is public.
+ * getScore() method is public. <br><br>
+ * Also maintains methods for computing the cost of traveling at a given speed for trucks,
+ * and validates colors for parcels and trucks.
  * @author MPatashnik
  */
 public class Score {
-
-	/** Milliseconds per frame. Wait time between travel updates*/
-	public static final int FRAME = 40;
 
 	/** The Colors that are in the game. Colors of Trucks and of Parcels are chosen from this Array.
 	 * Other colors are not allowed in the game, as setColor(Color c) methods must check for c being
@@ -35,8 +32,7 @@ public class Score {
 
 	/** Returns a random Color from Score.Color */
 	public static Color getRandomColor(){
-		int i = (int)(Math.random()*(double)COLOR.length);
-		return COLOR[i];
+		return COLOR[(int)(Math.random()*(double)COLOR.length)];
 	}
 
 
@@ -67,10 +63,13 @@ public class Score {
 
 	/** Returns the cost of traveling one frame at a rate of speed.
 	 * Most efficient speed is in middle.
+	 * See Truck.MIN_SPEED, Truck.MAX_SPEED for boundary values,
+	 * Truck.EFFICIENT_SPEED for most cost-effective speed to travel.
 	 * <br><br>
-	 * Cost = if speed < Efficient_Speed, speed + 1
-	 *        else if speed > Efficient_Speed, speed + fib(speed - Efficient_Speed)
-	 *        else speed
+	 * {@code Cost =} <br>
+	 *        {@code if (speed < Efficient_Speed) -> speed + 1} <br>
+	 *        {@code else if (speed > Efficient_Speed) -> speed + fib(speed - Efficient_Speed)} <br>
+	 *        {@code else -> speed }
 	 * <br> 1 : 2
 	 * <br> 2 : 3
 	 * <br> 3 : 4
@@ -82,7 +81,7 @@ public class Score {
 	 * <br> 9 : 17
 	 * <br> 10 : 22   
 	 * @throws IllegalArgumentException if speed is out of the range [min,max] speed.
-	 * @return -Cost, calculated using the above table  
+	 * @return -Cost, calculated using the above equation. Sample values are in table 
 	 */
 	public static int cost(int speed) throws IllegalArgumentException{
 		if (speed < Truck.MIN_SPEED || speed > Truck.MAX_SPEED)
