@@ -127,12 +127,13 @@ public abstract class Manager implements Runnable{
 		thread = t;
 	}
 
-	/** Called by the game when the game is over */
+	/** Called by the game when the game is over.
+	 * If thread is null, does nothing because this was never started in the first place */
 	final void gameOver(){
 		try {
 			thread.join(1000); //Wait some time
 			thread.interrupt(); //Just interrupt it
-		} catch (InterruptedException e) {}
+		} catch (InterruptedException | NullPointerException e) {}
 	}
 
 }

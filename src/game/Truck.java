@@ -669,13 +669,14 @@ public class Truck implements BoardElement, Runnable{
 		return 1;
 	}
 
-	/** Called by the Game when the game is done. Causes this thread to die */
+	/** Called by the Game when the game is done. Causes this thread to die.
+	 * If thread is null, does nothing because this truck was never started. */
 	protected void gameOver(){
 		clearTravel();
 		try{
 			thread.join(1000); //Try to join it.
 			thread.interrupt(); //Failed - just interrupt
-		}catch(InterruptedException e){}
+		}catch(InterruptedException | NullPointerException e){}
 	}
 
 	@Override

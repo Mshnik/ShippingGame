@@ -176,9 +176,7 @@ public class GUI extends JFrame{
 				}
 			}
 		});
-//		if(g.getFile() == null && g.getSeed() == -1){
-//			mntmReset.setEnabled(false);
-//		}
+		mntmReset.setEnabled(false); //Reset button unenabled until game starts.
 		mnGame.add(mntmReset);
 
 		JMenuItem mntmRandom = new JMenuItem("New Random Map...");
@@ -350,9 +348,11 @@ public class GUI extends JFrame{
 		boolean running = game.isRunning();
 		if(running){
 			//TODO
+			mntmReset.setEnabled(true);
 		}
 		else{
 			//TODO
+			mntmReset.setEnabled(game.isFinished());
 		}
 	}
 
