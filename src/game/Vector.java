@@ -89,8 +89,8 @@ public class Vector {
 		return new Vector(there.x - x, there.y - y);
 	}
 
-	@Override
 	/** Returns a simple string representation of this vector */
+	@Override
 	public String toString(){
 		return "<" + x + "," + y + ">";
 	}

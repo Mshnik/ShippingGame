@@ -67,6 +67,7 @@ public class Parcel implements BoardElement{
 	}
 
 	/** Returns the board this Parcel belongs to */
+	@Override
 	public Board getBoard(){
 		return board;
 	}
@@ -85,16 +86,19 @@ public class Parcel implements BoardElement{
 
 	/** Returns the color of this Parcel. Because the color of a parcel has game significance,
 	 * this will not be changed after the game starts running. */
+	@Override
 	public Color getColor() {
 		return color;
 	}
 
 	/** Returns the userData stored in this Node. May be null if the user has not yet given this Node userData */
+	@Override
 	public Object getUserData(){
 		return userData;
 	}
 
 	/** Sets the value of userData to Object uData. To erase the current userData just pass in null */
+	@Override
 	public void setUserData(Object uData){
 		userData = uData;
 	}
@@ -150,14 +154,14 @@ public class Parcel implements BoardElement{
 		return;
 	}
 
-	@Override
 	/** Parcels do not have mapped names. Returns a blank string */
+	@Override
 	public String getMappedName() {
 		return "";
 	}
 
-	@Override
 	/** Returns this' start location and its color for JSON string */
+	@Override
 	public String toJSONString(){
 		return "{\n" + Main.addQuotes(BoardElement.LOCATION_TOKEN) + ":" + Main.addQuotes(location.name) + "," +
 				"\n" + Main.addQuotes(BoardElement.DESTINATION_TOKEN) + ":" + Main.addQuotes(destination.name) + "," +
@@ -165,8 +169,8 @@ public class Parcel implements BoardElement{
 				"\n}";
 	}
 
-	@Override
 	/** Returns 0, since Parcels have no mapped name */
+	@Override
 	public int getRelativeX() {
 		return 0;
 	}
@@ -177,22 +181,22 @@ public class Parcel implements BoardElement{
 		return 0;
 	}
 
-	@Override
 	/** Returns true if a truck is currently holding this Parcel, false otherwise */
+	@Override
 	public boolean isTruckHere(Truck t) {
 		return holder == t;
 	}
 
+	/** Returns 1 if a truck is currently holding this, 0 otherwise */
 	@Override
-	/** Returns 1 if there is a holder, 0 otherwise */
 	public int trucksHere(){
 		if(holder == null)
 			return 0;
 		return 1;
 	}
 
-	@Override
 	/** Relies on circle for painting. Parcels have no dependents */
+	@Override
 	public void updateGUILocation(int x, int y) {
 		Circle c = getCircle();
 		c.setX1(x);

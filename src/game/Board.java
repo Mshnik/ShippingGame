@@ -337,8 +337,8 @@ public class Board implements JSONString{
 	}
 
 
-	@Override
 	/** Returns a String representation of this board, including edges and nodes */
+	@Override
 	public String toString(){
 		String output = "";
 		Iterator<Node> nodesIterator = nodes.iterator();
@@ -366,7 +366,6 @@ public class Board implements JSONString{
 	private static final String TRUCK_TOKEN = "truck-";
 	private static final String PARCEL_TOKEN = "parcel-";
 
-	@Override
 	/** Returns a JSON-compliant version of toString().
 	 * A full serialized version of the board, including:
 	 * > Seed
@@ -375,6 +374,7 @@ public class Board implements JSONString{
 	 * > Edges
 	 * > Trucks
 	 * > Parcels */
+	@Override
 	public String toJSONString() {		
 		String s = "{\n" + Main.addQuotes(SEED_TOKEN) + ":" + seed +",";
 		s += Main.addQuotes(SCORE_TOKEN) + ":[" + WAIT_COST + "," 

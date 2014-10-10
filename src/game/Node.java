@@ -216,11 +216,13 @@ public class Node implements BoardElement{
 
 	/** Returns the userData stored in this Node. May be null if the user has not yet given this Node userData 
 	 */
+	@Override
 	public Object getUserData(){
 		return userData;
 	}
 
 	/** Sets the value of userData to Object uData. To erase the current userData just pass in null */
+	@Override
 	public void setUserData(Object uData){
 		userData = uData;
 	}
@@ -248,6 +250,7 @@ public class Node implements BoardElement{
 	 * @param x - the new X location of this Truck in the GUI
 	 * @param y - the new Y location of this Truck in the GUI
 	 * */
+	@Override
 	public void updateGUILocation(int x, int y){
 		circle.setX1(x);
 		circle.setY1(y);
@@ -265,8 +268,8 @@ public class Node implements BoardElement{
 
 	}
 
-	@Override
 	/** Two Nodes are equal if they have the same name */
+	@Override
 	public boolean equals(Object n){
 		if(n == null)
 			return false;
@@ -276,16 +279,16 @@ public class Node implements BoardElement{
 		return name.equals( ((Node)n).name);
 	}
 
-	@Override
 	/** A Node's hashCode is equal to the hashCode of its name.
 	 * This is guaranteed to be unique within the context of a single game. */
+	@Override
 	public int hashCode(){
 		return name.hashCode();
 	}
 
-	@Override
 	/** Returns true if a truck is currently at this node, false otherwise.
 	 * Returns false if the calling thread is interrupted */
+	@Override
 	public boolean isTruckHere(Truck t){
 		try {
 			truckLock.acquire();
@@ -299,9 +302,9 @@ public class Node implements BoardElement{
 		return b;
 	}
 
-	@Override
 	/** Returns the number of trucks here
 	 * Returns -1 if the calling thread is interrupted */
+	@Override
 	public int trucksHere(){
 		try {
 			truckLock.acquire();
@@ -330,34 +333,34 @@ public class Node implements BoardElement{
 		return circle.getColor();
 	}
 
-	@Override
 	/** Returns the name of this Node */
+	@Override
 	public String toString(){
 		return name;
 	}
 
-	@Override
 	/** Returns the string that is mapped when this Node is drawn */
+	@Override
 	public String getMappedName() {
 		return name;
 	}
 
-	@Override
 	/** Returns the x location that this Node's string is mapped relative to its top right coordinate */
+	@Override
 	public int getRelativeX() {
 		return -Circle.DEFAULT_DIAMETER/2;
 	}
 
-	@Override
 	/** Returns y location that this Node's string is mapped relative to its top right coordinate */
+	@Override
 	public int getRelativeY() {
 		return 0;
 	}
 
-	@Override
 	/** Returns just this' name for the JSONString - relies on JSONs of Edges and parcels
 	 * to take care of themselves.
 	 */
+	@Override
 	public String toJSONString(){
 		return "{\n" + Main.addQuotes(BoardElement.NAME_TOKEN) + ":" + Main.addQuotes(name) + ",\n"
 				+ Main.addQuotes(X_TOKEN) + ":"+ circle.getX1() + ",\n"

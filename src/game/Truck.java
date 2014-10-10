@@ -175,6 +175,7 @@ public class Truck implements BoardElement, Runnable{
 	}
 	
 	/** Returns the board this Truck belongs to */
+	@Override
 	public Board getBoard(){
 		return game.getBoard();
 	}
@@ -354,6 +355,7 @@ public class Truck implements BoardElement, Runnable{
 
 	/** Returns the Color of this Truck. Because the color of a truck
 	 * has game significance, this will not be changed while the game is running. */
+	@Override
 	public Color getColor(){
 		return color;
 	}
@@ -395,11 +397,13 @@ public class Truck implements BoardElement, Runnable{
 	}
 
 	/** Returns the userData stored in this Node. May be null if the user has not yet given this Node userData */
+	@Override
 	public Object getUserData(){
 		return userData;
 	}
 
 	/** Sets the value of userData to Object uData. To erase the current userData just pass in null */
+	@Override
 	public void setUserData(Object uData){
 		userData = uData;
 	}
@@ -630,6 +634,7 @@ public class Truck implements BoardElement, Runnable{
 	 * @param x - the new X location of this Truck in the GUI
 	 * @param y - the new Y location of this Truck in the GUI
 	 * */
+	@Override
 	public void updateGUILocation(int x, int y){
 		if(game.getGUI() != null){
 			circle.setX1(x);
@@ -641,39 +646,39 @@ public class Truck implements BoardElement, Runnable{
 		}
 	}
 
-	@Override
 	/**Returns a string representation of this Truck */
+	@Override
 	public String toString(){
 		return name;
 	}
 
-	@Override
 	/** Returns the name of this truck to display on the GUI */
+	@Override
 	public String getMappedName() {
 		return getTruckName();
 	}
 
-	@Override
 	/** Returns the location of this' name relative to its position on the GUI */
+	@Override
 	public int getRelativeX() {
 		return -Circle.DEFAULT_DIAMETER/2;
 	}
 
-	@Override
 	/** Returns the location of this' name relative to its position on the GUI */
+	@Override
 	public int getRelativeY() {
 		return Circle.DEFAULT_DIAMETER + 10;			
 	}
 
-	@Override
 	/** Always returns for this, always return false for other trucks, 
 	 * because a truck is always "at" itself */
+	@Override
 	public boolean isTruckHere(Truck t) {
 		return (this == t);
 	}
 
-	@Override
 	/** Always returns 1 - there is always one truck at itself */
+	@Override
 	public int trucksHere(){
 		return 1;
 	}
@@ -688,10 +693,10 @@ public class Truck implements BoardElement, Runnable{
 		}catch(InterruptedException | NullPointerException e){}
 	}
 
-	@Override
 	/** Returns a JSON String of this truck.
 	 * Just the basic truck info pertaining to map creation - location and load not included.
 	 */	
+	@Override
 	public String toJSONString() {
 		return "{\n" + Main.addQuotes(BoardElement.NAME_TOKEN) + ":" + Main.addQuotes(name) + "," +
 				"\n" + Main.addQuotes(BoardElement.COLOR_TOKEN) + ":" + color.getRGB() + 

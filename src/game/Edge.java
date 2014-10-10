@@ -79,6 +79,7 @@ public class Edge implements BoardElement{
 	}
 
 	/** Returns the Board this Edge belongs to. */
+	@Override
 	public Board getBoard(){
 		return board;
 	}
@@ -175,11 +176,13 @@ public class Edge implements BoardElement{
 	}
 
 	/** Returns the userData stored in this edge. May be null if the user has not yet given this Node userData */
+	@Override
 	public Object getUserData(){
 		return userData;
 	}
 
 	/** Sets the value of userData to Object uData. To erase the current userData just pass in null */
+	@Override
 	public void setUserData(Object uData){
 		userData = uData;
 	}
@@ -187,13 +190,14 @@ public class Edge implements BoardElement{
 	/** Returns the color of this Edge, as it is pained on the GUI. Color
 	 * of edges has no game significance, thus this value may be changed during gameplay.
 	 */
+	@Override
 	public Color getColor(){
 		return line.getColor();
 	}
 
-	@Override
 	/** Two Edges are equal if they have the same exits, even if they have different lengths.
 	 * This makes sure that only one edge connects each pair of nodes in duplicate-free collections  */
+	@Override
 	public boolean equals(Object e){
 		if(e == null)
 			return false;

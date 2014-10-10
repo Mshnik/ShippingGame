@@ -130,8 +130,8 @@ public class Score {
 		return getScore();
 	}
 
-	@Override
 	/** Returns the current score value as the string version of this score. */
+	@Override
 	public String toString(){
 		return "" + getScore();
 	}

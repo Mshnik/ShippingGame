@@ -48,6 +48,7 @@ public interface BoardElement extends JSONString, Colorable, UserData{
 	public int trucksHere();
 	
 	/** Returns the Color of this BoardElement */
+	@Override
 	public Color getColor();
 	
 	/** Update the location of this on the gui */
