@@ -12,21 +12,27 @@ public class DraggableCircle extends Circle {
 
 	private static final long serialVersionUID = -3983152780751574074L;
 
-	private MouseListener clickListener; //The listener to mouse press/release
 	private Point clickPoint; //The point the user clicked within the circle before dragging began
-	private MouseMotionListener motionListener; //The listener for dragging
 	
+	/** Constructs a DraggableCircle
+	 * @param represents - the game pice that this circle is drawn for
+	 * @param x - the starting x coordinate (center point)
+	 * @param y - the starting y coordinate (center point)
+	 * @param diameter - the diameter of the circle
+	 */
 	public DraggableCircle(BoardElement represents, int x, int y, int diameter) {
 		super(represents, x, y, diameter);
 		
-		clickListener = new MouseListener(){
-			@Override
-			public void mouseClicked(MouseEvent e) {}
-
+		MouseListener clickListener = new MouseListener(){
+			
+			/** When this is clicked, store the initial point at which this is clicked */
 			@Override
 			public void mousePressed(MouseEvent e) {
 				clickPoint = e.getPoint();
 			}
+			
+			@Override
+			public void mouseClicked(MouseEvent e) {}
 
 			@Override
 			public void mouseReleased(MouseEvent e) {}
@@ -38,8 +44,11 @@ public class DraggableCircle extends Circle {
 			public void mouseExited(MouseEvent e) {}	
 		};
 		
-		motionListener = new MouseMotionListener(){
+		MouseMotionListener motionListener = new MouseMotionListener(){
 
+			/** When this is dragged, perform the translation from the point where this was clicked
+			 * to the new dragged point
+			 */
 			@Override
 			public void mouseDragged(MouseEvent e) {
 				DraggableCircle c = (DraggableCircle)e.getSource();

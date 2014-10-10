@@ -14,21 +14,34 @@ import java.awt.geom.Line2D;
 
 import javax.swing.JPanel;
 
+/** The Line class is a graphic class that allows the drawing of lines.
+ * Lines use a (c1, c2) coordinate system of where they are located on the board, where
+ * c1 and c2 are each circle objects that denote the endpoints of this line.
+ * Each circle has (x,y) coordinates, so a Line can be though of as having (x1, y1, x2, y2)
+ * Each Line is tied to a BoardElement (most likely an Edge) that it represents.
+ * While a Line can be tied to a Node, Parcel, or Truck, this behavior is unspecified.
+ * @author MPatashnik
+ *
+ */
 public class Line  extends JPanel{
 
-	/**
-	 * 
-	 */
 	private static final long serialVersionUID = -1688624827819736589L;
 
+	/** Default thickness of lines when they are drawn on the GUI */
 	public static final int LINE_THICKNESS = 2;
+	/** Default color of lines when they are drawn on the GUI */
 	public static final Color DEFAULT_COLOR = Color.DARK_GRAY;
+	/** Color of lines when they are being traveled by a truck, if HIGHLIGHT_TRAVEL is selected */
 	public static final Color TRAVELING_COLOR = Color.RED;
-
+	/** Color of the lines representing the shortest edges, if DISTANCE_GRADIENT is selected */
+	public static final Color GRADIENT_SHORT_COLOR = Color.CYAN;
+	/** Color of the lines representing the longest edges, if DISTANCE_GRADIENT is selected */
+	public static final Color GRADIENT_LONG_COLOR = Color.BLACK;
+	
 	/** The different ways to draw the edges of the graph.
-	 * Default - all single color
-	 * Highlight color - all default color, but highlighted when a truck is traveling it
-	 * Distance gradient - shorter edges lighter, longer edges darker
+	 * <br>Default - all single color
+	 * <br>Highlight color - all default color, but highlighted when a truck is traveling it
+	 * <br>Distance gradient - shorter edges lighter, longer edges darker
 	 * @author MPatashnik
 	 *
 	 */
@@ -38,20 +51,16 @@ public class Line  extends JPanel{
 		DISTANCE_GRADIENT
 	}
 
-	private static final Color GRADIENT_SHORT_COLOR = Color.CYAN;
-	private static final Color GRADIENT_LONG_COLOR = Color.BLACK;
+	private static ColorPolicy colorPolicy = ColorPolicy.DEFAULT; //The color policy to follow
 
+	private Circle c1;  //Endpoint one of this line
+	private Circle c2;  //Endpoint two of this line
 
-	private static ColorPolicy colorPolicy = ColorPolicy.DEFAULT;
+	private Color color; //The color to draw this line - should stay in sync with the color policy
 
-	private Circle c1;
-	private Circle c2;
+	private BoardElement represents; //The BoardElement (probably Edge) that this represents
 
-	private Color color;
-
-	private BoardElement represents;
-
-	/** Constructor for the Line class. The line is colored black.
+	/** Constructor for the Line class. The line is colored according to the color policy.
 	 * @param c1 - the Circle that marks the first end of this line
 	 * @param c2 - the Circle that marks the second end of this line
 	 * @param represents - the MapElement this Line represents when drawn on the GUI
@@ -85,23 +94,22 @@ public class Line  extends JPanel{
 		c2 = c;
 	}
 
-	/** Returns the x1 coordinate of this line*/
+	/** Returns the x1 coordinate of this line, getC1().getX1()*/
 	public int getX1() {
 		return c1.getX1();
 	}
 
-	/** Returns the y1 coordinate of this line */
+	/** Returns the y1 coordinate of this line, getC1().getY1() */
 	public int getY1() {
 		return c1.getY1();
 	}
 
-	/** Returns the x2 coordinate of this line */
+	/** Returns the x2 coordinate of this line, getC2().getX1() */
 	public int getX2() {
 		return c2.getX1();
 	}
 
-
-	/** Returns the y2 coordinate of this line */
+	/** Returns the y2 coordinate of this line, getC2().getY1() */
 	public int getY2() {
 		return c2.getY1();
 	}
@@ -111,12 +119,12 @@ public class Line  extends JPanel{
 		return new Point(getXMid(), getYMid());
 	}
 
-	/** Returns the x midpoint of this line */
+	/** Returns the x value of the midpoint of this line */
 	public int getXMid(){
 		return (c1.getX1() + c2.getX1()) / 2;
 	}
 
-	/** Returns the y midpoint of this line */
+	/** Returns the y value of the midpoint of this line */
 	public int getYMid(){
 		return (c1.getY1() + c2.getY1()) / 2;
 	}
@@ -126,9 +134,8 @@ public class Line  extends JPanel{
 		return color;
 	}
 
-	/** Updates the Color according to the color policy
-	 * @throws RuntimeException if the colorPolicy is an illegal value*/
-	public void updateToColorPolicy() throws RuntimeException{
+	/** Updates the Color according to the color policy */
+	public void updateToColorPolicy(){
 		switch(colorPolicy){
 		case DEFAULT:
 			color = DEFAULT_COLOR;
@@ -142,13 +149,14 @@ public class Line  extends JPanel{
 		case DISTANCE_GRADIENT:
 			color = getDistGradientColor();
 			break;
-		default:
-			throw new RuntimeException("Invalid Color Policy; cannot update color");
 		}
 
 		repaint();
 	}
 
+	/** Returns the color for this line using the distance gradient.
+	 * Compares the length of the edge this represents to the max and min values of edge length.
+	 */
 	private Color getDistGradientColor(){
 		Board m = represents.getBoard();
 		if(m.getMaxLength() == Edge.DEFAULT_MAX_LENGTH || m.getMinLength() == Edge.DEFAULT_MIN_LENGTH)
@@ -164,27 +172,27 @@ public class Line  extends JPanel{
 				(int)( (double)GRADIENT_LONG_COLOR.getBlue() * v) + (int)( (double)GRADIENT_SHORT_COLOR.getBlue() * (1-v)));
 	}
 
-	/** Returns the color policy for painting roads. May be one of the following:
-	 * 	<br> DEFAULT - paint all roads the default color
-	 * 	<br> HIGHLIGHT_TRAVEL - highlight the roads that are currently being traveled
-	 *  <br> DISTANCE_GRADIENT - paint roads according to their length value
+	/** Returns the color policy for painting roads.
+	 * @see Line.ColorPolicy
 	 */
 	public static ColorPolicy getColorPolicy(){
 		return colorPolicy;
 	}
 
-	/** Sets the colorPolicy to one of the colorPolicies listed in the ColorPolicy enum
+	/** Sets the colorPolicy to one of the colorPolicies.
+	 * @see Line.ColorPolicy
 	 */
 	public static void setColorPolicy(ColorPolicy policy){
 		colorPolicy = policy;
 	}
 
-	/** Returns the MapElement this object represents */
+	/** Returns the BoardElement this object represents */
 	protected BoardElement getRepresents(){
 		return represents;
 	}
 
-	private static final int ON_LINE_TOLERANCE = 20;	//Number of pixels of tolerance for a point to be on the line
+	/** Number of pixels of tolerance for a point to be considered on the line */
+	public static final int ON_LINE_TOLERANCE = 20;
 
 	/** Returns true if Point p is within ON_LINE_TOLERANCE pixels of this line */
 	public boolean isOnLine(Point p){
@@ -202,14 +210,15 @@ public class Line  extends JPanel{
 		return Line2D.linesIntersect(c1.getX1(), c1.getY1(), c2.getX1(), c2.getY1(), l.getX1(), l.getY1(), l.getX2(), l.getY2());
 	}
 
-	@Override
 	/** Returns a String representation of this line */
+	@Override
 	public String toString(){
 		return "(" + c1.getX1() +"," + c1.getY1() + "), (" + c2.getX1() + "," + c2.getY1() + ")";
 	}
 
+	
+	/** Paints this line */
 	@Override
-	/**Allows the line object to draw itself */
 	public void paintComponent(Graphics g){
 		super.paintComponent(g);
 		Graphics2D g2d = (Graphics2D) g;
@@ -221,8 +230,9 @@ public class Line  extends JPanel{
 		g2d.drawString(represents.getMappedName(), represents.getRelativeX() + getX1(), represents.getRelativeY() + getY1());
 	}
 
+	
+	/** Returns the size of the line, as a rectangular bounding box (x2 - x1, y2 - y1). */
 	@Override
-	/** Returns the size of the line */
 	public Dimension getPreferredSize(){
 		return new Dimension(Math.abs(getX2()-getX1()), Math.abs(getY2()- getY1()));
 

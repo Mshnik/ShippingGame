@@ -19,8 +19,8 @@ import java.awt.geom.Ellipse2D;
 import javax.swing.JPanel;
 
 /** The Circle class is a graphic class that allows the drawing of circles.
- * Circles use an (x1, y1, diameter) coordinate system of where they are located on the threads.
- * Each Circle is tied to a MapElement that it represents. Circles can be tied instances of the
+ * Circles use an (x1, y1, diameter) coordinate system of where they are located on the board.
+ * Each Circle is tied to a BoardElement that it represents. Circles can be tied instances of the
  * Node class, Truck class, and the Parcel class. While a Circle can technically be tied to an instance
  * of the Edge class, this option is not expected and may result in irregular behavior.
  * @author MPatashnik
@@ -28,22 +28,18 @@ import javax.swing.JPanel;
  */
 public class Circle extends JPanel{
 
-	/**
-	 * 
-	 */
 	private static final long serialVersionUID = 1250263410666963976L;
 
 	/** The default diameter of Circles in pixels when they are drawn on the GUI */ 
 	public static final int DEFAULT_DIAMETER = 25;
 
-	/** Extra space to add on diameter when calculating bounds
-	 * 
-	 */
+	/** Extra space to add on diameter when calculating bounds*/
 	public static final int PANEL_BUFFER = DEFAULT_DIAMETER/2;
 
 	/** The minimum amount of distance between Circles in pixels when they are drawn on the GUI */
 	public static final int BUFFER_RADUIS = DEFAULT_DIAMETER * 5;
 
+	/** The game piece that this represents on the GUI */
 	BoardElement represents;
 
 	private int x1;
@@ -73,7 +69,7 @@ public class Circle extends JPanel{
 	 * @param x - x coordinate of center
 	 * @param y - y coordinate of center
 	 * @param diameter - the diameter of the circle
-	 * @param color - the Color of this circle
+	 * @param color - the Color of this circle - if null, uses the default color for represents
 	 * @param filled - whether or not this circle is filled when it is drawn
 	 */
 	public Circle(BoardElement represents, int x, int y, int diameter, Color color, boolean filled){
@@ -81,8 +77,6 @@ public class Circle extends JPanel{
 
 		//Set preliminary bounds
 		setBounds(0,0,DEFAULT_DIAMETER + PANEL_BUFFER, DEFAULT_DIAMETER + PANEL_BUFFER);
-		//setBorder(new LineBorder(Color.black, 2));
-
 
 		this.setDiameter(diameter);
 		this.setX1(x);
@@ -103,24 +97,24 @@ public class Circle extends JPanel{
 		setOpaque(false);
 	}
 
-	/** Returns the x1 coordinate of this circle*/
+	/** Returns the x coordinate of this circle*/
 	public int getX1() {
 		return x1;
 	}
 
-	/** Sets the x1 coordinate of this circle.
+	/** Sets the x coordinate of this circle.
 	 * Also sets the bounds such that this circle will be visible upon drawing */
 	public void setX1(int x1) {
 		this.x1 = x1;
 		fixBounds();
 	}
 
-	/** Returns the y1 coordinate of this circle */
+	/** Returns the y coordinate of this circle */
 	public int getY1() {
 		return y1;
 	}
 
-	/** Sets the y1 coordinate of this circle */
+	/** Sets the y coordinate of this circle */
 	public void setY1(int y1) {
 		this.y1 = y1;
 		fixBounds();
@@ -159,7 +153,7 @@ public class Circle extends JPanel{
 
 	/** Changes the color according to the Color Policy */
 	public void updateColor(){
-		//Do something??
+		//HERP
 	}
 
 	/** Extra height added (either on top or bottom) to bounds to fit text */
@@ -185,7 +179,7 @@ public class Circle extends JPanel{
 		//No extra fix necessary for parcel.
 	}
 
-	/** Returns the MapElement this object represents */
+	/** Returns the BoardElement this object represents */
 	protected BoardElement getRepresents(){
 		return represents;
 	}
@@ -202,7 +196,7 @@ public class Circle extends JPanel{
 		this.setY1(y2);
 	}
 
-	/** Returns the distance between this Circle and Circle c */
+	/** Returns the distance between this Circle and Circle c. Distances measured by center */
 	public double getDistance(Circle c){
 		return Math.sqrt( (Math.pow(x1-c.getX1(), 2) + Math.pow(y1 - c.getY1(), 2) ) );
 	}
@@ -212,14 +206,14 @@ public class Circle extends JPanel{
 		return new Vector(c.x1 - x1, c.y1 - y1);
 	}
 
-	@Override
 	/** Returns a string representation of this circle */
+	@Override
 	public String toString(){
 		return "("+ (getX1()-getDiameter()/2) + "," + (getY1()-getDiameter()/2) + ") , d=" + getDiameter() + " " + represents.getMappedName();
 	}
 
-	@Override
 	/**Draws the Circle when the component is painted*/
+	@Override
 	public void paintComponent(Graphics g) {
 		super.paintComponent(g);
 		Graphics2D g2d = (Graphics2D)g;
@@ -248,8 +242,8 @@ public class Circle extends JPanel{
 
 	}
 
+	/** Returns a bounding square (of size diameter * diameter) of the circle */
 	@Override
-	/** Returns the size of the circle */
 	public Dimension getPreferredSize(){
 		return new Dimension(getDiameter(), getDiameter());
 	}

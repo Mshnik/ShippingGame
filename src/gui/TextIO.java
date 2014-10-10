@@ -1,19 +1,17 @@
 package gui;
 
-import java.io.BufferedReader;
-import java.io.BufferedWriter;
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.FileReader;
-import java.io.FileWriter;
-import java.io.IOException;
-import java.util.ArrayList;
+import java.io.*;
 
-
+/** Simple Util class that allows reading and writing text from/to file.
+ * @author MPatashnik 
+ */
 public class TextIO {
 	
+	/** Prevent instantiation of TextIO */
+	private TextIO(){}
+	
 	/** Write a string to a text file at the given directory.
-	 * @param f - directory, a string
+	 * @param f - a file path to write to
 	 * @param s - text to write
 	 * @throws IOException
 	 */
@@ -22,8 +20,8 @@ public class TextIO {
 	}
 
 	/** Write a string to a text file at the given directory.
-	 * @param f - directory, a file
-	 * @param s - text to write
+	 * @param f - a file to write to
+	 * @param s - text to write to the file f.
 	 * @throws IOException
 	 */
 	public static void write(File f, String s) throws IOException {
@@ -38,7 +36,7 @@ public class TextIO {
 	
 	/** Reads File f as a text file.
 	 * @param f - the File to read
-	 * @return - a String of text
+	 * @return - a String of the contents of file f, with newlines as necessary.
 	 * @throws IOException - if the file reading goes bad.
 	 */
 	public static String read(File f) throws IOException {
@@ -56,71 +54,21 @@ public class TextIO {
 		do{
 			line = br.readLine();
 			if(line != null){
-				s+=line;
+				s+="\n" + line;
 			}
 		}while(line != null);
 		
 		br.close();
-		return s;
+		return s.substring(1); //Cut off preceding newline character
 	}
 	
 	/** Reads File f as a text file.
 	 * @param f - the File to read
-	 * @return - a String[], each entry of which is a line of text in f
+	 * @return - a String array of the contents of file f, each entry of which is a line
 	 * @throws IOException - if the file reading goes bad.
 	 */
-	public static String[] readToArray(File f) throws IOException {
-		FileReader fr = null;
-		BufferedReader br = null;
-		try {
-			fr = new FileReader(f);
-			br = new BufferedReader(fr);
-		} catch (FileNotFoundException e) {
-			e.printStackTrace();
-		}
-		
-		ArrayList<String> s = new ArrayList<String>();
-		
-		while(br.ready()){
-			s.add(br.readLine());
-		}
-		
-		br.close();
-		String[] sArray = new String[s.size()];
-		sArray = s.toArray(sArray);
-		return sArray;
+	public static String[] readToArray(File f) throws IOException{
+		return read(f).split("\\n");
 	}
 	
-	/**
-	 * Take in a string and divide it into an array list of strings, broken up by the tab markers
-	 * @param line - the string to parse
-	 * @return an array of strings. Each string should have no whitespace in it.
-	 */
-	public static String[] parseToArray(String line){
-
-		ArrayList <String> asArrayList = new ArrayList <String> ();
-
-		//If the first character in the line is the tab character, skip this line. (return an empty array)
-		if( line != null ){
-
-			int newBreak = -2;
-			while ( newBreak != -1){
-
-				line = line.trim();
-				newBreak = line.indexOf('\t');
-
-				if(newBreak != -1)	
-				{
-					asArrayList.add(line.substring(0, newBreak));
-					line = line.substring(newBreak);
-				}
-				else
-					asArrayList.add(line.substring(0,line.length()));
-			}
-		}
-
-		String[] asArray = new String[asArrayList.size()];
-		asArray = asArrayList.toArray(asArray);
-		return asArray;
-	}	
 }

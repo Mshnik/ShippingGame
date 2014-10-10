@@ -30,39 +30,30 @@ import javax.swing.JRadioButtonMenuItem;
 import java.awt.Font;
 
 /** The GUI Class creates the JFrame that shows the game.
+ * The Game class and other classes in game package send updates to the gui
+ * to keep it up to date on the board state.
  * The user and the manager have no interaction with the GUI class.
  * @author MPatashnik
  *
  */
 public class GUI extends JFrame{
 
-
-	/***/
 	private static final long serialVersionUID = 2941318999657277463L;
 
-	static final int NODE_BUFFER_SIZE = Circle.DEFAULT_DIAMETER*3;
-
-	static final int MAX_NEIGHBOR_DISTANCE = Circle.DEFAULT_DIAMETER * 5;
-
-	/** The color for menu items when they are not active */
-	public static final Color INACTIVE_COLOR = Color.GRAY;
-
-	/** The color for menu items when they are active */
-	public static final Color ACTIVE_COLOR = Color.BLACK;
-
+	/** The default size of the GUI */
 	public static final Dimension MAIN_WINDOW_SIZE = new Dimension(1000, 800);
 
-	private GUI self;
-	private Game game;
+	private GUI self;			//A reference to this, for use in anonymous inner classes
+	private Game game;			//The game this gui draws
 
-	private JPanel drawingPanel;
+	private JPanel drawingPanel; //The main panel on which the board is drawn
 
-	private JLabel lblUpdate;
-	private JLabel lblScore;
-	private JMenuBar menuBar;
-	private JMenuItem mntmReset;
+	private JLabel lblUpdate;    //The label that shows the game update string
+	private JLabel lblScore;     //The label that paints scores
+	private JMenuBar menuBar;    //The menu bar at the top of the gui
+	private JMenuItem mntmReset; //The button that resets the game
 
-	/** GUI constructor. Creates a window to show a game */
+	/** GUI constructor. Creates a window to show a game {@code g} */
 	public GUI(Game g) {
 		self = this;
 
@@ -268,7 +259,8 @@ public class GUI extends JFrame{
 		return r;
 	}
 
-	/** Draws all elements of the game on the threads. Used when the game is started */
+	/** Draws all elements of the game in the drawingPanel. Called as part of
+	 * GUI construction, and whenever a new game is loaded */
 	private void drawMap(){
 		//Put nodes on map
 		for(Node n : game.getBoard().getNodes()){
@@ -330,12 +322,12 @@ public class GUI extends JFrame{
 		repaint();
 	}
 
-	/** Sets the game to Game g */
+	/** Sets the game to Game {@code g} and redraws the map */
 	private void setGame(Game g){
 		game = g;
 		game.setGUI(this);
-		drawMap();
 		game.getBoard().updateMinMaxLength();
+		drawMap();
 	}
 
 	/** Returns the panel that the map is drawn on */
@@ -370,7 +362,7 @@ public class GUI extends JFrame{
 	private static final int MESSAGE_DELETE_TIME = 3000; 
 
 	/** The timer thread to clear the update message after a few seconds */
-	private static Thread messageClearer;
+	private Thread messageClearer;
 
 	/** Updates the GUI to show the given String as an update message.
 	 * Also starts a timer thread to delete the message after a few seconds. */
