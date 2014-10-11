@@ -2,6 +2,7 @@ package gui;
 import game.Edge;
 import game.Board;
 import game.BoardElement;
+import game.Vector;
 
 import java.awt.BasicStroke;
 import java.awt.Color;
@@ -204,10 +205,20 @@ public class Line  extends JPanel{
 	public double distanceTo(Point p){
 		return Line2D.ptLineDist(c1.getX1(), c1.getY1(), c2.getX1(), c2.getY1(), p.getX(), p.getY());
 	}
+	
+	/** Returns the angle between this line and line l, in radians.
+	 * Return is in the range [0 .. PI]
+	 */
+	public double radAngle(Line l){
+		Vector v = new Vector(getX2() - getX1(), getY2() - getY1());
+		Vector v2 = new Vector(l.getX2() - l.getX1(), l.getY2() - l.getY1());
+		return Vector.radAngle(v, v2);
+	}
 
-	/** Returns true if Line l intersects this line */
+	/** Returns true if Line l intersects this line. Returns false if they share an endpoint though. */
 	public boolean intersects(Line l){
-		return Line2D.linesIntersect(c1.getX1(), c1.getY1(), c2.getX1(), c2.getY1(), l.getX1(), l.getY1(), l.getX2(), l.getY2());
+		return c1 != l.getC1() && c2 != l.getC2() && c2 != l.getC1() && c2 != l.getC2() &&
+				Line2D.linesIntersect(c1.getX1(), c1.getY1(), c2.getX1(), c2.getY1(), l.getX1(), l.getY1(), l.getX2(), l.getY2());
 	}
 
 	/** Returns a String representation of this line */
@@ -215,7 +226,6 @@ public class Line  extends JPanel{
 	public String toString(){
 		return "(" + c1.getX1() +"," + c1.getY1() + "), (" + c2.getX1() + "," + c2.getY1() + ")";
 	}
-
 	
 	/** Paints this line */
 	@Override

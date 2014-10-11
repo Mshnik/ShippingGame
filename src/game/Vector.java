@@ -69,6 +69,21 @@ public class Vector {
 		return this;
 	}
 	
+	/** Returns the dot product of the two given vectors */
+	public static double dot(Vector a, Vector b){
+		return a.x * b.x + a.y * b.y;
+	}
+	
+	/** Returns the dot product of this and the vector other */
+	public double dot(Vector other){
+		return dot(this, other);
+	}
+	
+	/** Returns the length of the given vector */
+	public static double length(Vector a){
+		return a.length();
+	}
+	
 	/** Returns the length of this vector */
 	public double length(){
 		return Math.sqrt(Math.pow(x, 2) + Math.pow(y, 2));
@@ -79,14 +94,41 @@ public class Vector {
 		return length();
 	}
 	
+	/** Returns the distance between the two input vectors */
+	public static double distance(Vector a, Vector b){
+		return Point.distance(a.x, a.y, b.x, b.y);
+	}
+	
 	/** Returns the distance between this vector and that vector */
 	public double distance(Vector there){
-		return Point.distance(x, y, there.x, there.y);
+		return distance(this, there);
 	}
 	
 	/** Returns a new vector from this to there */
 	public Vector to(Vector there){
 		return new Vector(there.x - x, there.y - y);
+	}
+	
+	/** Returns the cosine of the angle between a and b */
+	public static double cos(Vector a, Vector b){
+		return dot(a,b)/(a.length()*b.length());
+	}
+	
+	/** Returns the cosine of the angle between this and vector other */
+	public double cos(Vector other){
+		return cos(this, other);
+	}
+	
+	/** Returns the angle between a and b, in radians.
+	 * Return is in the range [0.. PI] */
+	public static double radAngle(Vector a, Vector b){
+		return Math.acos(cos(a,b));
+	}
+	
+	/** Returns the angle between this and other, in radians.
+	 * Return is in the range [0 .. PI] */
+	public double radAngle(Vector other){
+		return radAngle(this, other);
 	}
 
 	/** Returns a simple string representation of this vector */
