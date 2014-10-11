@@ -426,14 +426,14 @@ public class Board implements JSONString{
 	private static final int MIN_EDGE_LENGTH = 15;
 	private static final int MAX_EDGE_LENGTH = 100;
 
-	private static final int WIDTH = GUI.MAIN_WINDOW_SIZE.width;
-	private static final int HEIGHT = GUI.MAIN_WINDOW_SIZE.height;
+	private static final int WIDTH = GUI.DRAWING_BOARD_WIDTH - Circle.DEFAULT_DIAMETER * 2;
+	private static final int HEIGHT = GUI.DRAWING_BOARD_HEIGHT - Circle.DEFAULT_DIAMETER * 2;
 
 	private static final int MIN_TRUCKS = 1;
-	private static final int MAX_TRUCKS = 1;
+	private static final int MAX_TRUCKS = 5;
 
 	private static final int MIN_PARCELS = 3;
-	private static final int MAX_PARCELS = 10;
+	private static final int MAX_PARCELS = 50;
 
 	private static final int WAIT_COST_MIN = 1;
 	private static final int WAIT_COST_MAX = 3;
@@ -492,50 +492,16 @@ public class Board implements JSONString{
 			if(i == 0){
 				name = Board.TRUCK_HOME_NAME;
 			} else{
-				name = cities.remove((int)(Math.random()*cities.size()));
+				name = cities.remove(r.nextInt(cities.size()));
 			}
 			Node n = new Node(this, name, null);
 			Circle c = n.getCircle();
-			c.setX1(r.nextInt(WIDTH + 1));
-			c.setY1(r.nextInt(HEIGHT + 1));
+			c.setX1(r.nextInt(WIDTH + 1) + Circle.DEFAULT_DIAMETER);
+			c.setY1(r.nextInt(HEIGHT + 1) + Circle.DEFAULT_DIAMETER);
 			getNodes().add(n);
 			if(n.name.equals(Board.TRUCK_HOME_NAME)){
 				setTruckHome(n);
 			}
-		}
-		//Add intial edges, make sure every node has degree at least 2.
-		//Do this by connecting every edge in order, creating an outer loop
-		Iterator<Node> i1 = getNodes().iterator();
-		Iterator<Node> i2 = getNodes().iterator();
-		Node first = i2.next(); //First node in collection
-		while(i2.hasNext()){
-			Node from = i1.next();
-			Node to = i2.next();
-			int length = r.nextInt(MAX_EDGE_LENGTH - MIN_EDGE_LENGTH + 1) + MIN_EDGE_LENGTH;
-			Edge e = new Edge(this, from, to, length);
-			getEdges().add(e);
-			from.addExit(e);
-			to.addExit(e);
-		}
-		//Add final edge connecting the circle
-		Node last = i1.next();
-		Edge e = new Edge(this, last, first, r.nextInt(MAX_EDGE_LENGTH - MIN_EDGE_LENGTH + 1) + MIN_EDGE_LENGTH);
-		getEdges().add(e);
-		first.addExit(e);
-		last.addExit(e);
-
-		//Add edges to the board to satisfy the average degree constraint
-		while (getEdges().size() < (getNodes().size()*AVERAGE_DEGREE)/2){
-			Node from = randomElement(getNodes(), r);
-			Node to = from;
-			while (from == to || from.isConnectedTo(to)){
-				from = randomElement(getNodes(), r);
-			}
-			int length = r.nextInt(MAX_EDGE_LENGTH - MIN_EDGE_LENGTH + 1) + MIN_EDGE_LENGTH;
-			e = new Edge(this, from, to, length);
-			getEdges().add(e);
-			from.addExit(e);
-			to.addExit(e);
 		}
 
 		//Add trucks
@@ -559,6 +525,41 @@ public class Board implements JSONString{
 			try {
 				start.addParcel(p);
 			} catch (InterruptedException e1) {}
+		}
+		
+		//Add initial edges, make sure every node has degree at least 2.
+		//Do this by connecting every edge in order, creating an outer loop
+		Iterator<Node> i1 = getNodes().iterator();
+		Iterator<Node> i2 = getNodes().iterator();
+		Node first = i2.next(); //First node in collection
+		while(i2.hasNext()){
+			Node from = i1.next();
+			Node to = i2.next();
+			int length = r.nextInt(MAX_EDGE_LENGTH - MIN_EDGE_LENGTH + 1) + MIN_EDGE_LENGTH;
+			Edge e = new Edge(this, from, to, length);
+			getEdges().add(e);
+			from.addExit(e);
+			to.addExit(e);
+		}
+		//Add final edge connecting the circle
+		Node last = i1.next();
+		Edge e = new Edge(this, last, first, r.nextInt(MAX_EDGE_LENGTH - MIN_EDGE_LENGTH + 1) + MIN_EDGE_LENGTH);
+		getEdges().add(e);
+		first.addExit(e);
+		last.addExit(e);
+		
+		//Add edges to the board to satisfy the average degree constraint
+		while (getEdges().size() < (getNodes().size()*AVERAGE_DEGREE)/2){
+			Node from = randomElement(getNodes(), r);
+			Node to = from;
+			while (from == to || from.isConnectedTo(to)){
+				from = randomElement(getNodes(), r);
+			}
+			int length = r.nextInt(MAX_EDGE_LENGTH - MIN_EDGE_LENGTH + 1) + MIN_EDGE_LENGTH;
+			e = new Edge(this, from, to, length);
+			getEdges().add(e);
+			from.addExit(e);
+			to.addExit(e);
 		}
 		updateMinMaxLength();
 	}

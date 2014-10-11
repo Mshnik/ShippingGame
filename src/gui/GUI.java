@@ -40,8 +40,11 @@ public class GUI extends JFrame{
 
 	private static final long serialVersionUID = 2941318999657277463L;
 
+	public static final int DRAWING_BOARD_WIDTH = 1000;
+	public static final int DRAWING_BOARD_HEIGHT = 600;
+	
 	/** The default size of the GUI */
-	public static final Dimension MAIN_WINDOW_SIZE = new Dimension(1000, 800);
+	private static final Dimension MAIN_WINDOW_SIZE = new Dimension(DRAWING_BOARD_WIDTH, DRAWING_BOARD_HEIGHT + 200);
 
 	private GUI self;			//A reference to this, for use in anonymous inner classes
 	private Game game;			//The game this gui draws
@@ -65,6 +68,7 @@ public class GUI extends JFrame{
 		drawingPanel.setBorder(new LineBorder(Color.BLUE));
 		drawingPanel.setBackground(Color.WHITE);
 		drawingPanel.setLayout(null);
+		
 
 		getContentPane().add(drawingPanel, BorderLayout.CENTER);
 
@@ -180,13 +184,12 @@ public class GUI extends JFrame{
 						s = JOptionPane.showInputDialog(null, "Enter seed for random game (any long)");
 						returnVal = Long.parseLong(s);
 					}catch(NumberFormatException e){
-						System.out.println(s);
 					}
 				}
 				if(s == null){
 					return;
 				}
-				System.out.println("Generating game with seed " + returnVal);
+				//System.out.println("Generating game with seed " + returnVal);
 				Game oldGame =  game;
 				game = new Game(oldGame.getManagerClassname(), returnVal);
 				game.setGUI(self);
