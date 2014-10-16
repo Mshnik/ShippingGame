@@ -2,8 +2,9 @@ package game;
 import gui.Line;
 
 import java.awt.Color;
+import java.util.Collections;
 import java.util.HashMap;
-import java.util.concurrent.Semaphore;
+import java.util.Map;
 
 /** The Edge Class in ShippingGame allows creation of the connections between Nodes that Trucks can travel along.
  * Each Edge is bidirectional and is connected to exactly two Nodes. 
@@ -31,9 +32,7 @@ public class Edge implements BoardElement{
 	/** Returns the length (weight) of this Edge. Uncorrelated with its graphical length on the GUI */
 	public final int length;		
 
-	private Semaphore truckLock; //Lock that trucks must acquire in order to make changes to this edge.
-
-	private HashMap<Truck, Boolean> truckHere; //Maps truck -> is here
+	private Map<Truck, Boolean> truckHere; //Maps truck -> is here
 	
 	private Object userData; //User data (if any) stored in this edge
 
@@ -68,8 +67,7 @@ public class Edge implements BoardElement{
 		setExits(e);
 		
 		board = m;
-		truckLock = new Semaphore(1);
-		truckHere = new HashMap<Truck, Boolean>();
+		truckHere = Collections.synchronizedMap(new HashMap<Truck, Boolean>());
 
 		if(lengthOfRoad <= 0)
 			throw new IllegalArgumentException("lengthOfRoad value " + lengthOfRoad + " is an illegal value.");
@@ -234,10 +232,8 @@ public class Edge implements BoardElement{
 
 	/** Tells the node if a Truck is currently on it or not. 
 	 * Gets its truckLock to prevent Truck thread collision */
-	protected void setTruckHere(Truck t, Boolean isHere) throws InterruptedException{
-		truckLock.acquire();
+	protected void setTruckHere(Truck t, Boolean isHere){
 		truckHere.put(t, isHere);
-		truckLock.release();
 	}
 
 	/** Returns a String to print when this object is drawn on a GUI */
@@ -258,36 +254,19 @@ public class Edge implements BoardElement{
 		return line.getYMid() - line.getY1() + Line.LINE_THICKNESS*3;
 	}
 
-	/** Returns true if the given truck is currently traveling this edge, false otherwise.
-	 * Also returns false if the calling thread is interrupted. */
+	/** Returns true if the given truck is currently traveling this edge, false otherwise. */
 	@Override
 	public boolean isTruckHere(Truck t){
-		try {
-			truckLock.acquire();
-		} catch (InterruptedException e) {
-			return false;
-		}
-		Boolean b = truckHere.get(t);
-		if(b == null)
-			b = false;
-		truckLock.release();
-		return b;
+		return truckHere.get(t);
 	}
 	
-	/** Returns the number of trucks here - currently traveling this edge.
-	 * Returns -1 if the calling thread is interrupted */
+	/** Returns the number of trucks here - currently traveling this edge. */
 	@Override
 	public int trucksHere(){
-		try {
-			truckLock.acquire();
-		} catch (InterruptedException e) {
-			return -1;
-		}
 		int i = 0;
 		for(Boolean b : truckHere.values()){
 			if(b) i++;
 		}
-		truckLock.release();
 		return i;
 	}
 

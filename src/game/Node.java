@@ -4,9 +4,10 @@ import gui.DraggableCircle;
 
 import java.awt.Color;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.concurrent.Semaphore;
+import java.util.Set;
 
 
 /** A Node (vertex) on the board of the game.
@@ -24,17 +25,13 @@ public class Node implements BoardElement{
 
 	private final Board board;		//The board this Node is contained in
 	
-	protected Semaphore parcelLock;   //Threads need to get this to view/edit parcels at this node
-									  //Protected to allow truck class to lock this before altering parcels
-	private Semaphore truckLock; //Lock that trucks must acquire in order to make changes to this edge.
-
 	private HashMap<Truck, Boolean> truckHere; //Maps truck -> is here
 
 	/** The name of this node. Set during construction */
 	public final String name;
-	private HashSet<Edge> exits = new HashSet<Edge>();			//Edges leaving this Node
-	private HashSet<Parcel> parcels = new HashSet<Parcel>();	//Parcels currently here and not on truck
-
+	private Set<Edge> exits; 				//Edges leaving this Node
+	private Set<Parcel> parcels; 		//Parcels currently here and not on truck
+	
 	private Object userData;
 
 	private Circle circle;	//Circle that represents this graphically
@@ -52,11 +49,9 @@ public class Node implements BoardElement{
 	 * @param name - the name of this Node
 	 * @param exits - the exits of this node
 	 */
-	protected Node(Board m, String name, DraggableCircle c, Collection<Edge> exits){
+	protected Node(Board m, String name, DraggableCircle c, Set<Edge> exits){
 		board = m;
 		this.name = name;
-		if(exits != null)
-			this.exits.addAll(exits);
 
 		if(c == null)
 			circle = new DraggableCircle(this, 0, 0, Circle.DEFAULT_DIAMETER);
@@ -65,8 +60,12 @@ public class Node implements BoardElement{
 
 		truckHere = new HashMap<Truck, Boolean>();
 
-		parcelLock = new Semaphore(1);
-		truckLock = new Semaphore(1);
+		if(exits !=  null){
+			this.exits = Collections.synchronizedSet(exits);
+		} else{
+			this.exits = Collections.synchronizedSet(new HashSet<Edge>());
+		}
+		parcels = Collections.synchronizedSet(new HashSet<Parcel>());
 	}
 
 	/** Returns the board this Node belongs to */
@@ -75,7 +74,7 @@ public class Node implements BoardElement{
 	}
 
 	/** Returns the exits of this Node */
-	protected HashSet<Edge> getTrueExits(){
+	protected Set<Edge> getTrueExits(){
 		return exits;
 	}
 
@@ -90,7 +89,7 @@ public class Node implements BoardElement{
 
 	/** Returns a random exit from exits */
 	public Edge getRandomExit(){
-		return Main.randomElement(exits, null);
+		return Main.randomElement(exits);
 	}
 
 	/** Sets the value of exits to newExits */
@@ -124,59 +123,37 @@ public class Node implements BoardElement{
 		return exits.contains(r);
 	}
 
-	/** Adds Parcel p to parcels on this Node 
-	 * @throws InterruptedException - if this is interrupted while locking */
-	protected void addParcel(Parcel p) throws InterruptedException{
-		parcelLock.acquire();
+	/** Adds Parcel p to parcels on this Node  */
+	protected void addParcel(Parcel p){
 		board.getParcels().add(p);
 		parcels.add(p);
-		parcelLock.release();
 	}
 
-	/** Removes parcel p from parcels 
-	 * @throws InterruptedException - if this is interrupted while locking */
-	protected void removeParcel(Parcel p) throws InterruptedException{
-		parcelLock.acquire();
+	/** Removes parcel p from parcels  */
+	protected void removeParcel(Parcel p){
 		parcels.remove(p);
-		parcelLock.release();
 	}
 
 	/** Returns the parcels located this Node, not held by any truck */
-	protected HashSet<Parcel> getTrueParcels(){
+	protected Set<Parcel> getTrueParcels(){
 		return parcels;
 	}
 
-	/** Returns a copy of the HashSet containing the present parcels to prevent its editing 
-	 * Returns null if the calling thread is interrupted while locking */
+	/** Returns a copy of the HashSet containing the present parcels to prevent its editing */
 	public HashSet<Parcel> getParcels(){
-		try {
-			parcelLock.acquire();
-		} catch (InterruptedException e) {
-			return null;
-		}
 		HashSet<Parcel> parcelClone = new HashSet<Parcel>();
 		parcelClone.addAll(parcels);
-		parcelLock.release();
 		return parcelClone;
 	}
 
-	/** Returns a random parcel at this node. 
-	 * Returns null if the calling thread is interrupted while locking*/
+	/** Returns a random parcel at this node.*/
 	public Parcel getRandomParcel(){
-		return Main.randomElement(parcels, parcelLock);
+		return Main.randomElement(parcels);
 	}
 
-	/** Returns true if parcel p is on this node, false otherwise 
-	 * Returns false if the calling thread is interrupted while locking */
+	/** Returns true if parcel p is on this node, false otherwise */
 	public boolean isParcelHere(Parcel p){
-		try {
-			parcelLock.acquire();
-		} catch (InterruptedException e) {
-			return false;
-		}
-		boolean isHere = parcels.contains(p);
-		parcelLock.release();
-		return isHere;
+		return parcels.contains(p);
 	}
 
 	/** Creates a new Edge with length length and adds it as an exit
@@ -239,11 +216,9 @@ public class Node implements BoardElement{
 		circle = c;
 	}
 
-	/** Tells the node if a Truck is currently on it or not. Gets its truckLock to prevent Truck thread collision */
-	protected void setTruckHere(Truck t, Boolean isHere) throws InterruptedException{
-		truckLock.acquire();
+	/** Tells the node if a Truck is currently on it or not.*/
+	protected void setTruckHere(Truck t, Boolean isHere){
 		truckHere.put(t, isHere);
-		truckLock.release();
 	}
 
 	/** Updates the circle graphic that represents this truck on the GUI.
@@ -289,36 +264,19 @@ public class Node implements BoardElement{
 		return name.hashCode();
 	}
 
-	/** Returns true if a truck is currently at this node, false otherwise.
-	 * Returns false if the calling thread is interrupted */
+	/** Returns true if a truck is currently at this node, false otherwise. */
 	@Override
 	public boolean isTruckHere(Truck t){
-		try {
-			truckLock.acquire();
-		} catch (InterruptedException e) {
-			return false;
-		}
-		Boolean b = truckHere.get(t);
-		if(b == null)
-			b = false;
-		truckLock.release();
-		return b;
+		return truckHere.get(t);
 	}
 
-	/** Returns the number of trucks here
-	 * Returns -1 if the calling thread is interrupted */
+	/** Returns the number of trucks here */
 	@Override
 	public int trucksHere(){
-		try {
-			truckLock.acquire();
-		} catch (InterruptedException e) {
-			return -1;
-		}
 		int i = 0;
 		for(Boolean b : truckHere.values()){
 			if(b) i++;
 		}
-		truckLock.release();
 		return i;
 	}
 

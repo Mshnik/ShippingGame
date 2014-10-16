@@ -114,21 +114,13 @@ public class Main {
 		return "\"" + s + "\"";
 	}
 	
-	/** Returns a random element of the given collection. Locks lock before doing processing.
-	 * If lock is null, doesn't do any locking. Returns null if calling thread is interrupted during locking. */
-	public static <T> T randomElement(Collection<T> elms, Semaphore lock){
-		if(lock != null)
-			try {
-				lock.acquire();
-			} catch (InterruptedException e) {
-				return null;
-			}
+	/** Returns a random element of the given collection.*/
+	public static <T> T randomElement(Collection<T> elms){
 		Iterator<T> it = elms.iterator();
 		T val = null;
 		for(int i = 0; i < (int)(Math.random() * elms.size()) + 1; i++){
 			val = it.next();
 		}
-		if(lock != null) lock.release();
 		return val;
 	}
 	

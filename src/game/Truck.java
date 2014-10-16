@@ -2,9 +2,9 @@ package game;
 import gui.Circle;
 
 import java.awt.Color;
+import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Queue;
 import java.util.concurrent.Semaphore;
 
 /** The Truck class is a runnable object that represents a single Truck in the game.
@@ -54,7 +54,7 @@ public class Truck implements BoardElement, Runnable{
 	private Circle circle;			//The circle that represents this Graphically
 	private Color color;			//The color of this truck
 
-	private Queue<Edge> travel; 	//This truck's queue of travel directions, FIFO.
+	private List<Edge> travel; 	//This truck's queue of travel directions, FIFO.
 
 	private Parcel load;			//The Parcel (if any) this truck is currently holding
 	private Node location;			//The Node this truck is currently at
@@ -72,7 +72,6 @@ public class Truck implements BoardElement, Runnable{
 	//Lock should be released before any notifications are fired.
 	private Semaphore statusLock; 	//A Lock for the status of this truck.
 	private Semaphore parcelLock;	//A Lock for the parcel this truck is carrying
-	private Semaphore travelLock;	//A Lock for editing/accessing the travel queue.
 
 	private Object userData;
 
@@ -107,13 +106,12 @@ public class Truck implements BoardElement, Runnable{
 		locLock = new Semaphore(1);
 		statusLock = new Semaphore(1);
 		parcelLock = new Semaphore(1);
-		travelLock = new Semaphore(1);
-
+		
 		location = start;
 		travelingTo = null;
 		goingTo = null;
 		status = Status.WAITING;
-		travel = new LinkedList<Edge>();
+		travel = Collections.synchronizedList(new LinkedList<Edge>());
 		color = c;
 		circle = new Circle(this, 0, 0, (int)((double)Circle.DEFAULT_DIAMETER * 0.8), c, false);
 
@@ -422,10 +420,8 @@ public class Truck implements BoardElement, Runnable{
 		if(location.getTrueParcels().contains(p)){
 			try {
 				parcelLock.acquire();
-				location.parcelLock.acquire();
 			} catch (InterruptedException e) {
 				parcelLock.release();
-				location.parcelLock.release();
 				return;
 			}
 			location.getTrueParcels().remove(p);
@@ -437,11 +433,9 @@ public class Truck implements BoardElement, Runnable{
 				location.getTrueParcels().add(p);
 				load = null;
 				parcelLock.release();
-				location.parcelLock.release();
 				return;
 			}
 			parcelLock.release();
-			location.parcelLock.release();
 
 			getManager().getScoreObject().changeScore(getBoard().PICKUP_COST);
 			game.getManager().truckNotification(this, Manager.Notification.PICKED_UP_PARCEL);
@@ -486,18 +480,11 @@ public class Truck implements BoardElement, Runnable{
 	/** Adds the road r to this Truck's travel plans, in a fashion that prevents thread collision 
 	 * Does nothing if the thread is interrupted*/
 	public void addToTravel(Edge r){
-		try {
-			travelLock.acquire();
-		} catch (InterruptedException e) {
-			return;
-		}
-		
 		if(goingTo == null)
 			setGoingTo(r.getOther(location));
 		else
 			setGoingTo(r.getOther(goingTo));
 		travel.add(r);
-		travelLock.release();
 	}
 	
 	/** Sets the travel queue to travel the given list of edges, in order. */
@@ -528,13 +515,7 @@ public class Truck implements BoardElement, Runnable{
 	 * Returns null if the calling thread is interrupted.
 	 *  */
 	private Edge getTravel(){
-		try {
-			travelLock.acquire();
-		} catch (InterruptedException e1) {
-			return null;
-		}
-		Edge e = travel.poll();
-		travelLock.release();
+		Edge e = travel.remove(0);
 		return e;
 	}
 
@@ -543,14 +524,8 @@ public class Truck implements BoardElement, Runnable{
 	 * (The Node the Truck is currently traveling towards) 
 	 * Does nothing (doesn't clear) if the calling thread is interrupted */
 	public void clearTravel(){
-		try {
-			travelLock.acquire();
-		} catch (InterruptedException e) {
-			return;
-		}
 		setGoingTo(travelingTo);
 		travel.clear();
-		travelLock.release();
 	}
 
 	/** Tells the Truck to travel along the given edge.

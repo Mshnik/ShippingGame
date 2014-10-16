@@ -145,11 +145,7 @@ public class Board implements JSONString{
 
 				Parcel p = new Parcel(this, start, dest, c);
 				parcels.add(p);
-				try {
-					start.addParcel(p);
-				} catch (InterruptedException e) {
-					e.printStackTrace();
-				}
+				start.addParcel(p);
 			}
 		}
 		updateMinMaxLength();
@@ -157,12 +153,12 @@ public class Board implements JSONString{
 
 	/** Returns a random node in this board */
 	public Node getRandomNode(){
-		return Main.randomElement(nodes, null);
+		return Main.randomElement(nodes);
 	}
 
 	/** Returns a random edge in this board */
 	public Edge getRandomEdge(){
-		return Main.randomElement(edges, null);
+		return Main.randomElement(edges);
 	}
 
 	/** Returns a HashSet containing all the Nodes in this board. Allows addition and removal of Nodes to this board */
@@ -259,11 +255,7 @@ public class Board implements JSONString{
 			t.getManager().getScoreObject().changeScore(PAYOFF);
 
 		parcels.remove(p);
-		try {
-			n.removeParcel(p);
-		} catch (InterruptedException e) {
-			e.printStackTrace();
-		}
+		n.removeParcel(p);
 		game.getGUI().getDrawingPanel().remove(p.getCircle());
 	}
 
@@ -543,9 +535,7 @@ public class Board implements JSONString{
 			Color c = Score.COLOR[r.nextInt(Score.COLOR.length)];
 			Parcel p = new Parcel(this, start, dest, c);
 			parcels.add(p);
-			try {
-				start.addParcel(p);
-			} catch (InterruptedException e1) {}
+			start.addParcel(p);
 		}
 
 		spiderwebEdges(r);
@@ -633,7 +623,7 @@ public class Board implements JSONString{
 			iterations++;
 			if(iterations == MAX_EDGE_ITERATIONS) break;
 		}
-		
+
 		//Fix triangulation such that it's cleaner.
 		delunayTriangulate(r);
 	}
@@ -705,11 +695,11 @@ public class Board implements JSONString{
 	/** Fixes (psuedo) triangulation via the delunay method.
 	 * Alters the current edge set so that triangles are less skinny */
 	private void delunayTriangulate(Random r){
-		
+
 		final double FLIP_CONDITION = Math.PI; //Amount of radians that angle sum necessitates switch
-		
+
 		HashMap<Edge, Node[]> needsFlip = new HashMap<>(); //Edge that should be removed, mapped to its new exits
-		
+
 		for(Node n1 : getNodes()){
 			for(Edge e2 : n1.getTrueExits()){
 				Node n2 = e2.getOther(n1);
@@ -729,7 +719,7 @@ public class Board implements JSONString{
 										Edge e24 = n2.getConnect(n4);
 										Edge e34 = n3.getConnect(n4);
 										if(e2.getLine().radAngle(e24.getLine())
-											+ e3.getLine().radAngle(e34.getLine()) < FLIP_CONDITION){
+												+ e3.getLine().radAngle(e34.getLine()) < FLIP_CONDITION){
 											//Store the dividing edge as needing a flip
 											Node[] newExits = {n2, n3};
 											needsFlip.put(e4, newExits);
@@ -742,20 +732,20 @@ public class Board implements JSONString{
 				}
 			}
 		}
-		
+
 		for(Entry<Edge, Node[]> e : needsFlip.entrySet()){
 			//Remove old edge
 			getEdges().remove(e.getKey());
-			
+
 			Node oldFirst = e.getKey().getFirstExit();
 			Node oldSecond = e.getKey().getSecondExit();
-			
+
 			oldFirst.removeExit(e.getKey());
 			oldSecond.removeExit(e.getKey());
 
 			Node newFirst = e.getValue()[0];
 			Node newSecond = e.getValue()[1];
-			
+
 			//Add new edge if it doesn't cross an existing edge
 			if(! lineCrosses(newFirst, newSecond)){
 				addEdge(r, newFirst, newSecond);
