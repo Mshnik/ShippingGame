@@ -224,9 +224,10 @@ public class Board implements JSONString{
 	/** Returns true if all alive Truck in this board are currently on the TruckHome node, false otherwise 
 	 */
 	public boolean isAllTrucksHome(){
-		for(Truck t : getTrucks())
+		for(Truck t : getTrucks()){
 			if(t.getLocation() == null || ! t.getLocation().equals(getTruckHome()))
 				return false;
+		}
 
 		return true;
 	}
@@ -430,7 +431,7 @@ public class Board implements JSONString{
 	private static final int HEIGHT = GUI.DRAWING_BOARD_HEIGHT - Circle.DEFAULT_DIAMETER * 3;
 
 	private static final int MIN_TRUCKS = 2;
-	private static final int MAX_TRUCKS = 7;
+	private static final int MAX_TRUCKS = 35;
 
 	private static final int MIN_PARCELS = 10;
 	private static final int MAX_PARCELS = 100;
@@ -794,6 +795,9 @@ public class Board implements JSONString{
 
 	/** Returns a random element from the given collection using the given randomer */
 	private static <T> T randomElement(Collection<T> elms, Random r){
+		if(elms.isEmpty())
+			return null;
+		
 		Iterator<T> it = elms.iterator();
 		T val = null;
 		int rand = r.nextInt(elms.size()) + 1;

@@ -114,8 +114,11 @@ public class Main {
 		return "\"" + s + "\"";
 	}
 	
-	/** Returns a random element of the given collection.*/
+	/** Returns a random element of the given collection.
+	 * Returns null if elms is empty. */
 	public static <T> T randomElement(Collection<T> elms){
+		if(elms.isEmpty())
+			return null;
 		Iterator<T> it = elms.iterator();
 		T val = null;
 		for(int i = 0; i < (int)(Math.random() * elms.size()) + 1; i++){

@@ -14,6 +14,9 @@ public class MyManager extends Manager {
 	@Override
 	public void run() {
 		game = getGame();
+		for(Truck t : getTrucks()){
+			t.setSpeed(Truck.MAX_SPEED);
+		}
 	}
 
 	@Override
