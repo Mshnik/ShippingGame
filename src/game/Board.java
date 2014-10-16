@@ -431,7 +431,7 @@ public class Board implements JSONString{
 	private static final int HEIGHT = GUI.DRAWING_BOARD_HEIGHT - Circle.DEFAULT_DIAMETER * 3;
 
 	private static final int MIN_TRUCKS = 2;
-	private static final int MAX_TRUCKS = 35;
+	private static final int MAX_TRUCKS = 1000;
 
 	private static final int MIN_PARCELS = 10;
 	private static final int MAX_PARCELS = 100;
