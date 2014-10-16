@@ -11,13 +11,11 @@ import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashSet;
 import java.util.Iterator;
-import java.util.LinkedList;
 import java.util.Random;
 
 import org.json.JSONArray;
@@ -548,9 +546,6 @@ public class Board implements JSONString{
 			} catch (InterruptedException e1) {}
 		}
 
-		//addRandomEdges(r);
-		//addTriangularEdges(r);
-		//addGiftWrapEdges(r);
 		spiderwebEdges(r);
 		updateMinMaxLength();
 	}
@@ -567,7 +562,9 @@ public class Board implements JSONString{
 		return e;
 	}
 	
-	/** */
+	/** Creates a spiderweb of edges by creating concentric hulls,
+	 * then connecting between the hulls.
+	 * Creates a connected, planar graph */
 	private void spiderwebEdges(Random r){
 		HashSet<Node> nodes = new HashSet<Node>();
 		nodes.addAll(getNodes());
@@ -679,6 +676,7 @@ public class Board implements JSONString{
 		}
 	}
 
+	/** An instance of the XComparator for sorting nodes. No real need to instantiate another one */
 	private final static XComparator xComp = new XComparator();
 
 	/** Allows for sorting a Collection of Nodes by the x coordinate.
@@ -689,45 +687,6 @@ public class Board implements JSONString{
 			return n1.getCircle().getX1() - n2.getCircle().getX1();
 		}
 	}
-
-//	/** Totally Randomly (naively) adds edges to board. Guarantees average degree,
-//	 * but overlap likely. */
-//	private void addRandomEdges(Random r){
-//		//Add initial edges, make sure every node has degree at least 2.
-//		//Do this by connecting every edge in order, creating an outer loop
-//		Iterator<Node> i1 = getNodes().iterator();
-//		Iterator<Node> i2 = getNodes().iterator();
-//		Node first = i2.next(); //First node in collection
-//		while(i2.hasNext()){
-//			Node from = i1.next();
-//			Node to = i2.next();
-//			int length = r.nextInt(MAX_EDGE_LENGTH - MIN_EDGE_LENGTH + 1) + MIN_EDGE_LENGTH;
-//			Edge e = new Edge(this, from, to, length);
-//			getEdges().add(e);
-//			from.addExit(e);
-//			to.addExit(e);
-//		}
-//		//Add final edge connecting the circle
-//		Node last = i1.next();
-//		Edge e = new Edge(this, last, first, r.nextInt(MAX_EDGE_LENGTH - MIN_EDGE_LENGTH + 1) + MIN_EDGE_LENGTH);
-//		getEdges().add(e);
-//		first.addExit(e);
-//		last.addExit(e);
-//
-//		//Add edges to the board to satisfy the average degree constraint
-//		while (getEdges().size() < (getNodes().size()*AVERAGE_DEGREE)/2){
-//			Node from = randomElement(getNodes(), r);
-//			Node to = from;
-//			while (from == to || from.isConnectedTo(to)){
-//				from = randomElement(getNodes(), r);
-//			}
-//			int length = r.nextInt(MAX_EDGE_LENGTH - MIN_EDGE_LENGTH + 1) + MIN_EDGE_LENGTH;
-//			e = new Edge(this, from, to, length);
-//			getEdges().add(e);
-//			from.addExit(e);
-//			to.addExit(e);
-//		}
-//	}
 
 	/** Returns a random element from the given collection using the given randomer */
 	private static <T> T randomElement(Collection<T> elms, Random r){

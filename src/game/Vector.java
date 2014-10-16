@@ -1,6 +1,7 @@
 package game;
 
 import java.awt.Point;
+import java.util.Objects;
 
 /** A simple geometric vector class (a la Point) that allows doubles for its fields */
 public class Vector {
@@ -141,6 +142,26 @@ public class Vector {
 	 * Return is in the range [0 .. PI] */
 	public double radAngle(Vector other){
 		return radAngle(this, other);
+	}
+	
+	/** Hashes a vector based on its components, using the Objects.hash method. */
+	@Override
+	public int hashCode(){
+		return Objects.hash(x, y);
+	}
+	
+	/** Tolerance to consider two vector components equal */
+	public static final double TOLERANCE = 0.000001;
+	
+	/** Two vectors are equal if their components are equal.
+	 * To fix for precision, checks if components are within TOLERANCE of eachother */
+	@Override
+	public boolean equals(Object o){
+		if(! (o instanceof Vector))
+			return false;
+		
+		Vector v = (Vector)o;
+		return Math.abs(x - v.x) < TOLERANCE && Math.abs(y - v.y) < TOLERANCE;
 	}
 
 	/** Returns a simple string representation of this vector */

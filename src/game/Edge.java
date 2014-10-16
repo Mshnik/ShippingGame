@@ -209,7 +209,8 @@ public class Edge implements BoardElement{
 	}
 
 	/** An Edge's hashCode is equal to the sum of the hashCodes of its first exit and its second exit.
-	 * {@code getFirstExit().hashCode() + getSecondExit().hashCode()} */
+	 * {@code getFirstExit().hashCode() + getSecondExit().hashCode()}.
+	 * Notably this means the ordering of the exits for an edge doesn't matter for hashing */
 	@Override
 	public int hashCode(){
 		return exits[0].hashCode() + exits[1].hashCode();

@@ -270,7 +270,8 @@ public class Node implements BoardElement{
 
 	}
 
-	/** Two Nodes are equal if they have the same name */
+	/** Two Nodes are equal if they have the same name - guaranteed to be unique
+	 * within the context of a single game */
 	@Override
 	public boolean equals(Object n){
 		if(n == null)
