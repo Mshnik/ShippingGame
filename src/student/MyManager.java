@@ -21,6 +21,10 @@ public class MyManager extends Manager {
 		if(getGame().isRunning()){
 			switch(message){
 			case WAITING:
+				if(t.getLocation().equals(game.getBoard().getTruckHome()) && game.getBoard().getParcels().isEmpty()){
+					t.clearTravel();
+					break;
+				}
 				if(t.getGoingTo() == null)
 					t.addToTravel(t.getLocation().getRandomExit());
 				else

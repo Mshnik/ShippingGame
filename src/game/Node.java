@@ -24,7 +24,8 @@ public class Node implements BoardElement{
 
 	private final Board board;		//The board this Node is contained in
 	
-	private Semaphore parcelLock;   //Threads need to get this to view/edit parcels at this node
+	protected Semaphore parcelLock;   //Threads need to get this to view/edit parcels at this node
+									  //Protected to allow truck class to lock this before altering parcels
 	private Semaphore truckLock; //Lock that trucks must acquire in order to make changes to this edge.
 
 	private HashMap<Truck, Boolean> truckHere; //Maps truck -> is here

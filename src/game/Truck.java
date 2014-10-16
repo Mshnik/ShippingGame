@@ -422,7 +422,10 @@ public class Truck implements BoardElement, Runnable{
 		if(location.getTrueParcels().contains(p)){
 			try {
 				parcelLock.acquire();
+				location.parcelLock.acquire();
 			} catch (InterruptedException e) {
+				parcelLock.release();
+				location.parcelLock.release();
 				return;
 			}
 			location.getTrueParcels().remove(p);
@@ -434,9 +437,11 @@ public class Truck implements BoardElement, Runnable{
 				location.getTrueParcels().add(p);
 				load = null;
 				parcelLock.release();
+				location.parcelLock.release();
 				return;
 			}
 			parcelLock.release();
+			location.parcelLock.release();
 
 			getManager().getScoreObject().changeScore(getBoard().PICKUP_COST);
 			game.getManager().truckNotification(this, Manager.Notification.PICKED_UP_PARCEL);
