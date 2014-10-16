@@ -24,9 +24,9 @@ public class Main {
 		
 		String userManagerClass = "student."+args[0];
 		
-		Game g = new Game(userManagerClass, Game.gameFile("JSONMap1.txt"));
+		//Game g = new Game(userManagerClass, Game.gameFile("JSONMap1.txt"));
 
-		//Game g = new Game(userManagerClass, 12345678);
+		Game g = new Game(userManagerClass, 90107);
 		
 		//Add intital elements to fibCalc
 		fibCalc.add(0);

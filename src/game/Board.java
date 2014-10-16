@@ -14,8 +14,10 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
+import java.util.Map.Entry;
 import java.util.Random;
 
 import org.json.JSONArray;
@@ -428,26 +430,26 @@ public class Board implements JSONString{
 	private static final int MIN_NODES = 5;
 	private static final int MAX_NODES = 20;
 
-	//private static final double AVERAGE_DEGREE = 3;
-	private static final int MIN_EDGE_LENGTH = 15;
-	private static final int MAX_EDGE_LENGTH = 100;
+	private static final double AVERAGE_DEGREE = 2.5;
+	private static final int MIN_EDGE_LENGTH = 5;
+	private static final int MAX_EDGE_LENGTH = 70;
 
-	private static final int WIDTH = GUI.DRAWING_BOARD_WIDTH - Circle.DEFAULT_DIAMETER * 2;
-	private static final int HEIGHT = GUI.DRAWING_BOARD_HEIGHT - Circle.DEFAULT_DIAMETER * 2;
+	private static final int WIDTH = GUI.DRAWING_BOARD_WIDTH - Circle.DEFAULT_DIAMETER * 3;
+	private static final int HEIGHT = GUI.DRAWING_BOARD_HEIGHT - Circle.DEFAULT_DIAMETER * 3;
 
-	private static final int MIN_TRUCKS = 1;
-	private static final int MAX_TRUCKS = 5;
+	private static final int MIN_TRUCKS = 2;
+	private static final int MAX_TRUCKS = 7;
 
-	private static final int MIN_PARCELS = 3;
-	private static final int MAX_PARCELS = 50;
+	private static final int MIN_PARCELS = 10;
+	private static final int MAX_PARCELS = 100;
 
 	private static final int WAIT_COST_MIN = 1;
 	private static final int WAIT_COST_MAX = 3;
 
-	private static final int PICKUP_COST_MIN = 50;
+	private static final int PICKUP_COST_MIN = 0;
 	private static final int PICKUP_COST_MAX = 150;
 
-	private static final int DROPOFF_COST_MIN = 50;
+	private static final int DROPOFF_COST_MIN = 0;
 	private static final int DROPOFF_COST_MAX = 150;
 
 	private static final int PAYOFF_MIN = 3000;
@@ -506,8 +508,8 @@ public class Board implements JSONString{
 			c.setY1(-Circle.DEFAULT_DIAMETER);
 			while(c.getX1() == -Circle.DEFAULT_DIAMETER || c.getY1() == -Circle.DEFAULT_DIAMETER){
 				//Try setting to a new location
-				c.setX1(r.nextInt(WIDTH + 1) + Circle.DEFAULT_DIAMETER);
-				c.setY1(r.nextInt(HEIGHT + 1) + Circle.DEFAULT_DIAMETER);
+				c.setX1(r.nextInt(WIDTH + 1) + Circle.DEFAULT_DIAMETER * 2);
+				c.setY1(r.nextInt(HEIGHT + 1) + Circle.DEFAULT_DIAMETER * 2);
 				//Check other existing nodes. If too close, re-randomize this node's location
 				for(Node n2 : getNodes()){
 					if(n2.getCircle().getDistance(c) < Circle.BUFFER_RADUIS){
@@ -549,7 +551,7 @@ public class Board implements JSONString{
 		spiderwebEdges(r);
 		updateMinMaxLength();
 	}
-	
+
 	/** Creates an edge with a random length that connects the two given nodes,
 	 * and adds to the correct collections. Returns the created edge
 	 */
@@ -561,7 +563,10 @@ public class Board implements JSONString{
 		n2.addExit(e);
 		return e;
 	}
-	
+
+	/** Maximum number of attempts to get to average node degree */
+	private int MAX_EDGE_ITERATIONS = 1000;
+
 	/** Creates a spiderweb of edges by creating concentric hulls,
 	 * then connecting between the hulls.
 	 * Creates a connected, planar graph */
@@ -569,7 +574,7 @@ public class Board implements JSONString{
 		HashSet<Node> nodes = new HashSet<Node>();
 		nodes.addAll(getNodes());
 		ArrayList<HashSet<Node>> hulls = new ArrayList<>();
-		
+
 		//Create hulls, add edges
 		while(! nodes.isEmpty()){
 			HashSet<Node> nds = addGiftWrapEdges(r, nodes);
@@ -578,8 +583,11 @@ public class Board implements JSONString{
 				nodes.remove(n);
 			}
 		}
-		
-		//Connect layers w/ random edges
+		//At this point, there are either 2*n edges or 2*n - 1 edges, depending
+		//if the inner most hull had a polygon in it or not.
+
+		//Connect layers w/ random edges - try to connect each node to its closest on the surrounding hull
+		//Guarantees that the map is connected after this step
 		for(int i = 0; i < hulls.size() - 1; i++){
 			for(Node n : hulls.get(i+1)){
 				Node c = Collections.min(hulls.get(i), new DistanceComparator(n));
@@ -588,7 +596,46 @@ public class Board implements JSONString{
 				}
 			}
 		}
+
+		//Create a hashmap of node -> hull the node is in within hulls.
+		HashMap<Node, Integer> hullMap = new HashMap<>();
+		for(int i = 0; i < hulls.size(); i++){
+			for(Node n : hulls.get(i)){
+				hullMap.put(n,i);
+			}
+		}
+		final int maxHull = hulls.size() - 1;
+
+		int iterations = 0;
+
+		while(getEdges().size() < getNodes().size() * AVERAGE_DEGREE){
+			//Get random node
+			Node n = randomElement(getNodes(), r);
+			int hull = hullMap.get(n);
+			//Try to connect to a node on the hull beyond this one.
+			if(hull < maxHull){
+				for(Node c : hulls.get(hull + 1)){
+					if(! lineCrosses(n,c) && ! n.isConnectedTo(c)){
+						addEdge(r,n,c);
+						break;
+					}
+				}
+			}
+			//Try to connect to a node on the hull outside this one
+			if(hull > 0){
+				for(Node c : hulls.get(hull - 1)){
+					if(! lineCrosses(n,c) && ! n.isConnectedTo(c)){
+						addEdge(r,n,c);
+						break;
+					}
+				}
+			}
+			iterations++;
+			if(iterations == MAX_EDGE_ITERATIONS) break;
+		}
 		
+		//Fix triangulation such that it's cleaner.
+		delunayTriangulate(r);
 	}
 
 	/** Gift wraps the nodes - creates a concentric set of edges that surrounds
@@ -601,7 +648,7 @@ public class Board implements JSONString{
 			addedNodes.add(nodes.iterator().next());
 			return addedNodes;
 		}
-		
+
 		//Base case - 2 nodes. Add the one edge connecting them and return.
 		if(nodes.size() == 2){
 			Iterator<Node> n = nodes.iterator();
@@ -612,7 +659,7 @@ public class Board implements JSONString{
 			addedNodes.add(n2);
 			return addedNodes;
 		}
-			
+
 		//Non base case - do actual gift wrapping alg
 		Node first = Collections.min(nodes, xComp);
 		Node lastHull = first;
@@ -630,11 +677,12 @@ public class Board implements JSONString{
 
 			lastHull = endpoint;
 		}while(lastHull != first);
-		
+
 		return addedNodes;
 	}
 
-	/** Returns true if e2 is left of the line start -> e1, false otherwise */
+	/** Returns true if e2 is left of the line start -> e1, false otherwise.
+	 * Helper for giftwrapping method */
 	private boolean isLeftOfLine(Node start, Node e1, Node e2){
 		Vector a = start.getCircle().getVectorTo(e1.getCircle());
 		Vector b = start.getCircle().getVectorTo(e2.getCircle());
@@ -642,7 +690,8 @@ public class Board implements JSONString{
 	}
 
 	/** Returns true if the line that would be formed by connecting the two given nodes
-	 * crosses an existing edge, false otherwise
+	 * crosses an existing edge, false otherwise.
+	 * Helper for giftwrappign and spiderwebbing methods
 	 */
 	private boolean lineCrosses(Node n1, Node n2){
 		Line l = new Line(n1.getCircle(), n2.getCircle(), null);
@@ -651,6 +700,71 @@ public class Board implements JSONString{
 				return true;
 		}
 		return false;
+	}
+
+	/** Fixes (psuedo) triangulation via the delunay method.
+	 * Alters the current edge set so that triangles are less skinny */
+	private void delunayTriangulate(Random r){
+		
+		final double FLIP_CONDITION = Math.PI; //Amount of radians that angle sum necessitates switch
+		
+		HashMap<Edge, Node[]> needsFlip = new HashMap<>(); //Edge that should be removed, mapped to its new exits
+		
+		for(Node n1 : getNodes()){
+			for(Edge e2 : n1.getTrueExits()){
+				Node n2 = e2.getOther(n1);
+				if(n2 != n1){
+					for(Edge e3 : n1.getTrueExits()){
+						Node n3 = e3.getOther(n1);
+						if(n3 != n2 && n3 != n1){
+							for(Edge e4 : n1.getTrueExits()){
+								Node n4 = e4.getOther(n1);
+								if(n4 != n3 && n4 != n2 && n4 != n1){
+									//Check all triangulated quads - n1 connected to n2, n3, n4; n2 and n3 each connected to n4.
+									//We already know that n1 is connected to n2, n3, n4.
+									//Check other part of condition.
+									if(n2.isConnectedTo(n4) && n3.isConnectedTo(n4)){
+										//This is a pair of adjacent triangles. 
+										//Check angles to see if flip should be made
+										Edge e24 = n2.getConnect(n4);
+										Edge e34 = n3.getConnect(n4);
+										if(e2.getLine().radAngle(e24.getLine())
+											+ e3.getLine().radAngle(e34.getLine()) < FLIP_CONDITION){
+											//Store the dividing edge as needing a flip
+											Node[] newExits = {n2, n3};
+											needsFlip.put(e4, newExits);
+										}
+									}
+								}
+							}
+						}
+					}
+				}
+			}
+		}
+		
+		for(Entry<Edge, Node[]> e : needsFlip.entrySet()){
+			//Remove old edge
+			getEdges().remove(e.getKey());
+			
+			Node oldFirst = e.getKey().getFirstExit();
+			Node oldSecond = e.getKey().getSecondExit();
+			
+			oldFirst.removeExit(e.getKey());
+			oldSecond.removeExit(e.getKey());
+
+			Node newFirst = e.getValue()[0];
+			Node newSecond = e.getValue()[1];
+			
+			//Add new edge if it doesn't cross an existing edge
+			if(! lineCrosses(newFirst, newSecond)){
+				addEdge(r, newFirst, newSecond);
+			}
+			//Otherwise, put old edge back
+			else{
+				addEdge(r, oldFirst, oldSecond);
+			}
+		}
 	}
 
 	/** Allows for sorting of Collections of Nodes by their gui distance to
