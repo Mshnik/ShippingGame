@@ -75,7 +75,7 @@ public class Edge implements BoardElement{
 			throw new IllegalArgumentException("lengthOfRoad value " + lengthOfRoad + " is an illegal value.");
 		
 		length = lengthOfRoad;
-		line = new Line(null, null, this);
+		line = new Line(firstExit.getCircle(), secondExit.getCircle(), this);
 	}
 
 	/** Returns the Board this Edge belongs to. */

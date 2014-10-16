@@ -179,7 +179,7 @@ public class Node implements BoardElement{
 	}
 
 	/** Creates a new Edge with length length and adds it as an exit
-	 * to this Node and other Node.
+	 * to this Node and other Node. Also adds it to the board.
 	 * @param other the Node to connect this Node to
 	 * @param length the length of the Edge
 	 */
@@ -187,6 +187,7 @@ public class Node implements BoardElement{
 		Edge r = new Edge(board, this, other, length);
 		addExit(r);
 		other.addExit(r);
+		board.getEdges().add(r);
 	}
 
 	/** Returns false if destination.equals(this), else  

@@ -142,13 +142,16 @@ public class Line  extends JPanel{
 			color = DEFAULT_COLOR;
 			break;
 		case HIGHLIGHT_TRAVEL:
-			if(represents.trucksHere() > 0)
+			if(represents != null && represents.trucksHere() > 0)
 				color = TRAVELING_COLOR;
 			else
 				color = DEFAULT_COLOR;
 			break;
 		case DISTANCE_GRADIENT:
-			color = getDistGradientColor();
+			if(represents != null)
+				color = getDistGradientColor();
+			else
+				color = DEFAULT_COLOR;
 			break;
 		}
 
@@ -217,8 +220,9 @@ public class Line  extends JPanel{
 
 	/** Returns true if Line l intersects this line. Returns false if they share an endpoint though. */
 	public boolean intersects(Line l){
-		return c1 != l.getC1() && c2 != l.getC2() && c2 != l.getC1() && c2 != l.getC2() &&
-				Line2D.linesIntersect(c1.getX1(), c1.getY1(), c2.getX1(), c2.getY1(), l.getX1(), l.getY1(), l.getX2(), l.getY2());
+		return ! c1.locationEquals(l.getC1()) && ! c1.locationEquals(l.getC2()) &&
+			   ! c2.locationEquals(l.getC1()) && ! c2.locationEquals(l.getC2()) &&
+			Line2D.linesIntersect(c1.getX1(), c1.getY1(), c2.getX1(), c2.getY1(), l.getX1(), l.getY1(), l.getX2(), l.getY2());
 	}
 
 	/** Returns a String representation of this line */

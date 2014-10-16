@@ -200,6 +200,11 @@ public class Circle extends JPanel{
 	public double getDistance(Circle c){
 		return Math.sqrt( (Math.pow(x1-c.getX1(), 2) + Math.pow(y1 - c.getY1(), 2) ) );
 	}
+	
+	/** Returns true if the this circle has the same location as the circle other */
+	public boolean locationEquals(Circle o){
+		return x1 == o.x1 && y1 == o.y1;
+	}
 
 	/** Returns the vector from this circle to circle c */
 	public Vector getVectorTo(Circle c){

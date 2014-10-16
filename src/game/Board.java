@@ -2,6 +2,7 @@ package game;
 
 import gui.Circle;
 import gui.GUI;
+import gui.Line;
 
 import java.awt.Color;
 import java.io.BufferedReader;
@@ -10,9 +11,13 @@ import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashSet;
 import java.util.Iterator;
+import java.util.LinkedList;
 import java.util.Random;
 
 import org.json.JSONArray;
@@ -413,8 +418,11 @@ public class Board implements JSONString{
 	/**
 	 * Library for random board generation.
 	 * Implemented inside board class to allow construction based on these methods.
-	 * 
 	 * @author eperdew
+	 * 
+	 * Node placement and Edge connections are done using the Delaunay Triangulation Method:
+	 * http://en.wikipedia.org/wiki/Delaunay_triangulation 
+	 * 
 	 * @author MPatashnik
 	 * 
 	 */
@@ -422,7 +430,7 @@ public class Board implements JSONString{
 	private static final int MIN_NODES = 5;
 	private static final int MAX_NODES = 20;
 
-	private static final double AVERAGE_DEGREE = 3;
+	//private static final double AVERAGE_DEGREE = 3;
 	private static final int MIN_EDGE_LENGTH = 15;
 	private static final int MAX_EDGE_LENGTH = 100;
 
@@ -496,8 +504,21 @@ public class Board implements JSONString{
 			}
 			Node n = new Node(this, name, null);
 			Circle c = n.getCircle();
-			c.setX1(r.nextInt(WIDTH + 1) + Circle.DEFAULT_DIAMETER);
-			c.setY1(r.nextInt(HEIGHT + 1) + Circle.DEFAULT_DIAMETER);
+			c.setX1(-Circle.DEFAULT_DIAMETER); 
+			c.setY1(-Circle.DEFAULT_DIAMETER);
+			while(c.getX1() == -Circle.DEFAULT_DIAMETER || c.getY1() == -Circle.DEFAULT_DIAMETER){
+				//Try setting to a new location
+				c.setX1(r.nextInt(WIDTH + 1) + Circle.DEFAULT_DIAMETER);
+				c.setY1(r.nextInt(HEIGHT + 1) + Circle.DEFAULT_DIAMETER);
+				//Check other existing nodes. If too close, re-randomize this node's location
+				for(Node n2 : getNodes()){
+					if(n2.getCircle().getDistance(c) < Circle.BUFFER_RADUIS){
+						c.setX1(-Circle.DEFAULT_DIAMETER);
+						c.setY1(-Circle.DEFAULT_DIAMETER);
+						break;
+					}
+				}
+			}
 			getNodes().add(n);
 			if(n.name.equals(Board.TRUCK_HOME_NAME)){
 				setTruckHome(n);
@@ -526,43 +547,187 @@ public class Board implements JSONString{
 				start.addParcel(p);
 			} catch (InterruptedException e1) {}
 		}
-		
-		//Add initial edges, make sure every node has degree at least 2.
-		//Do this by connecting every edge in order, creating an outer loop
-		Iterator<Node> i1 = getNodes().iterator();
-		Iterator<Node> i2 = getNodes().iterator();
-		Node first = i2.next(); //First node in collection
-		while(i2.hasNext()){
-			Node from = i1.next();
-			Node to = i2.next();
-			int length = r.nextInt(MAX_EDGE_LENGTH - MIN_EDGE_LENGTH + 1) + MIN_EDGE_LENGTH;
-			Edge e = new Edge(this, from, to, length);
-			getEdges().add(e);
-			from.addExit(e);
-			to.addExit(e);
-		}
-		//Add final edge connecting the circle
-		Node last = i1.next();
-		Edge e = new Edge(this, last, first, r.nextInt(MAX_EDGE_LENGTH - MIN_EDGE_LENGTH + 1) + MIN_EDGE_LENGTH);
-		getEdges().add(e);
-		first.addExit(e);
-		last.addExit(e);
-		
-		//Add edges to the board to satisfy the average degree constraint
-		while (getEdges().size() < (getNodes().size()*AVERAGE_DEGREE)/2){
-			Node from = randomElement(getNodes(), r);
-			Node to = from;
-			while (from == to || from.isConnectedTo(to)){
-				from = randomElement(getNodes(), r);
-			}
-			int length = r.nextInt(MAX_EDGE_LENGTH - MIN_EDGE_LENGTH + 1) + MIN_EDGE_LENGTH;
-			e = new Edge(this, from, to, length);
-			getEdges().add(e);
-			from.addExit(e);
-			to.addExit(e);
-		}
+
+		//addRandomEdges(r);
+		//addTriangularEdges(r);
+		//addGiftWrapEdges(r);
+		spiderwebEdges(r);
 		updateMinMaxLength();
 	}
+	
+	/** Creates an edge with a random length that connects the two given nodes,
+	 * and adds to the correct collections. Returns the created edge
+	 */
+	private Edge addEdge(Random r, Node n1, Node n2){
+		int length = r.nextInt(MAX_EDGE_LENGTH - MIN_EDGE_LENGTH + 1) + MIN_EDGE_LENGTH;
+		Edge e = new Edge(this, n1, n2, length);
+		getEdges().add(e);
+		n1.addExit(e);
+		n2.addExit(e);
+		return e;
+	}
+	
+	/** */
+	private void spiderwebEdges(Random r){
+		HashSet<Node> nodes = new HashSet<Node>();
+		nodes.addAll(getNodes());
+		ArrayList<HashSet<Node>> hulls = new ArrayList<>();
+		
+		//Create hulls, add edges
+		while(! nodes.isEmpty()){
+			HashSet<Node> nds = addGiftWrapEdges(r, nodes);
+			hulls.add(nds);
+			for(Node n : nds){
+				nodes.remove(n);
+			}
+		}
+		
+		//Connect layers w/ random edges
+		for(int i = 0; i < hulls.size() - 1; i++){
+			for(Node n : hulls.get(i+1)){
+				Node c = Collections.min(hulls.get(i), new DistanceComparator(n));
+				if(! lineCrosses(n, c)){
+					addEdge(r, n, c);
+				}
+			}
+		}
+		
+	}
+
+	/** Gift wraps the nodes - creates a concentric set of edges that surrounds
+	 * the set of nodes passed in, with random edge lengths.
+	 * Returns a set of nodes that is the nodes involved in the giftwrapping */
+	private HashSet<Node> addGiftWrapEdges(Random r, HashSet<Node> nodes){
+		HashSet<Node> addedNodes = new HashSet<Node>();
+		//Base case - 0 or 1 node. Nothing to do.
+		if(nodes.size() <= 1){
+			addedNodes.add(nodes.iterator().next());
+			return addedNodes;
+		}
+		
+		//Base case - 2 nodes. Add the one edge connecting them and return.
+		if(nodes.size() == 2){
+			Iterator<Node> n = nodes.iterator();
+			Node n1 = n.next();
+			Node n2 = n.next();
+			addEdge(r, n1, n2);
+			addedNodes.add(n1);
+			addedNodes.add(n2);
+			return addedNodes;
+		}
+			
+		//Non base case - do actual gift wrapping alg
+		Node first = Collections.min(nodes, xComp);
+		Node lastHull = first;
+		Node endpoint = null;
+		do{
+			for(Node n : nodes){
+				if(endpoint == null || n != lastHull && isLeftOfLine(lastHull, endpoint, n) 
+						&& ! lastHull.isConnectedTo(n)){
+					endpoint = n;
+				}
+			}
+
+			addEdge(r, lastHull, endpoint);
+			addedNodes.add(lastHull);
+
+			lastHull = endpoint;
+		}while(lastHull != first);
+		
+		return addedNodes;
+	}
+
+	/** Returns true if e2 is left of the line start -> e1, false otherwise */
+	private boolean isLeftOfLine(Node start, Node e1, Node e2){
+		Vector a = start.getCircle().getVectorTo(e1.getCircle());
+		Vector b = start.getCircle().getVectorTo(e2.getCircle());
+		return Vector.cross(a, b) <= 0;
+	}
+
+	/** Returns true if the line that would be formed by connecting the two given nodes
+	 * crosses an existing edge, false otherwise
+	 */
+	private boolean lineCrosses(Node n1, Node n2){
+		Line l = new Line(n1.getCircle(), n2.getCircle(), null);
+		for(Edge e : getEdges()){
+			if(l.intersects(e.getLine()))
+				return true;
+		}
+		return false;
+	}
+
+	/** Allows for sorting of Collections of Nodes by their gui distance to
+	 * each of the nodes in collection n.
+	 * The node that is closest in the collection to the given node is the one that counts.
+	 * @author MPatashnik
+	 *
+	 */
+	private static class DistanceComparator implements Comparator<Node> {
+		/** The node to which distance is compared */
+		protected final Node node;
+
+		@Override
+		public int compare(Node n1, Node n2){
+			double d = node.getCircle().getDistance(n1.getCircle()) - node.getCircle().getDistance(n2.getCircle());
+			if(d < 0) return -1;
+			if(d > 0) return 1;
+			return 0;
+		}
+
+		DistanceComparator(Node node){
+			this.node = node;
+		}
+	}
+
+	private final static XComparator xComp = new XComparator();
+
+	/** Allows for sorting a Collection of Nodes by the x coordinate.
+	 * No need to instantiate beyond the xcomparator instantiated above */
+	private static class XComparator implements Comparator<Node>{
+		@Override
+		public int compare(Node n1, Node n2){
+			return n1.getCircle().getX1() - n2.getCircle().getX1();
+		}
+	}
+
+//	/** Totally Randomly (naively) adds edges to board. Guarantees average degree,
+//	 * but overlap likely. */
+//	private void addRandomEdges(Random r){
+//		//Add initial edges, make sure every node has degree at least 2.
+//		//Do this by connecting every edge in order, creating an outer loop
+//		Iterator<Node> i1 = getNodes().iterator();
+//		Iterator<Node> i2 = getNodes().iterator();
+//		Node first = i2.next(); //First node in collection
+//		while(i2.hasNext()){
+//			Node from = i1.next();
+//			Node to = i2.next();
+//			int length = r.nextInt(MAX_EDGE_LENGTH - MIN_EDGE_LENGTH + 1) + MIN_EDGE_LENGTH;
+//			Edge e = new Edge(this, from, to, length);
+//			getEdges().add(e);
+//			from.addExit(e);
+//			to.addExit(e);
+//		}
+//		//Add final edge connecting the circle
+//		Node last = i1.next();
+//		Edge e = new Edge(this, last, first, r.nextInt(MAX_EDGE_LENGTH - MIN_EDGE_LENGTH + 1) + MIN_EDGE_LENGTH);
+//		getEdges().add(e);
+//		first.addExit(e);
+//		last.addExit(e);
+//
+//		//Add edges to the board to satisfy the average degree constraint
+//		while (getEdges().size() < (getNodes().size()*AVERAGE_DEGREE)/2){
+//			Node from = randomElement(getNodes(), r);
+//			Node to = from;
+//			while (from == to || from.isConnectedTo(to)){
+//				from = randomElement(getNodes(), r);
+//			}
+//			int length = r.nextInt(MAX_EDGE_LENGTH - MIN_EDGE_LENGTH + 1) + MIN_EDGE_LENGTH;
+//			e = new Edge(this, from, to, length);
+//			getEdges().add(e);
+//			from.addExit(e);
+//			to.addExit(e);
+//		}
+//	}
 
 	/** Returns a random element from the given collection using the given randomer */
 	private static <T> T randomElement(Collection<T> elms, Random r){

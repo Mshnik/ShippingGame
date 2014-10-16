@@ -79,6 +79,18 @@ public class Vector {
 		return dot(this, other);
 	}
 	
+	/** Returns the cross product of the two given vectors.
+	 * Because vectors are 2-d, the return is a vector of the form <0, 0, z>
+	 * So a 1-D vector. */
+	public static double cross(Vector a, Vector b){
+		return a.x * b.y - b.x * a.y;
+	}
+	
+	/** Returns the cross product of this and vector other */
+	public double cross(Vector other){
+		return cross(this, other);
+	}
+	
 	/** Returns the length of the given vector */
 	public static double length(Vector a){
 		return a.length();
