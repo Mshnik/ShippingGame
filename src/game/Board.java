@@ -53,9 +53,12 @@ public class Board implements JSONString{
 
 	private ArrayList<Truck> trucks; //The trucks in this board
 	private Set<Parcel> parcels; //The parcels in this board - ones that have not been delivered yet
-	
+
 	protected List<Integer> parcelCounts; //A count of [on map, on truck, delivered] parcels
-	 									  //Values are managed by parcels as they are moved
+										  //Values are managed by parcels as they are moved
+	protected static final int PARCELS_ON_MAP = 0;
+	protected static final int PARCELS_ON_TRUCK = 1;
+	protected static final int PARCELS_DELIVERED = 2;
 
 	/** The game this board is for */
 	public final Game game;
@@ -153,33 +156,33 @@ public class Board implements JSONString{
 				start.addParcel(p);
 			}
 		}
-		initParcelCounts();
+		initParcelTruckCounts();
 		updateMinMaxLength();
 	}
-	
+
 	/** Initializes the parcelCount list - call during construction */
-	private void initParcelCounts(){
+	private void initParcelTruckCounts(){
 		parcelCounts = Collections.synchronizedList(new ArrayList<Integer>(3));
 		parcelCounts.add(parcels.size());
 		parcelCounts.add(0);
 		parcelCounts.add(0);
 	}
-	
+
 	/** Returns the number of parcels on this board that are not being caried by trucks */
 	public int getOnNodeParcels(){
-		return parcelCounts.get(0);
-	}
-	
-	/** Returns the number of parcels on this board being carried by trucks */
-	public int getOnTruckParcels(){
-		return parcelCounts.get(1);
-	}
-	
-	/** Returns the number of parcels from this board that have been successfully delivered */
-	public int getDeliveredParcels(){
-		return parcelCounts.get(2);
+		return parcelCounts.get(PARCELS_ON_MAP);
 	}
 
+	/** Returns the number of parcels on this board being carried by trucks */
+	public int getOnTruckParcels(){
+		return parcelCounts.get(PARCELS_ON_TRUCK);
+	}
+
+	/** Returns the number of parcels from this board that have been successfully delivered */
+	public int getDeliveredParcels(){
+		return parcelCounts.get(PARCELS_DELIVERED);
+	}
+	
 	/** Returns a random node in this board */
 	public Node getRandomNode(){
 		return Main.randomElement(nodes);
@@ -253,12 +256,24 @@ public class Board implements JSONString{
 	/** Returns true if all alive Truck in this board are currently on the TruckHome node, false otherwise 
 	 */
 	public boolean isAllTrucksHome(){
-		for(Truck t : getTrucks()){
-			if(t.getLocation() == null || ! t.getLocation().equals(getTruckHome()))
-				return false;
-		}
+		try{
+			for(Truck t : getTrucks()){
+				if(t.getLocation() == null || ! t.getLocation().equals(getTruckHome()))
+					return false;
+			}
 
-		return true;
+			return true;
+		}catch(NullPointerException e){
+			for(Truck t : getTrucks()){
+				System.out.print(t + " : ");
+				if(t != null)
+					System.out.print(t.getLocation() + ", ");
+				if(t != null && t.getLocation() != null)
+					System.out.print(t.getLocation().equals(getTruckHome()));
+				System.out.println();
+			}
+			return false;
+		}
 	}
 
 	/** Returns the parcels in this board. Returned parcels are parcels that have not yet been delivered. */
@@ -403,7 +418,7 @@ public class Board implements JSONString{
 	 * > Parcels */
 	@Override
 	public String toJSONString() {		
-		String s = "{\n" + Main.addQuotes(SEED_TOKEN) + ":" + seed +",";
+		String s = "{\n" + Main.addQuotes(SEED_TOKEN) + ":" + seed +",\n";
 		s += Main.addQuotes(SCORE_TOKEN) + ":[" + WAIT_COST + "," 
 				+ PICKUP_COST + "," + DROPOFF_COST + "," + PAYOFF + "," + ON_COLOR_MULTIPLIER + "],";
 		int i = 0;
@@ -460,10 +475,10 @@ public class Board implements JSONString{
 	private static final int HEIGHT = GUI.DRAWING_BOARD_HEIGHT - Circle.DEFAULT_DIAMETER * 3;
 
 	private static final int MIN_TRUCKS = 2;
-	private static final int MAX_TRUCKS = 20;
+	private static final int MAX_TRUCKS = 50;
 
 	private static final int MIN_PARCELS = 10;
-	private static final int MAX_PARCELS = 1000;
+	private static final int MAX_PARCELS = 100;
 
 	private static final int WAIT_COST_MIN = 1;
 	private static final int WAIT_COST_MAX = 3;
@@ -569,7 +584,7 @@ public class Board implements JSONString{
 		}
 
 		spiderwebEdges(r);
-		initParcelCounts();
+		initParcelTruckCounts();
 		updateMinMaxLength();
 	}
 
@@ -827,7 +842,7 @@ public class Board implements JSONString{
 	private static <T> T randomElement(Collection<T> elms, Random r){
 		if(elms.isEmpty())
 			return null;
-		
+
 		Iterator<T> it = elms.iterator();
 		T val = null;
 		int rand = r.nextInt(elms.size()) + 1;
@@ -852,7 +867,8 @@ public class Board implements JSONString{
 		String line;
 		try{
 			while((line = read.readLine()) != null){
-				result.add(line);
+				if(! line.equals(""))
+					result.add(line);
 			}
 			read.close();
 		}

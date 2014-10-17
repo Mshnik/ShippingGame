@@ -27,6 +27,7 @@ public class Main {
 
 		//Game g = new Game(userManagerClass, Game.gameFile("JSONMap1.txt"));
 
+
 		Game g = new Game(userManagerClass, Math.abs((new Random()).nextLong()));
 
 		//Add intital elements to fibCalc

@@ -11,12 +11,14 @@ import javax.swing.JLabel;
 
 import java.awt.Color;
 import javax.swing.border.LineBorder;
+import javax.swing.table.DefaultTableModel;
 import javax.swing.ButtonGroup;
 import javax.swing.JFileChooser;
 import javax.swing.JMenuBar;
 import javax.swing.JMenu;
 import javax.swing.JOptionPane;
 import javax.swing.JMenuItem;
+import javax.swing.JTable;
 
 import java.awt.event.ActionListener;
 import java.awt.event.ActionEvent;
@@ -54,9 +56,7 @@ public class GUI extends JFrame{
 	private JLabel lblUpdate;    //The label that shows the game update string
 	private JLabel lblScore;     //The label that paints scores
 	
-	private JLabel lblParcelNode; //Label of parcels on nodes
-	private JLabel lblParcelTruck; //Label of parcels on trucks
-	private JLabel lblParcelDelivered; //Label of parcels that have been delivered
+	private JTable statsTable;	//Table on the side panel that holds the stats about the game 
 	
 	private JMenuBar menuBar;    //The menu bar at the top of the gui
 	private JMenuItem mntmReset; //The button that resets the game
@@ -351,38 +351,59 @@ public class GUI extends JFrame{
 	}
 	
 	private static final String margin = "    ";
-	private static final String tabOne = "  ";
+	
+	/** Row in the stats table that corresponds to parcels in cities.
+	 * Parcels on trucks is in FIRST_PARCEL_ROW + 1,
+	 * Delivered parcels is in FIRST_PARCEL_ROW + 2
+	 */
+	private static final int FIRST_PARCEL_ROW = 9;
 	
 	/** Updates the info panel to the new game that was just loaded */
 	private void updateSidePanel(){
 		sidePanel.removeAll();
 		sidePanel.add(new JLabel("  ")); //Line of space at top
 		if(game.getFile() != null)
-			sidePanel.add(new JLabel(margin + "Game from File: " + game.getFile().getName()));
+			sidePanel.add(new JLabel("Game from File: " + game.getFile().getName()));
 		else if(game.getSeed() != -1)
-			sidePanel.add(new JLabel(margin + "Game from Seed: " + game.getSeed()));
+			sidePanel.add(new JLabel("Game from Seed: " + game.getSeed()));
 		else
-			sidePanel.add(new JLabel(margin + "Custom Game"));
+			sidePanel.add(new JLabel("Custom Game"));
 		sidePanel.add(new JLabel("  "));
-		sidePanel.add(new JLabel(margin + "Basic Game Info:"));
-		sidePanel.add(new JLabel(margin + tabOne + "Cities: " + game.getBoard().getNodesSize()));
-		sidePanel.add(new JLabel(margin + tabOne + "Highways: " + game.getBoard().getEdgesSize()));
-		sidePanel.add(new JLabel(margin + tabOne + "Trucks: " + game.getBoard().getTrucks().size()));
-		sidePanel.add(new JLabel("  ")); //Line of space
-		sidePanel.add(new JLabel(margin + "Score Constants:"));
-		sidePanel.add(new JLabel(margin + tabOne + "Wait Cost:                  " + game.getBoard().WAIT_COST));
-		sidePanel.add(new JLabel(margin + tabOne + "Pickup Cost:              " + game.getBoard().PICKUP_COST));
-		sidePanel.add(new JLabel(margin + tabOne + "Dropoff Cost:            " + game.getBoard().DROPOFF_COST));
-		sidePanel.add(new JLabel(margin + tabOne + "Parcel Payoff:             " + game.getBoard().PAYOFF));
-		sidePanel.add(new JLabel(margin + tabOne + "On Color Multiplier:   " + game.getBoard().ON_COLOR_MULTIPLIER));
-		sidePanel.add(new JLabel("  "));
-		sidePanel.add(new JLabel(margin + "Parcel Counts:"));
-		lblParcelNode = new JLabel();
-		lblParcelTruck = new JLabel();
-		lblParcelDelivered = new JLabel();
-		sidePanel.add(lblParcelNode);
-		sidePanel.add(lblParcelTruck);
-		sidePanel.add(lblParcelDelivered);
+				
+		StatsTableModel basicModel = new StatsTableModel();
+		statsTable = new JTable(basicModel);		
+		basicModel.addColumn("Info");
+		basicModel.addColumn("Value");
+		basicModel.addRow(new Object[]{"Cities",game.getBoard().getNodesSize()});
+		basicModel.addRow(new Object[]{"Highways",game.getBoard().getEdgesSize()});
+		basicModel.addRow(new Object[]{"Trucks",game.getBoard().getTrucks().size()});
+		basicModel.addRow(new Object[]{"Wait Cost", game.getBoard().WAIT_COST});
+		basicModel.addRow(new Object[]{"Pickup Cost", game.getBoard().PICKUP_COST});
+		basicModel.addRow(new Object[]{"Dropoff Cost", game.getBoard().DROPOFF_COST});
+		basicModel.addRow(new Object[]{"Parcel Payoff", game.getBoard().PAYOFF});
+		basicModel.addRow(new Object[]{"On Color Multiplier", game.getBoard().ON_COLOR_MULTIPLIER});
+		basicModel.addRow(new Object[]{"",""});
+		basicModel.addRow(new Object[]{"Parcels in Cities",""});
+		basicModel.addRow(new Object[]{"Parcels on Trucks",""});
+		basicModel.addRow(new Object[]{"Parcels Delivered",""});
+		
+		//Set properties of table
+		JPanel innerPanel = new JPanel();
+		innerPanel.setLayout(new BoxLayout(innerPanel, BoxLayout.X_AXIS));
+		innerPanel.add(new JLabel(margin));
+		innerPanel.add(statsTable);
+		innerPanel.add(new JLabel(margin));
+		innerPanel.setBackground(sidePanel.getBackground());
+		sidePanel.add(innerPanel);
+		statsTable.setFont(Font.decode("asdf-14")); //System default font with size 14
+		statsTable.setBackground(sidePanel.getBackground());
+		statsTable.setEnabled(false);
+		statsTable.setShowGrid(false);
+		statsTable.setSelectionBackground(statsTable.getBackground());
+		statsTable.setSelectionForeground(statsTable.getForeground());
+		statsTable.setRowHeight(18);
+		statsTable.getColumn(statsTable.getColumnName(0)).setPreferredWidth(200);
+
 		updateParcelStats();
 	}
 
@@ -411,9 +432,10 @@ public class GUI extends JFrame{
 	
 	/** Updates the GUI to show the new parcel stats */
 	public void updateParcelStats(){
-		lblParcelNode.setText(margin + tabOne + "Parcels in Cities:          "  + game.getBoard().getOnNodeParcels());
-		lblParcelTruck.setText(margin + tabOne + "Parcels on Trucks:        " + game.getBoard().getOnTruckParcels());
-		lblParcelDelivered.setText(margin + tabOne + "Parcels Delivered:         " + game.getBoard().getDeliveredParcels());
+		StatsTableModel m = (StatsTableModel)statsTable.getModel();
+		m.setValueAt(new Integer(game.getBoard().getOnNodeParcels()), FIRST_PARCEL_ROW + 0, 1);
+		m.setValueAt(new Integer(game.getBoard().getOnTruckParcels()), FIRST_PARCEL_ROW + 1, 1);
+		m.setValueAt(new Integer(game.getBoard().getDeliveredParcels()), FIRST_PARCEL_ROW + 2, 1);
 	}
 
 	/** Returns the current update message shown on the GUI */

@@ -133,15 +133,17 @@ public class Truck implements BoardElement, Runnable{
 			while(travel.isEmpty() && game.isRunning()){
 				try{
 					Thread.sleep(WAIT_TIME);
+					preManagerNotification();
 					game.getManager().truckNotification(this, Manager.Notification.WAITING);
+					postManagerNotification();
 				}
 				catch (InterruptedException e){
 					e.printStackTrace();
 				}
 
 				setGoingTo(null);
-
 				fixLastTravelTime();
+				
 				while(!travel.isEmpty() && game.isRunning()){
 					try {
 						Edge r = getTravel();
@@ -159,6 +161,28 @@ public class Truck implements BoardElement, Runnable{
 		fixLastTravelTime();
 	}
 
+	/** Call before any manager notification - sets this as waiting for manager input */
+	private void preManagerNotification(){
+//		int status = 0;
+//		if(getStatus().equals(Status.TRAVELING)){
+//			status = 1;
+//		}
+//		game.getBoard().truckCounts.set(status, game.getBoard().truckCounts.get(status) - 1);
+//		game.getBoard().truckCounts.set(2, game.getBoard().truckCounts.get(2) + 1);
+//		game.getGUI().updateTruckStats();
+	}
+	
+	/** Call after a manager notification - sets this as finishing recieving manager input */
+	private void postManagerNotification(){
+//		int status = 0;
+//		if(getStatus().equals(Status.TRAVELING)){
+//			status = 1;
+//		}
+//		game.getBoard().truckCounts.set(status, game.getBoard().truckCounts.get(status) + 1);
+//		game.getBoard().truckCounts.set(2, game.getBoard().truckCounts.get(2) - 1);
+//		game.getGUI().updateTruckStats();
+	}
+	
 	/** Updates the waitTime to now, and deducts correct number of points for doing this */
 	private void fixLastTravelTime(){
 		long now = System.currentTimeMillis();
@@ -220,7 +244,9 @@ public class Truck implements BoardElement, Runnable{
 			locLock.acquire();
 			location = l;
 			locLock.release();
+			preManagerNotification();
 			game.getManager().truckNotification(this, Manager.Notification.LOCATION_CHANGED);
+			postManagerNotification();
 		}
 	}
 
@@ -249,7 +275,9 @@ public class Truck implements BoardElement, Runnable{
 			locLock.acquire();
 			travelingTo = t;
 			locLock.release();
+			preManagerNotification();
 			game.getManager().truckNotification(this, Manager.Notification.TRAVELING_TO_CHANGED);
+			postManagerNotification();
 		}
 	}
 
@@ -315,7 +343,9 @@ public class Truck implements BoardElement, Runnable{
 			}
 			goingTo = g;
 			locLock.release();
+			preManagerNotification();
 			game.getManager().truckNotification(this, Manager.Notification.GOING_TO_CHANGED);
+			postManagerNotification();
 		}
 	}
 
@@ -337,10 +367,12 @@ public class Truck implements BoardElement, Runnable{
 	 * @throws InterruptedException */
 	protected void setStatus(Truck.Status s) throws InterruptedException{
 		if(!status.equals(s)){
+			preManagerNotification();
 			statusLock.acquire();
 			status = s;
 			statusLock.release();
 			game.getManager().truckNotification(this, Manager.Notification.STATUS_CHANGED);
+			postManagerNotification();
 		}
 	}
 
@@ -438,7 +470,9 @@ public class Truck implements BoardElement, Runnable{
 			parcelLock.release();
 
 			getManager().getScoreObject().changeScore(getBoard().PICKUP_COST);
+			preManagerNotification();
 			game.getManager().truckNotification(this, Manager.Notification.PICKED_UP_PARCEL);
+			postManagerNotification();
 		}
 	}
 
@@ -468,7 +502,9 @@ public class Truck implements BoardElement, Runnable{
 		load = null;
 		parcelLock.release();
 		getManager().getScoreObject().changeScore(getBoard().DROPOFF_COST);
+		preManagerNotification();
 		game.getManager().truckNotification(this, Manager.Notification.DROPPED_OFF_PARCEL);
+		postManagerNotification();
 
 	}
 
@@ -589,6 +625,9 @@ public class Truck implements BoardElement, Runnable{
 			//Out of travel directions entirely, which occurs in the run() method.
 			statusLock.acquire();
 			status = Status.WAITING;
+//			game.getBoard().truckCounts.set(0, game.getBoard().truckCounts.get(0) + 1);
+//			game.getBoard().truckCounts.set(1, game.getBoard().truckCounts.get(1) - 1);
+//			game.getGUI().updateTruckStats();
 			statusLock.release();
 
 			setLocation(travelingTo);
@@ -600,8 +639,11 @@ public class Truck implements BoardElement, Runnable{
 			location.getCircle().updateColor();
 			travelingAlong.getLine().updateToColorPolicy();
 
-			if(location.getParcels().size() > 0)
+			if(location.getParcels().size() > 0){
+				preManagerNotification();
 				game.getManager().truckNotification(this, Manager.Notification.PARCEL_AT_NODE);
+				postManagerNotification();
+			}
 
 			if(getBoard().getParcels().isEmpty() && getBoard().isAllTrucksHome())
 				game.finish();

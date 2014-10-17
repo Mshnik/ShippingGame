@@ -17,7 +17,7 @@ public interface Heap<T extends Comparable<T>> {
 	 *  Takes as an argument the value which currently an element of this Heap
 	 *  that has its value changed. 
 	 *  May be unused in less complex implementations.
-	 *  Implement in at worst O(log(N)) time.
+	 *  Implement in at worst O(N) time.
 	 */
 	public void updateValue(T val);
 	
