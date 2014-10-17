@@ -142,7 +142,9 @@ public class Node implements BoardElement{
 	/** Returns a copy of the HashSet containing the present parcels to prevent its editing */
 	public HashSet<Parcel> getParcels(){
 		HashSet<Parcel> parcelClone = new HashSet<Parcel>();
-		parcelClone.addAll(parcels);
+		synchronized(parcels){
+			parcelClone.addAll(parcels);
+		}
 		return parcelClone;
 	}
 
