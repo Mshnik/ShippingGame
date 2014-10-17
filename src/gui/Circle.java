@@ -40,7 +40,7 @@ public class Circle extends JPanel{
 	public static final int BUFFER_RADUIS = DEFAULT_DIAMETER * 5;
 
 	/** The game piece that this represents on the GUI */
-	BoardElement represents;
+	protected BoardElement represents;
 
 	private int x1;
 	private int y1;

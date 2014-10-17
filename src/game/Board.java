@@ -17,8 +17,10 @@ import java.util.Comparator;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Map.Entry;
 import java.util.Random;
+import java.util.Set;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -50,7 +52,10 @@ public class Board implements JSONString{
 	private HashSet<Node> nodes;    //All nodes in this board
 
 	private ArrayList<Truck> trucks; //The trucks in this board
-	private HashSet<Parcel> parcels; //The parcels in this board
+	private Set<Parcel> parcels; //The parcels in this board - ones that have not been delivered yet
+	
+	protected List<Integer> parcelCounts; //A count of [on map, on truck, delivered] parcels
+	 									  //Values are managed by parcels as they are moved
 
 	/** The game this board is for */
 	public final Game game;
@@ -94,7 +99,7 @@ public class Board implements JSONString{
 		ON_COLOR_MULTIPLIER = scoreJSON.getInt(4);
 
 		trucks = new ArrayList<Truck>();
-		parcels = new HashSet<Parcel>();
+		parcels = Collections.synchronizedSet(new HashSet<Parcel>());
 		nodes = new HashSet<Node>();
 		edges = new HashSet<Edge>();
 
@@ -148,7 +153,31 @@ public class Board implements JSONString{
 				start.addParcel(p);
 			}
 		}
+		initParcelCounts();
 		updateMinMaxLength();
+	}
+	
+	/** Initializes the parcelCount list - call during construction */
+	private void initParcelCounts(){
+		parcelCounts = Collections.synchronizedList(new ArrayList<Integer>(3));
+		parcelCounts.add(parcels.size());
+		parcelCounts.add(0);
+		parcelCounts.add(0);
+	}
+	
+	/** Returns the number of parcels on this board that are not being caried by trucks */
+	public int getOnNodeParcels(){
+		return parcelCounts.get(0);
+	}
+	
+	/** Returns the number of parcels on this board being carried by trucks */
+	public int getOnTruckParcels(){
+		return parcelCounts.get(1);
+	}
+	
+	/** Returns the number of parcels from this board that have been successfully delivered */
+	public int getDeliveredParcels(){
+		return parcelCounts.get(2);
 	}
 
 	/** Returns a random node in this board */
@@ -233,7 +262,7 @@ public class Board implements JSONString{
 	}
 
 	/** Returns the parcels in this board. Returned parcels are parcels that have not yet been delivered. */
-	public HashSet<Parcel> getParcels(){
+	public Set<Parcel> getParcels(){
 		return parcels;
 	}
 
@@ -431,10 +460,10 @@ public class Board implements JSONString{
 	private static final int HEIGHT = GUI.DRAWING_BOARD_HEIGHT - Circle.DEFAULT_DIAMETER * 3;
 
 	private static final int MIN_TRUCKS = 2;
-	private static final int MAX_TRUCKS = 1000;
+	private static final int MAX_TRUCKS = 20;
 
 	private static final int MIN_PARCELS = 10;
-	private static final int MAX_PARCELS = 100;
+	private static final int MAX_PARCELS = 1000;
 
 	private static final int WAIT_COST_MIN = 1;
 	private static final int WAIT_COST_MAX = 3;
@@ -540,6 +569,7 @@ public class Board implements JSONString{
 		}
 
 		spiderwebEdges(r);
+		initParcelCounts();
 		updateMinMaxLength();
 	}
 

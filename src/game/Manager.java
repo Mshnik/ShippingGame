@@ -1,6 +1,7 @@
 package game;
 import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.Set;
 
 /** The Manager Class determines the the behavior of the Trucks.
  * In addition to having a getGame() method, other getters are available for ease of use.
@@ -110,8 +111,8 @@ public abstract class Manager implements Runnable{
 		return getBoard().getTrucks();
 	}
 
-	/** Returns the Parcels in this Game */
-	public final HashSet<Parcel> getParcels(){
+	/** Returns the Parcels in this Game - undelivered parcels */
+	public final Set<Parcel> getParcels(){
 		return getBoard().getParcels();
 	}
 

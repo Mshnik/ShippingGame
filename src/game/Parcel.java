@@ -122,6 +122,11 @@ public class Parcel implements BoardElement{
 	protected void pickedUp(Truck t) throws InterruptedException{
 		parcelLock.acquire();
 		holder = t;
+		int oldParcelOnNodeCount = board.parcelCounts.get(0);
+		board.parcelCounts.set(0, oldParcelOnNodeCount - 1);
+		int oldParcelOnTruckCount = board.parcelCounts.get(1);
+		board.parcelCounts.set(1, oldParcelOnTruckCount + 1);
+		board.game.getGUI().updateParcelStats();
 		parcelLock.release();
 	}
 
@@ -136,15 +141,23 @@ public class Parcel implements BoardElement{
 			parcelLock.release();
 			throw new RuntimeException("Parcel is not currently on a Truck, cannot be dropped off");
 		}
+		int oldParcelOnTruckCount = board.parcelCounts.get(1);
+		board.parcelCounts.set(1, oldParcelOnTruckCount - 1);
 
 		if(holder.getLocation().equals(destination)){
 			reachedDestination();
 			parcelLock.release();
+			int oldParcelDeliveredCount = board.parcelCounts.get(2);
+			board.parcelCounts.set(2, oldParcelDeliveredCount + 1);
+			board.game.getGUI().updateParcelStats();
 			return;
 		}
 
 		setLocation(holder.getLocation());
 		holder = null;
+		int oldParcelOnNodeCount = board.parcelCounts.get(0);
+		board.parcelCounts.set(0, oldParcelOnNodeCount + 1);
+		board.game.getGUI().updateParcelStats();
 		parcelLock.release();
 	}
 

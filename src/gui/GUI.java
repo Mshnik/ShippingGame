@@ -40,19 +40,24 @@ public class GUI extends JFrame{
 
 	private static final long serialVersionUID = 2941318999657277463L;
 
-	public static final int DRAWING_BOARD_WIDTH = 1000;
-	public static final int DRAWING_BOARD_HEIGHT = 600;
+	public static final int DRAWING_BOARD_WIDTH = 900;
+	public static final int DRAWING_BOARD_HEIGHT = 500;
+	public static final int UPDATE_PANEL_HEIGHT = 100;
+	public static final int SIDE_PANEL_WIDTH = 300;
 	
-	/** The default size of the GUI */
-	private static final Dimension MAIN_WINDOW_SIZE = new Dimension(DRAWING_BOARD_WIDTH, DRAWING_BOARD_HEIGHT + 200);
-
 	private GUI self;			//A reference to this, for use in anonymous inner classes
 	private Game game;			//The game this gui draws
 
 	private JPanel drawingPanel; //The main panel on which the board is drawn
+	private JPanel sidePanel;	 // The info panel located on the right of the board.
 
 	private JLabel lblUpdate;    //The label that shows the game update string
 	private JLabel lblScore;     //The label that paints scores
+	
+	private JLabel lblParcelNode; //Label of parcels on nodes
+	private JLabel lblParcelTruck; //Label of parcels on trucks
+	private JLabel lblParcelDelivered; //Label of parcels that have been delivered
+	
 	private JMenuBar menuBar;    //The menu bar at the top of the gui
 	private JMenuItem mntmReset; //The button that resets the game
 
@@ -60,19 +65,27 @@ public class GUI extends JFrame{
 	public GUI(Game g) {
 		self = this;
 
-		setMinimumSize(MAIN_WINDOW_SIZE);
 		setDefaultCloseOperation(EXIT_ON_CLOSE);
 		setResizable(false);
 
 		drawingPanel = new JPanel();
 		drawingPanel.setBorder(new LineBorder(Color.BLUE));
 		drawingPanel.setBackground(Color.WHITE);
+		drawingPanel.setPreferredSize(new Dimension(DRAWING_BOARD_WIDTH, DRAWING_BOARD_HEIGHT));
 		drawingPanel.setLayout(null);
-		
-
+	
 		getContentPane().add(drawingPanel, BorderLayout.CENTER);
-
+		
+		sidePanel = new JPanel();
+		sidePanel.setBorder(new LineBorder(Color.BLACK));
+		sidePanel.setBackground(new Color(190, 230, 150));
+		sidePanel.setPreferredSize(new Dimension(SIDE_PANEL_WIDTH, DRAWING_BOARD_HEIGHT + UPDATE_PANEL_HEIGHT));
+		sidePanel.setLayout(new BoxLayout(sidePanel, BoxLayout.Y_AXIS));
+		
+		getContentPane().add(sidePanel, BorderLayout.EAST);
+		
 		JPanel bottomPanel = new JPanel();
+		bottomPanel.setPreferredSize(new Dimension(DRAWING_BOARD_WIDTH, UPDATE_PANEL_HEIGHT));
 		bottomPanel.setBackground(SystemColor.textHighlight);
 		getContentPane().add(bottomPanel, BorderLayout.SOUTH);
 		bottomPanel.setLayout(new BoxLayout(bottomPanel, BoxLayout.Y_AXIS));
@@ -121,7 +134,7 @@ public class GUI extends JFrame{
 						oldGame.getManager().setGame(game);
 						oldGame.kill();
 						drawingPanel.removeAll();
-						drawMap();
+						setGame(game);
 						mntmReset.setEnabled(true);
 					}
 				}
@@ -165,7 +178,7 @@ public class GUI extends JFrame{
 					game.setGUI(self);
 					oldGame.kill();
 					drawingPanel.removeAll();
-					drawMap();
+					setGame(game);
 					setUpdateMessage("Game Reset");
 					updateScore(game.getManager().getScore());
 				}
@@ -195,7 +208,7 @@ public class GUI extends JFrame{
 				game.setGUI(self);
 				oldGame.kill();
 				drawingPanel.removeAll();
-				drawMap();
+				setGame(game);
 				setUpdateMessage("Game Reset");
 				updateScore(game.getManager().getScore());
 				mntmReset.setEnabled(true);
@@ -235,8 +248,8 @@ public class GUI extends JFrame{
 
 		setVisible(true);
 		pack();
+		validate();
 		repaint();
-		
 		setGame(g);
 	}
 
@@ -331,6 +344,46 @@ public class GUI extends JFrame{
 		game.setGUI(this);
 		game.getBoard().updateMinMaxLength();
 		drawMap();
+		updateSidePanel();
+		pack();
+		validate();
+		repaint();
+	}
+	
+	private static final String margin = "    ";
+	private static final String tabOne = "  ";
+	
+	/** Updates the info panel to the new game that was just loaded */
+	private void updateSidePanel(){
+		sidePanel.removeAll();
+		sidePanel.add(new JLabel("  ")); //Line of space at top
+		if(game.getFile() != null)
+			sidePanel.add(new JLabel(margin + "Game from File: " + game.getFile().getName()));
+		else if(game.getSeed() != -1)
+			sidePanel.add(new JLabel(margin + "Game from Seed: " + game.getSeed()));
+		else
+			sidePanel.add(new JLabel(margin + "Custom Game"));
+		sidePanel.add(new JLabel("  "));
+		sidePanel.add(new JLabel(margin + "Basic Game Info:"));
+		sidePanel.add(new JLabel(margin + tabOne + "Cities: " + game.getBoard().getNodesSize()));
+		sidePanel.add(new JLabel(margin + tabOne + "Highways: " + game.getBoard().getEdgesSize()));
+		sidePanel.add(new JLabel(margin + tabOne + "Trucks: " + game.getBoard().getTrucks().size()));
+		sidePanel.add(new JLabel("  ")); //Line of space
+		sidePanel.add(new JLabel(margin + "Score Constants:"));
+		sidePanel.add(new JLabel(margin + tabOne + "Wait Cost:                  " + game.getBoard().WAIT_COST));
+		sidePanel.add(new JLabel(margin + tabOne + "Pickup Cost:              " + game.getBoard().PICKUP_COST));
+		sidePanel.add(new JLabel(margin + tabOne + "Dropoff Cost:            " + game.getBoard().DROPOFF_COST));
+		sidePanel.add(new JLabel(margin + tabOne + "Parcel Payoff:             " + game.getBoard().PAYOFF));
+		sidePanel.add(new JLabel(margin + tabOne + "On Color Multiplier:   " + game.getBoard().ON_COLOR_MULTIPLIER));
+		sidePanel.add(new JLabel("  "));
+		sidePanel.add(new JLabel(margin + "Parcel Counts:"));
+		lblParcelNode = new JLabel();
+		lblParcelTruck = new JLabel();
+		lblParcelDelivered = new JLabel();
+		sidePanel.add(lblParcelNode);
+		sidePanel.add(lblParcelTruck);
+		sidePanel.add(lblParcelDelivered);
+		updateParcelStats();
 	}
 
 	/** Returns the panel that the map is drawn on */
@@ -354,6 +407,13 @@ public class GUI extends JFrame{
 	/** Updates the GUI to show the newScore */
 	public void updateScore(int newScore){
 		lblScore.setText( "" + newScore);
+	}
+	
+	/** Updates the GUI to show the new parcel stats */
+	public void updateParcelStats(){
+		lblParcelNode.setText(margin + tabOne + "Parcels in Cities:          "  + game.getBoard().getOnNodeParcels());
+		lblParcelTruck.setText(margin + tabOne + "Parcels on Trucks:        " + game.getBoard().getOnTruckParcels());
+		lblParcelDelivered.setText(margin + tabOne + "Parcels Delivered:         " + game.getBoard().getDeliveredParcels());
 	}
 
 	/** Returns the current update message shown on the GUI */

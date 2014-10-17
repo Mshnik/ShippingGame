@@ -28,7 +28,7 @@ public class Game{
 	private boolean running;  //True if the game is currently in progress
 	private boolean finished; //True if the game is over
 	private Board board;      //The board for this game
-
+	
 	/** Creates a game instance with a set Board, read from File f. Uses Default for all other fields */
 	public Game(String managerClassname, File f){
 		file = f;
@@ -148,7 +148,7 @@ public class Game{
 	}
 
 	/** Returns the GUI that represents this game */
-	protected GUI getGUI(){
+	public GUI getGUI(){
 		return gui;
 	}
 

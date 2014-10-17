@@ -11,8 +11,10 @@ import game.BoardElement;
 public class DraggableCircle extends Circle {
 
 	private static final long serialVersionUID = -3983152780751574074L;
-
 	private Point clickPoint; //The point the user clicked within the circle before dragging began
+	private int maxX;   //Boundary for dragging on the x
+	private int maxY;   //Boundary for dragging on the y
+	
 	
 	/** Constructs a DraggableCircle
 	 * @param represents - the game pice that this circle is drawn for
@@ -20,7 +22,7 @@ public class DraggableCircle extends Circle {
 	 * @param y - the starting y coordinate (center point)
 	 * @param diameter - the diameter of the circle
 	 */
-	public DraggableCircle(BoardElement represents, int x, int y, int diameter) {
+	public DraggableCircle(final BoardElement represents, int x, int y, int diameter) {
 		super(represents, x, y, diameter);
 		
 		MouseListener clickListener = new MouseListener(){
@@ -28,6 +30,8 @@ public class DraggableCircle extends Circle {
 			/** When this is clicked, store the initial point at which this is clicked */
 			@Override
 			public void mousePressed(MouseEvent e) {
+				maxX = represents.getBoard().game.getGUI().getDrawingPanel().getWidth();
+				maxY = represents.getBoard().game.getGUI().getDrawingPanel().getHeight();
 				clickPoint = e.getPoint();
 			}
 			
@@ -53,7 +57,9 @@ public class DraggableCircle extends Circle {
 			public void mouseDragged(MouseEvent e) {
 				DraggableCircle c = (DraggableCircle)e.getSource();
 				Point p = e.getPoint();
-				c.represents.updateGUILocation(c.getX1() + p.x - clickPoint.x, c.getY1() + p.y - clickPoint.y);
+				c.represents.updateGUILocation(
+					    Math.min(maxX, Math.max(0, c.getX1() + p.x - clickPoint.x)), 
+						Math.min(maxY, Math.max(0, c.getY1() + p.y - clickPoint.y)));
 			}
 
 			@Override
