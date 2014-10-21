@@ -49,7 +49,8 @@ public class GUI extends JFrame{
 	
 	private GUI self;			//A reference to this, for use in anonymous inner classes
 	private Game game;			//The game this gui draws
-
+	private boolean interactable;	//True if the user can do input, false otherwise
+	
 	private JPanel drawingPanel; //The main panel on which the board is drawn
 	private JPanel sidePanel;	 // The info panel located on the right of the board.
 
@@ -64,6 +65,7 @@ public class GUI extends JFrame{
 	/** GUI constructor. Creates a window to show a game {@code g} */
 	public GUI(Game g) {
 		self = this;
+		interactable = true;
 
 		setDefaultCloseOperation(EXIT_ON_CLOSE);
 		setResizable(false);
@@ -339,7 +341,9 @@ public class GUI extends JFrame{
 	}
 
 	/** Sets the game to Game {@code g} and redraws the map */
-	private void setGame(Game g){
+	public void setGame(Game g){
+		if(game != null) game.kill();
+		drawingPanel.removeAll();
 		game = g;
 		game.setGUI(this);
 		game.getBoard().updateMinMaxLength();
@@ -407,6 +411,14 @@ public class GUI extends JFrame{
 		updateParcelStats();
 	}
 
+	/** Sets this gui to the given interactability. When this isn't uninteractable,
+	 * doesn't allow user to provide any input
+	 */
+	public void toggleInteractable(){
+		interactable = ! interactable;
+		menuBar.setEnabled(interactable);
+	}
+	
 	/** Returns the panel that the map is drawn on */
 	public JPanel getDrawingPanel(){
 		return drawingPanel;

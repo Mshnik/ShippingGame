@@ -21,28 +21,64 @@ public class Main {
 	 * @throws IllegalArgumentException if args is null or has length 0.
 	 */
 	public static void main(String[] args) throws IllegalArgumentException{
-
+		//Add intital elements to fibCalc
+		fibCalc.add(0);
+		fibCalc.add(1);
+		
 		if(args == null || args.length < 1)
-			throw new IllegalArgumentException("Illegal String Array Passed into Main:\n" +
-					"expecting length at least 1 array of name of manager class.\n" +
+			throw new IllegalArgumentException("Illegal String Array Passed into Args:\n" +
+					"expecting length at least 1 array with name of manager class as first element.\n" +
 					"recieved " + args + " of length " + (args == null ? "null" : args.length));
 
 		String userManagerClass = "student."+args[0];
 		
-		if(args.length > 1 && args[1].equals("-s") && ! IS_CLASS_RELEASE){
-			userManagerClass = "solution."+args[0];
+		if(args[0].startsWith("<s>") && ! IS_CLASS_RELEASE){
+			userManagerClass = "solution."+args[0].substring(args[0].indexOf('>') + 1);
 		}
 		
-		//Game g = new Game(userManagerClass, Game.gameFile("JSONMap1.txt"));
-
-
-		Game g = new Game(userManagerClass, Math.abs((new Random()).nextLong()));
-
-		//Add intital elements to fibCalc
-		fibCalc.add(0);
-		fibCalc.add(1);
-
-		new GUI(g);
+		//Headless mode
+		if(args.length > 1 && args[1].equals("-h")){
+			GameRunner gr = new GameRunner(userManagerClass);
+			
+			if(args.length < 3)
+				throw new IllegalArgumentException("Illegal String Array passed into Args:\n" +
+						"For headless mode, expecting either\n:" +
+						"\t <userManagerClass> -h <seed1> <seed2> <seed3> ...\n" +
+						"\t\t or\n" +
+						"\t <userManagerClass> -h -r <numberOfSeeds>.\n" +
+						"recieved " + args + " of length " + (args == null ? "null" : args.length));
+			
+			if(args[2].equals("-r")){
+				int n = -1;
+				try{
+					n = Integer.parseInt(args[3]);
+				}catch(NumberFormatException | ArrayIndexOutOfBoundsException e){
+					throw new IllegalArgumentException("Illegal String Array passed into Args:\n" +
+							"For headless random mode, expecting\n:" +
+							"\t <userManagerClass> -h -r <numberOfSeeds>.\n" +
+							"Number of seeds should be an int.\n" +
+							"recieved " + args + " of length " + (args == null ? "null" : args.length));
+				}
+				gr.runRandom(n, true);	
+			} else{
+				long[] seeds = new long[args.length - 2];
+				try{
+					for(int i = 0; i < seeds.length; i++){
+						seeds[i] = Long.parseLong(args[i+2]);
+					}
+				}catch(NumberFormatException e){
+					throw new IllegalArgumentException("Illegal String Array passed into Args:\n" +
+							"For headless mode, expecting either\n:" +
+							"\t <userManagerClass> -h <seed1> <seed2> <seed3> ...\n" +
+							"Each seed should be a long.\n" +
+							"recieved " + args + " of length " + (args == null ? "null" : args.length));
+				}
+				gr.runSeeds(seeds, true);
+			}
+		} else{
+			Game g = new Game(userManagerClass, Math.abs((new Random()).nextLong()));
+			new GUI(g);
+		}
 	}
 
 	/** Creates and returns an instance of the user defined manager class

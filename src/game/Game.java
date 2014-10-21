@@ -90,13 +90,13 @@ public class Game{
 	/** Sets the value of running. Also informs gui of changes */
 	protected void setRunning(boolean r){
 		running = r;
-		gui.updateRunning();
+		if(gui != null) gui.updateRunning();
 	}
 
 	/** Sets the value of finished. Also informs gui of changes */
 	protected void setFinished(boolean f){
 		finished = f;
-		gui.updateRunning();
+		if(gui != null) gui.updateRunning();
 	}
 
 	/** Returns the board of this game, @see Board for what information is contained therein */
@@ -187,11 +187,13 @@ public class Game{
 		if(! finished){
 			setRunning(false);	
 			setFinished(true);
-			if(gameActuallyOver)
-				gui.setUpdateMessage("Game Finished!");
-			else
-				gui.setUpdateMessage("Game Halted.");
-			gui.repaint();
+			if(gui != null){
+				if(gameActuallyOver)
+					gui.setUpdateMessage("Game Finished!");
+				else
+					gui.setUpdateMessage("Game Halted.");
+				gui.repaint();
+			}
 			
 			for(Truck t : board.getTrucks()){
 				t.gameOver();

@@ -117,7 +117,7 @@ public class Score {
 	/** Adds addToScore to score */
 	protected void changeScore(int addToScore){
 		score += addToScore;
-		manager.getGame().getGUI().updateScore(score);
+		if(manager.getGame().getGUI() != null) manager.getGame().getGUI().updateScore(score);
 	}
 
 	/** Returns the current score */

@@ -126,7 +126,7 @@ public class Parcel implements BoardElement{
 		board.parcelCounts.set(Board.PARCELS_ON_MAP, oldParcelOnNodeCount - 1);
 		int oldParcelOnTruckCount = board.parcelCounts.get(Board.PARCELS_ON_TRUCK);
 		board.parcelCounts.set(Board.PARCELS_ON_TRUCK, oldParcelOnTruckCount + 1);
-		board.game.getGUI().updateParcelStats();
+		if(board.game.getGUI() != null) board.game.getGUI().updateParcelStats();
 		parcelLock.release();
 	}
 
@@ -149,7 +149,7 @@ public class Parcel implements BoardElement{
 			parcelLock.release();
 			int oldParcelDeliveredCount = board.parcelCounts.get(Board.PARCELS_DELIVERED);
 			board.parcelCounts.set(Board.PARCELS_DELIVERED, oldParcelDeliveredCount + 1);
-			board.game.getGUI().updateParcelStats();
+			if(board.game.getGUI() != null) board.game.getGUI().updateParcelStats();
 			return;
 		}
 
@@ -157,7 +157,7 @@ public class Parcel implements BoardElement{
 		holder = null;
 		int oldParcelOnNodeCount = board.parcelCounts.get(Board.PARCELS_ON_MAP);
 		board.parcelCounts.set(Board.PARCELS_ON_MAP, oldParcelOnNodeCount + 1);
-		board.game.getGUI().updateParcelStats();
+		if(board.game.getGUI() != null) board.game.getGUI().updateParcelStats();
 		parcelLock.release();
 	}
 

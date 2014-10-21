@@ -301,7 +301,7 @@ public class Board implements JSONString{
 
 		parcels.remove(p);
 		n.removeParcel(p);
-		game.getGUI().getDrawingPanel().remove(p.getCircle());
+		if(game.getGUI() != null) game.getGUI().getDrawingPanel().remove(p.getCircle());
 	}
 
 	/** Returns a HashSet containing all the Edges in this board. Allows addition and removal of Edges to this board */
