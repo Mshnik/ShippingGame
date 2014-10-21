@@ -10,21 +10,29 @@ import java.util.concurrent.Semaphore;
 
 /** Game starting methods. Also serves as a util holder */
 public class Main {
+	
+	/** False if this code is for personal use and testing, true if for academic use in CS2110 */
+	private static final boolean IS_CLASS_RELEASE = false;
 
 	/** Reads args for a string of a ClassName of the Manager to create, then creates
 	 * an instance of that manager class, creates the game and the threads, and starts the game.
-	 * @param args - a 1x1 array containing the name of the class of the user wants as the Manager
+	 * @param args - a 1x... array containing the name of the class of the user wants as the Manager
+	 * 				first argument is manager name, other args are flags.
 	 * @throws IllegalArgumentException if args is null or has length 0.
 	 */
 	public static void main(String[] args) throws IllegalArgumentException{
 
-		if(args == null || args.length != 1)
+		if(args == null || args.length < 1)
 			throw new IllegalArgumentException("Illegal String Array Passed into Main:\n" +
-					"expecting length 1 array of name of manager class.\n" +
+					"expecting length at least 1 array of name of manager class.\n" +
 					"recieved " + args + " of length " + (args == null ? "null" : args.length));
 
 		String userManagerClass = "student."+args[0];
-
+		
+		if(args.length > 1 && args[1].equals("-s") && ! IS_CLASS_RELEASE){
+			userManagerClass = "solution."+args[0];
+		}
+		
 		//Game g = new Game(userManagerClass, Game.gameFile("JSONMap1.txt"));
 
 
