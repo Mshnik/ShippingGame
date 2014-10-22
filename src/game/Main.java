@@ -36,24 +36,28 @@ public class Main {
 			userManagerClass = "solution."+args[0].substring(args[0].indexOf('>') + 1);
 		}
 		
-		//Headless mode
-		if(args.length > 1 && args[1].equals("-h")){
-			GameRunner gr = new GameRunner(userManagerClass);
+		//Check if running on gamerunner mode.
+		//just one argument - not gamerunner mode (default gui mode. No headless option).
+		//multiple - gamerunner mode (may or may not be headless).
+		if(args.length > 1){
+			ArrayList<String> argsList = new ArrayList<String>();
+			for(int i = 0; i < args.length; i++){
+				argsList.add(args[i]);
+			}
+			boolean headless = false;
+			if(argsList.contains("-h")) headless = true;
 			
-			if(args.length < 3)
-				throw new IllegalArgumentException("Illegal String Array passed into Args:\n" +
-						"For headless mode, expecting either\n:" +
-						"\t <userManagerClass> -h <seed1> <seed2> <seed3> ...\n" +
-						"\t\t or\n" +
-						"\t <userManagerClass> -h -r <numberOfSeeds>.\n" +
-						"recieved " + args + " of length " + (args == null ? "null" : args.length));
+			GameRunner gr = new GameRunner(userManagerClass, ! headless);
 			
-			if(args[2].equals("-r")){
+			if((args[1].equals("-r") && ! headless) || (args[2].equals("-r") && headless)){
 				int n = -1;
 				try{
-					n = Integer.parseInt(args[3]);
+					if(headless) n = Integer.parseInt(args[3]);
+					else n = Integer.parseInt(args[2]);
 				}catch(NumberFormatException | ArrayIndexOutOfBoundsException e){
 					throw new IllegalArgumentException("Illegal String Array passed into Args:\n" +
+							"For headed random mode, expecting\n:" +
+							"\t <userManagerClass> -r <numberOfSeeds>.\n" +
 							"For headless random mode, expecting\n:" +
 							"\t <userManagerClass> -h -r <numberOfSeeds>.\n" +
 							"Number of seeds should be an int.\n" +
@@ -61,14 +65,19 @@ public class Main {
 				}
 				gr.runRandom(n, true);	
 			} else{
-				long[] seeds = new long[args.length - 2];
+				long[] seeds = null;
+				if(headless) seeds = new long[args.length - 2];
+				else seeds = new long[args.length - 1];
 				try{
+					int headlessOffset = headless ? 2 : 1;
 					for(int i = 0; i < seeds.length; i++){
-						seeds[i] = Long.parseLong(args[i+2]);
+						seeds[i] = Long.parseLong(args[i+headlessOffset]);
 					}
 				}catch(NumberFormatException e){
 					throw new IllegalArgumentException("Illegal String Array passed into Args:\n" +
-							"For headless mode, expecting either\n:" +
+							"For headed mode, expecting:\n" +
+							"\t <userManagerClass> <seed1> <seed2> <seed3> ...\n" +
+							"For headless mode, expecting:\n" +
 							"\t <userManagerClass> -h <seed1> <seed2> <seed3> ...\n" +
 							"Each seed should be a long.\n" +
 							"recieved " + args + " of length " + (args == null ? "null" : args.length));

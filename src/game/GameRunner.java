@@ -20,9 +20,13 @@ public class GameRunner {
 	/** Number of components of stack trace to include in status message printed to console */
 	private final int STACK_TRACE_LENGTH = 3;
 	
+	/** True if this GameRunnier has a gui, false otherwise */
+	private final boolean hasGUI;
+	
 	/** Creates a new GameRunner to run a set of games using the specified userManagerClassname */
-	GameRunner(String userManagerClassname){
+	GameRunner(String userManagerClassname, boolean hasGUI){
 		this.userManagerClass = userManagerClassname;
+		this.hasGUI = hasGUI;
 	}
 	
 	/** Runs the userManager on the given seeds */
@@ -36,15 +40,17 @@ public class GameRunner {
 		
 		for(int i = 0; i < seeds.length; i++){
 			Game g = new Game(userManagerClass, seeds[i]);
-			if(gui == null) gui = new GUI(g);
-			else gui.setGame(g);
-			gui.toggleInteractable();
+			if(hasGUI){
+				if(gui == null) gui = new GUI(g);
+				else gui.setGame(g);
+				gui.toggleInteractable();
+			}
 			gs[i] = monitor(g);
 			if(printOutput){
 				System.out.println(gs[i].game.getSeed() + "\t" + gs[i].score + "\t" + gs[i].message);
 			}
 		}
-		gui.dispose();
+		if(hasGUI) gui.dispose();
 		return gs;
 	}
 	
@@ -65,7 +71,7 @@ public class GameRunner {
 		//Calculate the longest possible time g could take to complete with a deterministic algorithm
 		final double parcelTruckRatio = Math.max(1, ((double)g.getBoard().getParcels().size())/((double)g.getBoard().getTrucks().size()));
 		final double maxPathLength = g.getBoard().getMaxLength() * g.getBoard().getEdgesSize();
-		final long maxTime = (long)(maxPathLength * parcelTruckRatio + TIME_ALLOWANCE);
+		final long maxTime = (long)(maxPathLength * parcelTruckRatio * 2 + TIME_ALLOWANCE);
 		
 		//Set the monitoring thread as this thread, start g
 		g.monitoringThread = Thread.currentThread();
