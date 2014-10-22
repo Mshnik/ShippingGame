@@ -472,7 +472,7 @@ public class Board implements JSONString{
 
 	private static final double AVERAGE_DEGREE = 2.5;
 	private static final int MIN_EDGE_LENGTH = 5;
-	private static final int MAX_EDGE_LENGTH = 70;
+	private static final int MAX_EDGE_LENGTH = 60;
 
 	private static final int WIDTH = GUI.DRAWING_BOARD_WIDTH - Circle.DEFAULT_DIAMETER * 3;
 	private static final int HEIGHT = GUI.DRAWING_BOARD_HEIGHT - Circle.DEFAULT_DIAMETER * 3;
@@ -492,11 +492,11 @@ public class Board implements JSONString{
 	private static final int DROPOFF_COST_MIN = 0;
 	private static final int DROPOFF_COST_MAX = 150;
 
-	private static final int PAYOFF_MIN = 3000;
-	private static final int PAYOFF_MAX = 10000;
+	private static final int PAYOFF_MIN = 1000;
+	private static final int PAYOFF_MAX = 4000;
 
 	private static final int ON_COLOR_MULTIPLIER_MIN = 2;
-	private static final int ON_COLOR_MULTIPLIER_MAX = 5;
+	private static final int ON_COLOR_MULTIPLIER_MAX = 4;
 
 	/**
 	 * Returns a new random board seeded via random seed.
