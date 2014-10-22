@@ -31,7 +31,7 @@ public class Truck implements BoardElement, Runnable{
 	 * @author MPatashnik
 	 */
 	public static enum Status {TRAVELING, WAITING};
-
+	
 	/** Milliseconds per travel increment. Wait time between travel updates.
 	 * A lower value means a faster game - more penalty for computation.
 	 * A higher value means a slower game - less penalty for computation*/

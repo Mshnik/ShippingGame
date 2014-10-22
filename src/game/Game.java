@@ -24,19 +24,29 @@ public class Game{
 
 	private GUI gui;
 	private Manager manager;
+	private ThreadGroup gameThreads;	//The Truck and Manager threads that are running
 
 	private boolean running;  //True if the game is currently in progress
 	private boolean finished; //True if the game is over
 	private Board board;      //The board for this game
 	
-	/** Creates a game instance with a set Board, read from File f. Uses Default for all other fields */
-	public Game(String managerClassname, File f){
-		file = f;
+	protected Throwable throwable;	//The throwable that has been thrown and not caught by this game, if any
+	protected Thread monitoringThread;	//The thread that is monitoring this Game - null if none
+	
+	/** Construction helper method - does standard construction protocols before board loading */
+	private Game(String managerClassname){
 		setManager(managerClassname);
 		manager.setGame(this);
 		running = false;
 		finished = false;
 		gui = null;
+		gameThreads = new GameThreadGroup(this);
+	}
+	
+	/** Creates a game instance with a set Board, read from File f. Uses Default for all other fields */
+	public Game(String managerClassname, File f){
+		this(managerClassname);
+		file = f;
 		try {
 			JSONObject obj = new JSONObject(TextIO.read(f));
 			board = new Board(this, obj);
@@ -47,12 +57,8 @@ public class Game{
 	
 	/** Creates a game instance with a random board from the given seed, and the given managerClass */
 	public Game(String managerClassname, long seed){
+		this(managerClassname);
 		file = null;
-		setManager(managerClassname);
-		manager.setGame(this);
-		running = false;
-		finished = false;
-		gui = null;
 		board = Board.randomBoard(this, seed);
 	}
 
@@ -75,7 +81,7 @@ public class Game{
 		}
 		return true;
 	}
-
+	
 	/** Returns true if this game is currently running (in progress, not completed), 
 	 * false otherwise */
 	public boolean isRunning(){
@@ -133,12 +139,12 @@ public class Game{
 		if(! running && !finished){
 			setRunning(true);
 			
-			Thread m = new Thread(manager);
+			Thread m = new Thread(gameThreads, manager);
 			manager.setThread(m);
 			m.start();
 			
 			for(Truck t : board.getTrucks()){
-				Thread th = new Thread(t);
+				Thread th = new Thread(gameThreads, t);
 				t.setThread(th);
 				th.start();
 			}
