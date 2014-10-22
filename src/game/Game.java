@@ -40,7 +40,7 @@ public class Game{
 		running = false;
 		finished = false;
 		gui = null;
-		gameThreads = new GameThreadGroup(this);
+		gameThreads = new GameThreadGroup();
 	}
 	
 	/** Creates a game instance with a set Board, read from File f. Uses Default for all other fields */
@@ -239,5 +239,36 @@ public class Game{
 
 		String n = MAP_DIRECTORY + fileName + ".txt";
 		TextIO.write(n, board.toJSONString());
+	}
+	
+	/** An extension of ThreadGroup to do custom uncaught error handling
+	 * @author MPatashnik
+	 */
+	private class GameThreadGroup extends ThreadGroup {
+		
+		/** Constructs a new GameThreadGroup (with name "Game Threads")
+		 */
+		GameThreadGroup() {
+			super("Game Threads");
+		}
+		
+		/** Called when a thread that is a member of this threadgroup
+		 * throws an exception that is not caught.
+		 * 
+		 * Assuming a monitoring thread, 
+		 * Stores the throwable e in the game and interrupts the monitoring thread.
+		 * 
+		 * Otherwise just uses the superclass' version of uncaught exception - printing to console.
+		 */
+		@Override
+		public void uncaughtException(Thread t, Throwable e){
+			if(monitoringThread != null){
+				throwable = e;
+				monitoringThread.interrupt();
+			} else{
+				super.uncaughtException(t, e);
+			}
+		}
+
 	}
 }
