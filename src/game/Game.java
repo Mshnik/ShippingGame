@@ -16,7 +16,7 @@ import org.json.JSONObject;
  */
 public class Game{
 
-	public static final String MAP_DIRECTORY = "Maps/";
+	public static final String MAP_DIRECTORY = "Maps";
 	public static final String MAP_EXTENSION = ".txt";
 
 	private File file;	//The file this game was loaded from. Null if none.
@@ -152,6 +152,13 @@ public class Game{
 			
 		}
 	}
+	
+	/** Returns the exception thrown during the running of this game.
+	 * Null if that hasn't happened
+	 */
+	public Throwable getThrownThrowable(){
+		return throwable;
+	}
 
 	/** Returns the GUI that represents this game */
 	public GUI getGUI(){
@@ -237,7 +244,7 @@ public class Game{
 		if(isRunning() || isFinished())
 			throw new RuntimeException("Can't Write Game File if the game is running.");
 
-		String n = MAP_DIRECTORY + fileName + ".txt";
+		String n = MAP_DIRECTORY + File.pathSeparator + fileName + ".txt";
 		TextIO.write(n, board.toJSONString());
 	}
 	

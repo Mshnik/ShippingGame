@@ -2,6 +2,7 @@ package game;
 
 import gui.GUI;
 
+import java.io.File;
 import java.util.Random;
 
 /** Allows for the running of many games, monitoring them and returning
@@ -10,7 +11,9 @@ import java.util.Random;
  */
 public class GameRunner {
 
+	/** The user manager class (name) that this is running games for */
 	private final String userManagerClass;
+	
 	private GUI gui;
 	private static final long UPDATE_FRAME = 1000;
 	
@@ -23,23 +26,54 @@ public class GameRunner {
 	/** True if this GameRunnier has a gui, false otherwise */
 	private final boolean hasGUI;
 	
+	/** True if this GameRunner should print output to the console, false otherwise */
+	private final boolean printOutput;
+
 	/** Creates a new GameRunner to run a set of games using the specified userManagerClassname */
-	GameRunner(String userManagerClassname, boolean hasGUI){
+	public GameRunner(String userManagerClassname, boolean hasGUI, boolean printOutput){
 		this.userManagerClass = userManagerClassname;
 		this.hasGUI = hasGUI;
+		this.printOutput = printOutput;
+	}
+	
+	/** Runs the userManager on the given files, assuming files in Maps/* */
+	public GameScore[] runFiles(String[] fNames){
+		Game[] g = new Game[fNames.length];
+		for(int i = 0; i < fNames.length; i++){
+			g[i] = new Game(userManagerClass, new File(Game.MAP_DIRECTORY + fNames[i] + Game.MAP_EXTENSION));
+		}
+		return runGames(g);
 	}
 	
 	/** Runs the userManager on the given seeds */
-	GameScore[] runSeeds(long[] seeds, boolean printOutput){
-		GameScore[] gs = new GameScore[seeds.length];
+	public GameScore[] runSeeds(long[] seeds){
+		Game[] g = new Game[seeds.length];
+		for(int i = 0; i < seeds.length; i++){
+			g[i] = new Game(userManagerClass, seeds[i]);
+		}
+		return runGames(g);
+	}
+	
+	/** Runs the userManager on the given number of random seeds. */
+	public GameScore[] runRandom(int numberTrials){
+		long[] seeds = new long[numberTrials];
+		for(int i = 0; i < seeds.length; i++){
+			seeds[i] = new Random().nextLong();
+		}
+		return runSeeds(seeds);
+	}
+	
+	/** Runs the userManager on the given set of games */
+	private GameScore[] runGames(Game[] games){
+		GameScore[] gs = new GameScore[games.length];
 		
 		if(printOutput){
 			System.out.println("Seed\t\t\tScore\tStatus");
 			System.out.println("----------------------------------------");
 		}
 		
-		for(int i = 0; i < seeds.length; i++){
-			Game g = new Game(userManagerClass, seeds[i]);
+		for(int i = 0; i < games.length; i++){
+			Game g = games[i];
 			if(hasGUI){
 				if(gui == null) gui = new GUI(g);
 				else gui.setGame(g);
@@ -51,17 +85,8 @@ public class GameRunner {
 						+ String.format("%7d",gs[i].score) + "  " + gs[i].message);
 			}
 		}
-		if(hasGUI) gui.dispose();
+		if(hasGUI && gui != null) gui.dispose();
 		return gs;
-	}
-	
-	/** Runs the userManager on the given number of random seeds. */
-	GameScore[] runRandom(int numberTrials, boolean printOutput){
-		long[] seeds = new long[numberTrials];
-		for(int i = 0; i < seeds.length; i++){
-			seeds[i] = new Random().nextLong();
-		}
-		return runSeeds(seeds, printOutput);
 	}
 	
 	/** Monitors game g.
@@ -105,7 +130,7 @@ public class GameRunner {
 	 * ERROR - game terminated itself because of internal error.
 	 * @author MPatashnik
 	 */
-	enum GameStatus{
+	public enum GameStatus{
 		SUCCESS,
 		TIMEOUT,
 		ERROR
@@ -116,7 +141,7 @@ public class GameRunner {
 	 * Records the game that was run and the score received
 	 * @author MPatashnik
 	 */
-	class GameScore{
+	public class GameScore{
 		public final Game game;
 		public final int score;
 		public final GameStatus status;

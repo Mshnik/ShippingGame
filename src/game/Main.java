@@ -14,6 +14,9 @@ public class Main {
 	/** False if this code is for personal use and testing, true if for academic use in CS2110 */
 	private static final boolean IS_CLASS_RELEASE = false;
 
+	/** Student directory */
+	public static final String studentDirectory = "student";
+	
 	/** Reads args for a string of a ClassName of the Manager to create, then creates
 	 * an instance of that manager class, creates the game and the threads, and starts the game.
 	 * @param args - a 1x... array containing the name of the class of the user wants as the Manager
@@ -30,7 +33,7 @@ public class Main {
 					"expecting length at least 1 array with name of manager class as first element.\n" +
 					"recieved " + args + " of length " + (args == null ? "null" : args.length));
 
-		String userManagerClass = "student."+args[0];
+		String userManagerClass = studentDirectory + "." +args[0];
 		
 		if(args[0].startsWith("<s>") && ! IS_CLASS_RELEASE){
 			userManagerClass = "solution."+args[0].substring(args[0].indexOf('>') + 1);
@@ -47,7 +50,7 @@ public class Main {
 			boolean headless = false;
 			if(argsList.contains("-h")) headless = true;
 			
-			GameRunner gr = new GameRunner(userManagerClass, ! headless);
+			GameRunner gr = new GameRunner(userManagerClass, ! headless, true);
 			
 			if((args[1].equals("-r") && ! headless) || (args[2].equals("-r") && headless)){
 				int n = -1;
@@ -63,7 +66,7 @@ public class Main {
 							"Number of seeds should be an int.\n" +
 							"recieved " + args + " of length " + (args == null ? "null" : args.length));
 				}
-				gr.runRandom(n, true);	
+				gr.runRandom(n);	
 			} else{
 				long[] seeds = null;
 				if(headless) seeds = new long[args.length - 2];
@@ -82,7 +85,7 @@ public class Main {
 							"Each seed should be a long.\n" +
 							"recieved " + args + " of length " + (args == null ? "null" : args.length));
 				}
-				gr.runSeeds(seeds, true);
+				gr.runSeeds(seeds);
 			}
 		} else{
 			Game g = new Game(userManagerClass, Math.abs((new Random()).nextLong()));
