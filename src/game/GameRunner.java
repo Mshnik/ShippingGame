@@ -47,7 +47,8 @@ public class GameRunner {
 			}
 			gs[i] = monitor(g);
 			if(printOutput){
-				System.out.println(gs[i].game.getSeed() + "\t" + gs[i].score + "\t" + gs[i].message);
+				System.out.println(String.format("%20d", gs[i].game.getSeed()) + "  " 
+						+ String.format("%7d",gs[i].score) + "  " + gs[i].message);
 			}
 		}
 		if(hasGUI) gui.dispose();
