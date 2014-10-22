@@ -709,10 +709,14 @@ public class Truck implements BoardElement, Runnable{
 	 * If thread is null, does nothing because this truck was never started. */
 	protected void gameOver(){
 		clearTravel();
-		try{
-			thread.join(1000); //Try to join it.
-			thread.interrupt(); //Failed - just interrupt
-		}catch(InterruptedException | NullPointerException e){}
+		if(thread != null){
+			try{
+				thread.join(1000); //Try to join it.
+				thread.interrupt(); //Failed - just interrupt
+			}catch(InterruptedException e){
+				if(thread != null) thread.interrupt(); //Failed - just interrupt
+			}
+		}
 	}
 
 	/** Returns a JSON String of this truck.

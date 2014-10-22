@@ -479,4 +479,11 @@ public class GUI extends JFrame{
 		messageClearer = new Thread(r);
 		messageClearer.start();
 	}
+	
+	/** Disposes of this gui, also interrupts messageClearer thread so that doesn't persist */
+	@Override
+	public void dispose(){
+		messageClearer.interrupt();
+		super.dispose();
+	}
 }

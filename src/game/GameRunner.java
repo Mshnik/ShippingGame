@@ -71,7 +71,7 @@ public class GameRunner {
 		//Calculate the longest possible time g could take to complete with a deterministic algorithm
 		final double parcelTruckRatio = Math.max(1, ((double)g.getBoard().getParcels().size())/((double)g.getBoard().getTrucks().size()));
 		final double maxPathLength = g.getBoard().getMaxLength() * g.getBoard().getEdgesSize();
-		final long maxTime = (long)(maxPathLength * parcelTruckRatio * 2 + TIME_ALLOWANCE);
+		final long maxTime = (long)(maxPathLength * parcelTruckRatio + TIME_ALLOWANCE);
 		
 		//Set the monitoring thread as this thread, start g
 		g.monitoringThread = Thread.currentThread();
@@ -91,7 +91,7 @@ public class GameRunner {
 			}
 		}catch(InterruptedException e){
 			String msg = g.throwable.toString();
-			for(int i = 0; i < Math.min(g.throwable.getStackTrace().length, STACK_TRACE_LENGTH); i++){
+			for(int i = 0; i < Math.min(g.throwable.getStackTrace().length - 1, STACK_TRACE_LENGTH); i++){
 				msg += " at " + g.throwable.getStackTrace()[i].toString();
 			}
 			return new GameScore(g,g.getManager().getScore(), GameStatus.ERROR, "Exception Thrown - " + msg);
