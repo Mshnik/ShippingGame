@@ -143,7 +143,7 @@ public class Truck implements BoardElement, Runnable{
 				postManagerNotification();
 			}
 			catch (InterruptedException e){
-				e.printStackTrace();
+				return;
 			}
 
 			setGoingTo(null);

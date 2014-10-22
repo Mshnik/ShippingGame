@@ -129,14 +129,7 @@ public class GUI extends JFrame{
 					f.showOpenDialog(null);
 					File fil = f.getSelectedFile();
 					if(fil != null && fil.exists()){
-						Game oldGame =  game;
-						game = new Game(oldGame.getManagerClassname(), fil);
-						game.setGUI(self);
-						oldGame.getManager().setGame(game);
-						oldGame.kill();
-						drawingPanel.removeAll();
-						setGame(game);
-						mntmReset.setEnabled(true);
+						setGame(new Game(game.getManagerClassname(), fil));
 					}
 				}
 			}
@@ -170,18 +163,11 @@ public class GUI extends JFrame{
 			public void actionPerformed(ActionEvent arg0) {
 				int returnVal = JOptionPane.showConfirmDialog(null, "Are You Sure You Want to Reset?");
 				if(returnVal == JOptionPane.YES_OPTION){
-					Game oldGame =  game;
-					if(oldGame.getFile() != null)
-						game = new Game(oldGame.getManagerClassname(), oldGame.getFile());
+					if(game.getFile() != null)
+						setGame(new Game(game.getManagerClassname(), game.getFile()));
 					else{
-						game = new Game(oldGame.getManagerClassname(), oldGame.getBoard().seed);
+						setGame(new Game(game.getManagerClassname(), game.getBoard().seed));
 					}
-					game.setGUI(self);
-					oldGame.kill();
-					drawingPanel.removeAll();
-					setGame(game);
-					setUpdateMessage("Game Reset");
-					updateScore(game.getManager().getScore());
 				}
 			}
 		});
