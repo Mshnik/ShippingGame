@@ -52,10 +52,12 @@ public class Board implements JSONString{
 	private HashSet<Node> nodes;    //All nodes in this board
 
 	private ArrayList<Truck> trucks; //The trucks in this board
+	private List<Truck> finishedTrucks; //The trucks that have terminated themselves 
+											 //because they are home and there are no more parcels
 	private Set<Parcel> parcels; //The parcels in this board - ones that have not been delivered yet
 
 	protected List<Integer> parcelCounts; //A count of [on map, on truck, delivered] parcels
-										  //Values are managed by parcels as they are moved
+	//Values are managed by parcels as they are moved
 	protected static final int PARCELS_ON_MAP = 0;
 	protected static final int PARCELS_ON_TRUCK = 1;
 	protected static final int PARCELS_DELIVERED = 2;
@@ -83,10 +85,13 @@ public class Board implements JSONString{
 	 * Thus, the score value of  an on-color delivery is PAYOFF * ON_COLOR_MULTIPLIER
 	 */
 	public final int ON_COLOR_MULTIPLIER;
-
+	
 	/** Initializes the board from the given serialized version of the board for game g */
 	protected Board(Game g, JSONObject obj){
 		game = g;
+		
+		initCollections();
+		
 		//Read seed if possible, otherwise use -1.
 		if(obj.has(SEED_TOKEN)){
 			seed = obj.getLong(SEED_TOKEN);
@@ -100,11 +105,6 @@ public class Board implements JSONString{
 		DROPOFF_COST = scoreJSON.getInt(2);
 		PAYOFF = scoreJSON.getInt(3);
 		ON_COLOR_MULTIPLIER = scoreJSON.getInt(4);
-
-		trucks = new ArrayList<Truck>();
-		parcels = Collections.synchronizedSet(new HashSet<Parcel>());
-		nodes = new HashSet<Node>();
-		edges = new HashSet<Edge>();
 
 		//Read in all nodes of board - read all nodes before reading any edges
 		for(String key : obj.keySet()){
@@ -159,6 +159,15 @@ public class Board implements JSONString{
 		initParcelTruckCounts();
 		updateMinMaxLength();
 	}
+	
+	/** Initializes collections - call during construction */
+	private void initCollections(){
+		trucks = new ArrayList<Truck>();
+		finishedTrucks = Collections.synchronizedList(new ArrayList<Truck>());
+		parcels = Collections.synchronizedSet(new HashSet<Parcel>());
+		nodes = new HashSet<Node>();
+		edges = new HashSet<Edge>();
+	}
 
 	/** Initializes the parcelCount list - call during construction */
 	private void initParcelTruckCounts(){
@@ -182,7 +191,7 @@ public class Board implements JSONString{
 	public int getDeliveredParcels(){
 		return parcelCounts.get(PARCELS_DELIVERED);
 	}
-	
+
 	/** Returns a random node in this board */
 	public Node getRandomNode(){
 		return Main.randomElement(nodes);
@@ -256,24 +265,18 @@ public class Board implements JSONString{
 	/** Returns true if all alive Truck in this board are currently on the TruckHome node, false otherwise 
 	 */
 	public boolean isAllTrucksHome(){
-		try{
-			for(Truck t : getTrucks()){
-				if(t.getLocation() == null || ! t.getLocation().equals(getTruckHome()))
-					return false;
-			}
-
-			return true;
-		}catch(NullPointerException e){
-			for(Truck t : getTrucks()){
-				System.out.print(t + " : ");
-				if(t != null)
-					System.out.print(t.getLocation() + ", ");
-				if(t != null && t.getLocation() != null)
-					System.out.print(t.getLocation().equals(getTruckHome()));
-				System.out.println();
-			}
-			return false;
+		for(Truck t : getTrucks()){
+			if(t.getStatus().equals(Truck.Status.TRAVELING) || ! t.getLocation().equals(getTruckHome()))
+				return false;
 		}
+
+		return true;
+	}
+	
+	/** Adds the given truck to the list of finishedTrucks. Then if all trucks are finished, ends the game */
+	protected void addTruckToFinished(Truck t){
+		finishedTrucks.add(t);
+		if(finishedTrucks.containsAll(trucks)) game.finish();
 	}
 
 	/** Returns the parcels in this board. Returned parcels are parcels that have not yet been delivered. */
@@ -525,10 +528,7 @@ public class Board implements JSONString{
 				+ ON_COLOR_MULTIPLIER_MIN;
 
 		//Initialize collections
-		nodes = new HashSet<Node>();
-		edges = new HashSet<Edge>();
-		parcels = new HashSet<Parcel>();
-		trucks = new ArrayList<Truck>();
+		initCollections();
 
 		ArrayList<String> cities = cityNames();
 		//Create nodes and add to board

@@ -72,7 +72,7 @@ public class GameRunner {
 		//Calculate the longest possible time g could take to complete with a deterministic algorithm
 		final double parcelTruckRatio = Math.max(1, ((double)g.getBoard().getParcels().size())/((double)g.getBoard().getTrucks().size()));
 		final double maxPathLength = g.getBoard().getMaxLength() * g.getBoard().getEdgesSize();
-		final long maxTime = (long)(maxPathLength * parcelTruckRatio + TIME_ALLOWANCE);
+		final long maxTime = (long)(maxPathLength * parcelTruckRatio * 1.5 + TIME_ALLOWANCE);
 		
 		//Set the monitoring thread as this thread, start g
 		g.monitoringThread = Thread.currentThread();

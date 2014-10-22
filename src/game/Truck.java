@@ -31,25 +31,25 @@ public class Truck implements BoardElement, Runnable{
 	 * @author MPatashnik
 	 */
 	public static enum Status {TRAVELING, WAITING};
-	
+
 	/** Milliseconds per travel increment. Wait time between travel updates.
 	 * A lower value means a faster game - more penalty for computation.
 	 * A higher value means a slower game - less penalty for computation*/
 	public static final int FRAME = 40;
-	
+
 	/** Milliseconds between wait updates.*/
 	public static final int WAIT_TIME = 5;
 
 	/** Maximum length/frame speed that a truck can travel */
 	public static final int MAX_SPEED = 10;
-	
+
 	/** Most efficient length/frame speed that a truck can travel, in terms of total cost
 	 *  for traveling a given length. */
 	public static final int EFFICIENT_SPEED = 4;
-	
+
 	/** Minimum length/frame speed that a truck can travel. */
 	public static final int MIN_SPEED = 1;
-	
+
 	private String name;			//The name of this truck
 	private Circle circle;			//The circle that represents this Graphically
 	private Color color;			//The color of this truck
@@ -77,7 +77,7 @@ public class Truck implements BoardElement, Runnable{
 
 	/** The game this truck belongs to */
 	public final Game game;
-	
+
 	private Thread thread;			//The thread this truck is running in. Should have TRUCK in its name
 
 	/** Constructor for the Truck Class. Uses a default random color
@@ -106,7 +106,7 @@ public class Truck implements BoardElement, Runnable{
 		locLock = new Semaphore(1);
 		statusLock = new Semaphore(1);
 		parcelLock = new Semaphore(1);
-		
+
 		location = start;
 		travelingTo = null;
 		goingTo = null;
@@ -121,68 +121,70 @@ public class Truck implements BoardElement, Runnable{
 	 * Waits for more instructions in WAIT_TIME intervals. While the travel directions
 	 * are not empty, pops off the next travel direction.<br><br>
 	 * 
-	 * Called on loop until the game ends. Students - don't call this.
+	 * Called and on loop until the game ends. Terminates itself when the parcels are empty
+	 * and this truck is home. Once that occurs, doesn't take any more instructions.
+	 * Students - don't call this.
 	 */
 	@Override
 	public void run(){
 		lastTravelTime = System.currentTimeMillis();
-		while(game.isRunning()){
+		while(true){
+			if(getBoard().getParcels().isEmpty() && location.equals(getBoard().getTruckHome())){
+				getBoard().addTruckToFinished(this);
+				//Deduct final waiting points
+				fixLastTravelTime();
+				return;
+			}
+			
+			try{
+				Thread.sleep(WAIT_TIME);
+				preManagerNotification();
+				game.getManager().truckNotification(this, Manager.Notification.WAITING);
+				postManagerNotification();
+			}
+			catch (InterruptedException e){
+				e.printStackTrace();
+			}
 
 			setGoingTo(null);
+			fixLastTravelTime();
 
-			while(travel.isEmpty() && game.isRunning()){
-				try{
-					Thread.sleep(WAIT_TIME);
-					preManagerNotification();
-					game.getManager().truckNotification(this, Manager.Notification.WAITING);
-					postManagerNotification();
-				}
-				catch (InterruptedException e){
+			while(!travel.isEmpty() && game.isRunning()){
+				try {
+					Edge r = getTravel();
+					travel(r);
+				} catch (InterruptedException e){
 					e.printStackTrace();
+				} catch (IllegalArgumentException e) {
+					clearTravel(); //If traveling isn't valid, clear the queue
 				}
-
-				setGoingTo(null);
 				fixLastTravelTime();
-				
-				while(!travel.isEmpty() && game.isRunning()){
-					try {
-						Edge r = getTravel();
-						travel(r);
-					} catch (InterruptedException e){
-						e.printStackTrace();
-					} catch (IllegalArgumentException e) {
-						clearTravel(); //If traveling isn't valid, clear the queue
-					}
-					fixLastTravelTime();
-				}
 			}
 		}
-		//Deduct final waiting points
-		fixLastTravelTime();
 	}
 
 	/** Call before any manager notification - sets this as waiting for manager input */
 	private void preManagerNotification(){
-//		int status = 0;
-//		if(getStatus().equals(Status.TRAVELING)){
-//			status = 1;
-//		}
-//		game.getBoard().truckCounts.set(status, game.getBoard().truckCounts.get(status) - 1);
-//		game.getBoard().truckCounts.set(2, game.getBoard().truckCounts.get(2) + 1);
-//		game.getGUI().updateTruckStats();
+		//		int status = 0;
+		//		if(getStatus().equals(Status.TRAVELING)){
+		//			status = 1;
+		//		}
+		//		game.getBoard().truckCounts.set(status, game.getBoard().truckCounts.get(status) - 1);
+		//		game.getBoard().truckCounts.set(2, game.getBoard().truckCounts.get(2) + 1);
+		//		game.getGUI().updateTruckStats();
 	}
-	
+
 	/** Call after a manager notification - sets this as finishing recieving manager input */
 	private void postManagerNotification(){
-//		int status = 0;
-//		if(getStatus().equals(Status.TRAVELING)){
-//			status = 1;
-//		}
-//		game.getBoard().truckCounts.set(status, game.getBoard().truckCounts.get(status) + 1);
-//		game.getBoard().truckCounts.set(2, game.getBoard().truckCounts.get(2) - 1);
-//		game.getGUI().updateTruckStats();
+		//		int status = 0;
+		//		if(getStatus().equals(Status.TRAVELING)){
+		//			status = 1;
+		//		}
+		//		game.getBoard().truckCounts.set(status, game.getBoard().truckCounts.get(status) + 1);
+		//		game.getBoard().truckCounts.set(2, game.getBoard().truckCounts.get(2) - 1);
+		//		game.getGUI().updateTruckStats();
 	}
-	
+
 	/** Updates the waitTime to now, and deducts correct number of points for doing this */
 	private void fixLastTravelTime(){
 		long now = System.currentTimeMillis();
@@ -190,12 +192,12 @@ public class Truck implements BoardElement, Runnable{
 		getManager().getScoreObject().changeScore(getBoard().WAIT_COST * (int)(diff / WAIT_TIME));
 		lastTravelTime = now;
 	}
-	
+
 	/** Returns the manager that is managing this truck */
 	public Manager getManager(){
 		return game.getManager();
 	}
-	
+
 	/** Returns the board this Truck belongs to */
 	@Override
 	public Board getBoard(){
@@ -207,7 +209,7 @@ public class Truck implements BoardElement, Runnable{
 		t.setName("TRUCK-THREAD:"+getTruckName());
 		thread = t;
 	}
-	
+
 	/** Returns the name of this Truck */
 	public String getTruckName(){
 		return name;
@@ -335,7 +337,7 @@ public class Truck implements BoardElement, Runnable{
 	 * Does not fire a Manager Notification if goingTo.equals(g)
 	 * Does nothing if the calling thread is interrupted */
 	private void setGoingTo(Node g){
-		if(goingTo == null || !goingTo.equals(g)){
+		if((goingTo == null && g != null) || (goingTo != null && !goingTo.equals(g))){
 			try {
 				locLock.acquire();
 			} catch (InterruptedException e) {
@@ -522,14 +524,14 @@ public class Truck implements BoardElement, Runnable{
 			setGoingTo(r.getOther(goingTo));
 		travel.add(r);
 	}
-	
+
 	/** Sets the travel queue to travel the given list of edges, in order. */
 	public void setTravelQueue(List<Edge> path){
 		for(Edge e : path){
 			addToTravel(e);
 		}
 	}
-	
+
 	/** Sets the travel queue to travel the given path.
 	 * First element should be the truck's current location, and the last
 	 * is the expected destination
@@ -625,9 +627,9 @@ public class Truck implements BoardElement, Runnable{
 			//Out of travel directions entirely, which occurs in the run() method.
 			statusLock.acquire();
 			status = Status.WAITING;
-//			game.getBoard().truckCounts.set(0, game.getBoard().truckCounts.get(0) + 1);
-//			game.getBoard().truckCounts.set(1, game.getBoard().truckCounts.get(1) - 1);
-//			game.getGUI().updateTruckStats();
+			//			game.getBoard().truckCounts.set(0, game.getBoard().truckCounts.get(0) + 1);
+			//			game.getBoard().truckCounts.set(1, game.getBoard().truckCounts.get(1) - 1);
+			//			game.getGUI().updateTruckStats();
 			statusLock.release();
 
 			setLocation(travelingTo);
@@ -644,9 +646,6 @@ public class Truck implements BoardElement, Runnable{
 				game.getManager().truckNotification(this, Manager.Notification.PARCEL_AT_NODE);
 				postManagerNotification();
 			}
-
-			if(getBoard().getParcels().isEmpty() && getBoard().isAllTrucksHome())
-				game.finish();
 		}
 	}
 
