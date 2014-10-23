@@ -63,6 +63,7 @@ public class Truck implements BoardElement, Runnable{
 	private Edge travelingAlong;	//The Edge this Truck is currently traveling along
 
 	private Status status;			//This truck's status, either waiting or traveling
+	private boolean waitingForManager;	//True while this is waiting for manager input, false otherwise
 
 	private long lastTravelTime;    //System time (ms) when this truck last finished travel
 
@@ -135,7 +136,7 @@ public class Truck implements BoardElement, Runnable{
 				fixLastTravelTime();
 				return;
 			}
-			
+
 			try{
 				Thread.sleep(WAIT_TIME);
 				preManagerNotification();
@@ -165,24 +166,12 @@ public class Truck implements BoardElement, Runnable{
 
 	/** Call before any manager notification - sets this as waiting for manager input */
 	private void preManagerNotification(){
-		//		int status = 0;
-		//		if(getStatus().equals(Status.TRAVELING)){
-		//			status = 1;
-		//		}
-		//		game.getBoard().truckCounts.set(status, game.getBoard().truckCounts.get(status) - 1);
-		//		game.getBoard().truckCounts.set(2, game.getBoard().truckCounts.get(2) + 1);
-		//		game.getGUI().updateTruckStats();
+		waitingForManager=true;
 	}
 
 	/** Call after a manager notification - sets this as finishing recieving manager input */
 	private void postManagerNotification(){
-		//		int status = 0;
-		//		if(getStatus().equals(Status.TRAVELING)){
-		//			status = 1;
-		//		}
-		//		game.getBoard().truckCounts.set(status, game.getBoard().truckCounts.get(status) + 1);
-		//		game.getBoard().truckCounts.set(2, game.getBoard().truckCounts.get(2) - 1);
-		//		game.getGUI().updateTruckStats();
+		waitingForManager = false;
 	}
 
 	/** Updates the waitTime to now, and deducts correct number of points for doing this */
@@ -378,8 +367,14 @@ public class Truck implements BoardElement, Runnable{
 		}
 	}
 
+	/** Returns true if this truck is waiting for manager input, false otherwise.
+	 * Useful for debuggin purposes if manager is recursing forever, trucks wait forever */
+	public boolean isWaitingForManager(){
+		return waitingForManager;
+	}
+
 	/** Returns the parcel this Truck is carrying. Returns null
-	 * if no truck is being carried
+	 * if no parcel is being carried
 	 */
 	public Parcel getLoad(){
 		return load;

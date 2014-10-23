@@ -65,7 +65,7 @@ public class GUI extends JFrame{
 	private JMenuItem mntmReset; //The button that resets the game
 	
 	private long updateTime;	//How quickly the parcel/truck stats should update (ms)
-	private static final long DEFAULT_UPDATE_TIME = 500;
+	private static final long DEFAULT_UPDATE_TIME = 200;
 	private Thread updateThread;	//Thread that manages updating of stats
 
 	/** GUI constructor. Creates a window to show a game {@code g} */
@@ -197,16 +197,7 @@ public class GUI extends JFrame{
 				if(s == null){
 					return;
 				}
-				//System.out.println("Generating game with seed " + returnVal);
-				Game oldGame =  game;
-				game = new Game(oldGame.getManagerClassname(), returnVal);
-				game.setGUI(self);
-				oldGame.kill();
-				drawingPanel.removeAll();
-				setGame(game);
-				setUpdateMessage("Game Reset");
-				updateScore(game.getManager().getScore());
-				mntmReset.setEnabled(true);
+				setGame(new Game(game.getManagerClassname(), returnVal));
 				
 			}
 		});
@@ -413,9 +404,9 @@ public class GUI extends JFrame{
 		statsTable.getColumn(statsTable.getColumnName(0)).setPreferredWidth(200);
 
 		JSlider updateSlider = new JSlider();
-		updateSlider.setMaximum(2000);
-		updateSlider.setMinimum(100);
-		updateSlider.setValue((int)DEFAULT_UPDATE_TIME);
+		updateSlider.setMaximum(1000);
+		updateSlider.setMinimum(25);
+		updateSlider.setValue((int)updateTime);
 		updateSlider.setToolTipText("Update timer for Parcel and Truck stats. Left for faster update, right for slower");
 		updateSlider.addChangeListener(new ChangeListener(){
 			@Override
@@ -423,7 +414,6 @@ public class GUI extends JFrame{
 				updateTime = ((JSlider)e.getSource()).getValue();
 			}
 		});
-		updateTime = updateSlider.getValue();
 		sidePanel.add(updateSlider);
 		
 		if(updateThread != null) updateThread.interrupt();

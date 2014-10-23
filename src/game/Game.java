@@ -29,10 +29,10 @@ public class Game{
 	private boolean running;  //True if the game is currently in progress
 	private boolean finished; //True if the game is over
 	private Board board;      //The board for this game
-	
+
 	protected Throwable throwable;	//The throwable that has been thrown and not caught by this game, if any
 	protected Thread monitoringThread;	//The thread that is monitoring this Game - null if none
-	
+
 	/** Construction helper method - does standard construction protocols before board loading */
 	private Game(String managerClassname){
 		setManager(managerClassname);
@@ -42,7 +42,7 @@ public class Game{
 		gui = null;
 		gameThreads = new GameThreadGroup();
 	}
-	
+
 	/** Creates a game instance with a set Board, read from File f. Uses Default for all other fields */
 	public Game(String managerClassname, File f){
 		this(managerClassname);
@@ -54,7 +54,7 @@ public class Game{
 			e1.printStackTrace();
 		}
 	}
-	
+
 	/** Creates a game instance with a random board from the given seed, and the given managerClass */
 	public Game(String managerClassname, long seed){
 		this(managerClassname);
@@ -81,13 +81,13 @@ public class Game{
 		}
 		return true;
 	}
-	
+
 	/** Returns true if this game is currently running (in progress, not completed), 
 	 * false otherwise */
 	public boolean isRunning(){
 		return running;
 	}
-	
+
 	/** Returns true if this game is finished, false otherwise */
 	public boolean isFinished(){
 		return finished;
@@ -125,7 +125,7 @@ public class Game{
 	public File getFile(){
 		return file;
 	}
-	
+
 	/** Returns the seed this game was generated from. Returns -1 if this game was loaded from
 	 * a non-randomly generated file.
 	 */
@@ -138,21 +138,21 @@ public class Game{
 	public void start(){
 		if(! running && !finished){
 			setRunning(true);
-			
+
 			Thread m = new Thread(gameThreads, manager);
 			manager.setThread(m);
 			m.start();
-			
+
 			for(Truck t : board.getTrucks()){
 				Thread th = new Thread(gameThreads, t);
 				t.setThread(th);
 				th.start();
 			}
 
-			
+
 		}
 	}
-	
+
 	/** Returns the exception thrown during the running of this game.
 	 * Null if that hasn't happened
 	 */
@@ -193,50 +193,55 @@ public class Game{
 		pArr[2] = getBoard().initialParcelCount - pArr[0] - pArr[1];
 		return pArr;
 	}
-	
+
 	/** Returns the truck stats for the current game in the form [waiting, traveling, getting manager input] */
 	public int[] truckStats(){
 		int[] tArr = new int[3];
 		for(Truck t : getBoard().getTrucks()){
-			if(t.getStatus().equals(Truck.Status.WAITING))
+			if(t.isWaitingForManager())
+				tArr[2]++;
+			else if(t.getStatus().equals(Truck.Status.WAITING))
 				tArr[0]++;
 			else
 				tArr[1]++;
 		}
 		return tArr;
 	}
-	
+
 	/** Ends this game prematurely by halting trucks and manager.
 	 * This will interrupt the manager and truck threads. */
 	public void kill(){
 		halt(false);
 	}
-	
+
 	/** Ends this game correctly when the last parcel is delivered. */
 	protected void finish(){
 		halt(true);
 	}
-	
+
 	/** Call to end the game. Correct game ending if {@code gameActuallyOver},
 	 * premature halting otherwise.
 	 * Multiple calls to this method won't do anything additional.
 	 */
 	private void halt(boolean gameActuallyOver){
+		boolean wasRunning = running;
 		if(! finished){
 			setRunning(false);	
 			setFinished(true);
 			if(gui != null){
-				if(gameActuallyOver)
-					gui.setUpdateMessage("Game Finished!");
-				else
-					gui.setUpdateMessage("Game Halted.");
-				gui.repaint();
+				if(wasRunning){
+					if(gameActuallyOver)
+						gui.setUpdateMessage("Game Finished!");
+					else
+						gui.setUpdateMessage("Game Halted.");
+					gui.repaint();
+				}
 			}
-			
+
 			for(Truck t : board.getTrucks()){
 				t.gameOver();
 			}
-	
+
 			manager.gameOver();
 		}
 	}
@@ -272,18 +277,18 @@ public class Game{
 		String n = MAP_DIRECTORY + File.pathSeparator + fileName + ".txt";
 		TextIO.write(n, board.toJSONString());
 	}
-	
+
 	/** An extension of ThreadGroup to do custom uncaught error handling
 	 * @author MPatashnik
 	 */
 	private class GameThreadGroup extends ThreadGroup {
-		
+
 		/** Constructs a new GameThreadGroup (with name "Game Threads")
 		 */
 		GameThreadGroup() {
 			super("Game Threads");
 		}
-		
+
 		/** Called when a thread that is a member of this threadgroup
 		 * throws an exception that is not caught.
 		 * 
