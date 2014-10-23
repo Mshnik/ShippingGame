@@ -11,12 +11,15 @@ import javax.swing.JLabel;
 
 import java.awt.Color;
 import javax.swing.border.LineBorder;
+import javax.swing.event.ChangeEvent;
+import javax.swing.event.ChangeListener;
 import javax.swing.ButtonGroup;
 import javax.swing.JFileChooser;
 import javax.swing.JMenuBar;
 import javax.swing.JMenu;
 import javax.swing.JOptionPane;
 import javax.swing.JMenuItem;
+import javax.swing.JSlider;
 import javax.swing.JTable;
 
 import java.awt.event.ActionListener;
@@ -60,11 +63,16 @@ public class GUI extends JFrame{
 	
 	private JMenuBar menuBar;    //The menu bar at the top of the gui
 	private JMenuItem mntmReset; //The button that resets the game
+	
+	private long updateTime;	//How quickly the parcel/truck stats should update (ms)
+	private static final long DEFAULT_UPDATE_TIME = 500;
+	private Thread updateThread;	//Thread that manages updating of stats
 
 	/** GUI constructor. Creates a window to show a game {@code g} */
 	public GUI(Game g) {
 		self = this;
 		interactable = true;
+		updateTime = DEFAULT_UPDATE_TIME;
 
 		setDefaultCloseOperation(EXIT_ON_CLOSE);
 		setResizable(false);
@@ -345,7 +353,13 @@ public class GUI extends JFrame{
 	 * Parcels on trucks is in FIRST_PARCEL_ROW + 1,
 	 * Delivered parcels is in FIRST_PARCEL_ROW + 2
 	 */
-	private static final int FIRST_PARCEL_ROW = 9;
+	private static final int FIRST_PARCEL_ROW = 10;
+	
+	/** Row in the stats table that corresponds to trucks that are waiting.
+	 * Parcels on trucks is in FIRST_PARCEL_ROW + 1,
+	 * Delivered parcels is in FIRST_PARCEL_ROW + 2
+	 */
+	private static final int FIRST_TRUCK_ROW = 14;
 	
 	/** Updates the info panel to the new game that was just loaded */
 	private void updateSidePanel(){
@@ -366,15 +380,20 @@ public class GUI extends JFrame{
 		basicModel.addRow(new Object[]{"Cities",game.getBoard().getNodesSize()});
 		basicModel.addRow(new Object[]{"Highways",game.getBoard().getEdgesSize()});
 		basicModel.addRow(new Object[]{"Trucks",game.getBoard().getTrucks().size()});
+		basicModel.addRow(new Object[]{"Parcels",game.getBoard().getParcels().size()});
 		basicModel.addRow(new Object[]{"Wait Cost", game.getBoard().WAIT_COST});
 		basicModel.addRow(new Object[]{"Pickup Cost", game.getBoard().PICKUP_COST});
 		basicModel.addRow(new Object[]{"Dropoff Cost", game.getBoard().DROPOFF_COST});
 		basicModel.addRow(new Object[]{"Parcel Payoff", game.getBoard().PAYOFF});
 		basicModel.addRow(new Object[]{"On Color Multiplier", game.getBoard().ON_COLOR_MULTIPLIER});
-		basicModel.addRow(new Object[]{"",""});
+		basicModel.addRow(new Object[]{"","  "});
 		basicModel.addRow(new Object[]{"Parcels in Cities",""});
 		basicModel.addRow(new Object[]{"Parcels on Trucks",""});
 		basicModel.addRow(new Object[]{"Parcels Delivered",""});
+		basicModel.addRow(new Object[]{"","  "});
+		basicModel.addRow(new Object[]{"Trucks Waiting",""});
+		basicModel.addRow(new Object[]{"Trucks Traveling",""});
+		basicModel.addRow(new Object[]{"Trucks com w/ Manager",""});
 		
 		//Set properties of table
 		JPanel innerPanel = new JPanel();
@@ -393,7 +412,36 @@ public class GUI extends JFrame{
 		statsTable.setRowHeight(18);
 		statsTable.getColumn(statsTable.getColumnName(0)).setPreferredWidth(200);
 
-		updateParcelStats();
+		JSlider updateSlider = new JSlider();
+		updateSlider.setMaximum(2000);
+		updateSlider.setMinimum(100);
+		updateSlider.setValue((int)DEFAULT_UPDATE_TIME);
+		updateSlider.setToolTipText("Update timer for Parcel and Truck stats. Left for faster update, right for slower");
+		updateSlider.addChangeListener(new ChangeListener(){
+			@Override
+			public void stateChanged(ChangeEvent e) {
+				updateTime = ((JSlider)e.getSource()).getValue();
+			}
+		});
+		updateTime = updateSlider.getValue();
+		sidePanel.add(updateSlider);
+		
+		if(updateThread != null) updateThread.interrupt();
+		
+		updateThread = new Thread(new Runnable(){
+			@Override
+			public void run(){
+				while(true){
+					try{
+						Thread.sleep(updateTime);
+						updateParcelAndTruckStats();
+					}catch(InterruptedException e){
+						return; //Terminates this thread upon interruption
+					}
+				}
+			}
+		});
+		updateParcelAndTruckStats();
 	}
 
 	/** Sets this gui to the given interactability. When this isn't uninteractable,
@@ -413,11 +461,10 @@ public class GUI extends JFrame{
 	public void updateRunning(){
 		boolean running = game.isRunning();
 		if(running){
-			//TODO
 			mntmReset.setEnabled(true);
+			updateThread.start();
 		}
 		else{
-			//TODO
 			mntmReset.setEnabled(game.isFinished());
 		}
 	}
@@ -427,12 +474,17 @@ public class GUI extends JFrame{
 		lblScore.setText( "" + newScore);
 	}
 	
-	/** Updates the GUI to show the new parcel stats */
-	public void updateParcelStats(){
+	/** Updates the GUI to show the new parcel stats and Truck stats */
+	public void updateParcelAndTruckStats(){
 		StatsTableModel m = (StatsTableModel)statsTable.getModel();
-		m.setValueAt(new Integer(game.getBoard().getOnNodeParcels()), FIRST_PARCEL_ROW + 0, 1);
-		m.setValueAt(new Integer(game.getBoard().getOnTruckParcels()), FIRST_PARCEL_ROW + 1, 1);
-		m.setValueAt(new Integer(game.getBoard().getDeliveredParcels()), FIRST_PARCEL_ROW + 2, 1);
+		int[] parcelStats = game.parcelStats();
+		for(int i = 0; i < parcelStats.length; i++){
+			m.setValueAt(parcelStats[i], FIRST_PARCEL_ROW + i, 1);
+		}
+		int[] truckStats = game.truckStats();
+		for(int i = 0; i < truckStats.length; i++){
+			m.setValueAt(truckStats[i], FIRST_TRUCK_ROW + i, 1);
+		}	
 	}
 
 	/** Returns the current update message shown on the GUI */
@@ -469,6 +521,7 @@ public class GUI extends JFrame{
 	/** Disposes of this gui, also interrupts messageClearer thread so that doesn't persist */
 	@Override
 	public void dispose(){
+		updateThread.interrupt();
 		messageClearer.interrupt();
 		super.dispose();
 	}

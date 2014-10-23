@@ -122,11 +122,6 @@ public class Parcel implements BoardElement{
 	protected void pickedUp(Truck t) throws InterruptedException{
 		parcelLock.acquire();
 		holder = t;
-		int oldParcelOnNodeCount = board.parcelCounts.get(Board.PARCELS_ON_MAP);
-		board.parcelCounts.set(Board.PARCELS_ON_MAP, oldParcelOnNodeCount - 1);
-		int oldParcelOnTruckCount = board.parcelCounts.get(Board.PARCELS_ON_TRUCK);
-		board.parcelCounts.set(Board.PARCELS_ON_TRUCK, oldParcelOnTruckCount + 1);
-		if(board.game.getGUI() != null) board.game.getGUI().updateParcelStats();
 		parcelLock.release();
 	}
 
@@ -141,23 +136,15 @@ public class Parcel implements BoardElement{
 			parcelLock.release();
 			throw new RuntimeException("Parcel is not currently on a Truck, cannot be dropped off");
 		}
-		int oldParcelOnTruckCount = board.parcelCounts.get(Board.PARCELS_ON_TRUCK);
-		board.parcelCounts.set(Board.PARCELS_ON_TRUCK, oldParcelOnTruckCount - 1);
 
 		if(holder.getLocation().equals(destination)){
 			reachedDestination();
 			parcelLock.release();
-			int oldParcelDeliveredCount = board.parcelCounts.get(Board.PARCELS_DELIVERED);
-			board.parcelCounts.set(Board.PARCELS_DELIVERED, oldParcelDeliveredCount + 1);
-			if(board.game.getGUI() != null) board.game.getGUI().updateParcelStats();
 			return;
 		}
 
 		setLocation(holder.getLocation());
 		holder = null;
-		int oldParcelOnNodeCount = board.parcelCounts.get(Board.PARCELS_ON_MAP);
-		board.parcelCounts.set(Board.PARCELS_ON_MAP, oldParcelOnNodeCount + 1);
-		if(board.game.getGUI() != null) board.game.getGUI().updateParcelStats();
 		parcelLock.release();
 	}
 
@@ -200,6 +187,11 @@ public class Parcel implements BoardElement{
 		return holder == t;
 	}
 
+	/** Returns true if this is currently being held by a truck, false otherwise */
+	public boolean isHeld(){
+		return holder != null;
+	}
+	
 	/** Returns 1 if a truck is currently holding this, 0 otherwise */
 	@Override
 	public int trucksHere(){

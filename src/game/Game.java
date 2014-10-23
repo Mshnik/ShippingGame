@@ -181,6 +181,31 @@ public class Game{
 		gui.setUpdateMessage(newUpdate);
 	}
 
+	/** Returns the parcel stats for the current game in the form [on city, on truck, delivered */
+	public int[] parcelStats(){
+		int[] pArr = new int[3];
+		for(Parcel p : getBoard().getParcels()){
+			if(p.isHeld())
+				pArr[1]++;
+			else
+				pArr[0]++;
+		}
+		pArr[2] = getBoard().initialParcelCount - pArr[0] - pArr[1];
+		return pArr;
+	}
+	
+	/** Returns the truck stats for the current game in the form [waiting, traveling, getting manager input] */
+	public int[] truckStats(){
+		int[] tArr = new int[3];
+		for(Truck t : getBoard().getTrucks()){
+			if(t.getStatus().equals(Truck.Status.WAITING))
+				tArr[0]++;
+			else
+				tArr[1]++;
+		}
+		return tArr;
+	}
+	
 	/** Ends this game prematurely by halting trucks and manager.
 	 * This will interrupt the manager and truck threads. */
 	public void kill(){

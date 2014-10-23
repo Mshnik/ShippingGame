@@ -54,10 +54,9 @@ public class Board implements JSONString{
 	private ArrayList<Truck> trucks; //The trucks in this board
 	private List<Truck> finishedTrucks; //The trucks that have terminated themselves 
 											 //because they are home and there are no more parcels
+	protected final int initialParcelCount;	//Starting number of parcels
 	private Set<Parcel> parcels; //The parcels in this board - ones that have not been delivered yet
 
-	protected List<Integer> parcelCounts; //A count of [on map, on truck, delivered] parcels
-	//Values are managed by parcels as they are moved
 	protected static final int PARCELS_ON_MAP = 0;
 	protected static final int PARCELS_ON_TRUCK = 1;
 	protected static final int PARCELS_DELIVERED = 2;
@@ -156,8 +155,9 @@ public class Board implements JSONString{
 				start.addParcel(p);
 			}
 		}
-		initParcelTruckCounts();
 		updateMinMaxLength();
+		
+		initialParcelCount = parcels.size();
 	}
 	
 	/** Initializes collections - call during construction */
@@ -167,29 +167,6 @@ public class Board implements JSONString{
 		parcels = Collections.synchronizedSet(new HashSet<Parcel>());
 		nodes = new HashSet<Node>();
 		edges = new HashSet<Edge>();
-	}
-
-	/** Initializes the parcelCount list - call during construction */
-	private void initParcelTruckCounts(){
-		parcelCounts = Collections.synchronizedList(new ArrayList<Integer>(3));
-		parcelCounts.add(parcels.size());
-		parcelCounts.add(0);
-		parcelCounts.add(0);
-	}
-
-	/** Returns the number of parcels on this board that are not being caried by trucks */
-	public int getOnNodeParcels(){
-		return parcelCounts.get(PARCELS_ON_MAP);
-	}
-
-	/** Returns the number of parcels on this board being carried by trucks */
-	public int getOnTruckParcels(){
-		return parcelCounts.get(PARCELS_ON_TRUCK);
-	}
-
-	/** Returns the number of parcels from this board that have been successfully delivered */
-	public int getDeliveredParcels(){
-		return parcelCounts.get(PARCELS_DELIVERED);
 	}
 
 	/** Returns a random node in this board */
@@ -584,8 +561,9 @@ public class Board implements JSONString{
 		}
 
 		spiderwebEdges(r);
-		initParcelTruckCounts();
 		updateMinMaxLength();
+		
+		initialParcelCount = parcels.size();
 	}
 
 	/** Creates an edge with a random length that connects the two given nodes,
