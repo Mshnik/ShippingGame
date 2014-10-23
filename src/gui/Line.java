@@ -71,7 +71,7 @@ public class Line  extends JPanel{
 		this.setC2(c2);
 		this.represents = represents;
 		setOpaque(false);
-
+		fixBounds();
 		updateToColorPolicy();
 	}
 
@@ -129,7 +129,27 @@ public class Line  extends JPanel{
 	public int getYMid(){
 		return (c1.getY1() + c2.getY1()) / 2;
 	}
+	
+	/** Returns the width (x diff) of the line. Always postive value */
+	public int getLineWidth(){
+		return Math.abs(getX1() - getX2());
+	}
+	
+	/** Returns the height (y diff) of the line. Always postive value */
+	public int getLineHeight(){
+		return Math.abs(getY1() - getY2());
+	}
 
+	/** Call whenever circles move to fix the drawing boundaries of this */
+	public void fixBounds(){
+		int minX = Math.min(getX1(), getX2());
+		int minY = Math.min(getY1(), getY2());
+		int width = Math.max(Math.abs(getX1() - getX2()), 40);
+		int height = Math.abs(getY1() - getY2());
+		
+		setBounds(minX, minY, width + 2, height + 2);
+	}
+	
 	/** Returns the current color of this line, which is determined by the color policy */
 	public Color getColor(){
 		return color;
@@ -238,10 +258,14 @@ public class Line  extends JPanel{
 		Graphics2D g2d = (Graphics2D) g;
 		g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING,  RenderingHints.VALUE_ANTIALIAS_ON);
 		g2d.setStroke(new BasicStroke(LINE_THICKNESS));
-		Line2D line2d = new Line2D.Double(getX1(), getY1(), getX2(), getY2());
+		Line2D line2d = null;
+		if(getX1() < getX2() && getY1() < getY2() || getX2() < getX1() && getY2() < getY1())
+			line2d = new Line2D.Double(1, 1, getLineWidth(), getLineHeight());
+		else
+			line2d = new Line2D.Double(1, getLineHeight(), getLineWidth(), 1);
 		g2d.setColor(getColor());
 		g2d.draw(line2d);
-		g2d.drawString(represents.getMappedName(), represents.getRelativeX() + getX1(), represents.getRelativeY() + getY1());
+		g2d.drawString(represents.getMappedName(), represents.getRelativeX(), represents.getRelativeY());
 	}
 
 	
@@ -249,6 +273,5 @@ public class Line  extends JPanel{
 	@Override
 	public Dimension getPreferredSize(){
 		return new Dimension(Math.abs(getX2()-getX1()), Math.abs(getY2()- getY1()));
-
 	}
 }

@@ -24,6 +24,8 @@ import javax.swing.JTable;
 
 import java.awt.event.ActionListener;
 import java.awt.event.ActionEvent;
+import java.awt.event.ComponentEvent;
+import java.awt.event.ComponentListener;
 import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
 import java.io.File;
@@ -31,6 +33,7 @@ import java.io.File;
 import javax.swing.BoxLayout;
 import java.awt.SystemColor;
 import javax.swing.JRadioButtonMenuItem;
+
 import java.awt.Font;
 
 /** The GUI Class creates the JFrame that shows the game.
@@ -44,14 +47,25 @@ public class GUI extends JFrame{
 
 	private static final long serialVersionUID = 2941318999657277463L;
 
-	public static final int DRAWING_BOARD_WIDTH = 1100;
-	public static final int DRAWING_BOARD_HEIGHT = 600;
+	public static final int DRAWING_BOARD_WIDTH = 1000;	//Default
+	public static final int DRAWING_BOARD_HEIGHT = 500; //Default
+	
 	public static final int UPDATE_PANEL_HEIGHT = 100;
 	public static final int SIDE_PANEL_WIDTH = 300;
 	
+	//Figure out how to get screen size
+	static{
+//		DRAWING_BOARD_WIDTH = s.get_width() - SIDE_PANEL_WIDTH;
+//		DRAWING_BOARD_HEIGHT = s.get_height() - UPDATE_PANEL_HEIGHT;
+	}
+	
+	private int drawingBoardWidth;	//Most recent value of width
+	private int drawingBoardHeight; //Most recent value of height
+		
 	private GUI self;			//A reference to this, for use in anonymous inner classes
 	private Game game;			//The game this gui draws
 	private boolean interactable;	//True if the user can do input, false otherwise
+	private boolean initialized;	//True once the initial construction process is done, false until then
 	
 	private JPanel drawingPanel; //The main panel on which the board is drawn
 	private JPanel sidePanel;	 // The info panel located on the right of the board.
@@ -75,13 +89,24 @@ public class GUI extends JFrame{
 		updateTime = DEFAULT_UPDATE_TIME;
 
 		setDefaultCloseOperation(EXIT_ON_CLOSE);
-		setResizable(false);
 		
 		drawingPanel = new JPanel();
 		drawingPanel.setBorder(new LineBorder(Color.BLUE));
 		drawingPanel.setBackground(Color.WHITE);
-		drawingPanel.setPreferredSize(new Dimension(DRAWING_BOARD_WIDTH, DRAWING_BOARD_HEIGHT));
+		
+		drawingBoardWidth = DRAWING_BOARD_WIDTH;
+		drawingBoardHeight = DRAWING_BOARD_HEIGHT;
+
+		drawingPanel.setPreferredSize(new Dimension(drawingBoardWidth, drawingBoardHeight));
 		drawingPanel.setLayout(null);
+		drawingPanel.addComponentListener(new ComponentListener(){
+			public void componentResized(ComponentEvent e) {
+				drawingPanelResized();
+			}
+			public void componentMoved(ComponentEvent e) {}
+			public void componentShown(ComponentEvent e) {}
+			public void componentHidden(ComponentEvent e) {}
+		});
 		
 		getContentPane().add(drawingPanel, BorderLayout.CENTER);
 		
@@ -231,12 +256,32 @@ public class GUI extends JFrame{
 		d.setSelected(true);
 		addEdgeStyleCheckbox("Highlight Travel", Line.ColorPolicy.HIGHLIGHT_TRAVEL, mnGUI, edgeStyleGroup);
 		addEdgeStyleCheckbox("Gradient", Line.ColorPolicy.DISTANCE_GRADIENT, mnGUI, edgeStyleGroup);
-
-		setVisible(true);
+		
 		pack();
 		validate();
 		repaint();
 		setGame(g);
+		initialized = true;
+		drawingPanelResized();
+		setVisible(true);
+	}
+	
+	/** Called internally when the drawing panel is resized */
+	private void drawingPanelResized(){
+		if(! initialized) return;
+		
+		Dimension newSize = drawingPanel.getSize();
+		double heightRatio = (double)newSize.height / (double)drawingBoardHeight;
+		double widthRatio = (double)newSize.width / (double)drawingBoardWidth;
+		
+		for(Node n : game.getBoard().getNodes()){
+			Circle c = n.getCircle();
+			n.updateGUILocation((int)Math.round((c.getX1() * widthRatio)), 
+								(int)Math.round((c.getY1() * heightRatio)));
+		}
+
+		drawingBoardWidth = newSize.width;
+		drawingBoardHeight = newSize.height;
 	}
 
 	/** Creates and adds to the gui a checkbox with the given text for edge paint style.

@@ -245,13 +245,13 @@ public class Edge implements BoardElement{
 	/** Returns the x location the boardped name of this Edge relative to the top left corner of the line */
 	@Override
 	public int getRelativeX() {
-		return line.getXMid() - line.getX1() + Line.LINE_THICKNESS;
+		return line.getXMid() - Math.min(line.getX1(), line.getX2()) + Line.LINE_THICKNESS;
 	}
 
 	/** Returns the y location the boardped name of this Edge relative to the top left corner of the line */
 	@Override
 	public int getRelativeY() {
-		return line.getYMid() - line.getY1() + Line.LINE_THICKNESS*3;
+		return line.getYMid() - Math.min(line.getY1(), line.getY2()) + Line.LINE_THICKNESS*3;
 	}
 
 	/** Returns true if the given truck is currently traveling this edge, false otherwise. */
@@ -273,6 +273,7 @@ public class Edge implements BoardElement{
 	/** Repaints itself. Values of x and y unused, but included to comply with interface. */
 	@Override
 	public void updateGUILocation(int x, int y) {
+		getLine().fixBounds();
 		getLine().repaint();
 	}
 }

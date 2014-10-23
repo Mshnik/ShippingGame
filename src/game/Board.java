@@ -780,7 +780,7 @@ public class Board implements JSONString{
 			//Otherwise, put old edge back
 			else{
 				addEdge(r, oldFirst, oldSecond);
-			}
+			}  
 		}
 	}
 
