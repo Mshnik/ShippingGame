@@ -44,8 +44,8 @@ public class GUI extends JFrame{
 
 	private static final long serialVersionUID = 2941318999657277463L;
 
-	public static final int DRAWING_BOARD_WIDTH = 900;
-	public static final int DRAWING_BOARD_HEIGHT = 500;
+	public static final int DRAWING_BOARD_WIDTH = 1100;
+	public static final int DRAWING_BOARD_HEIGHT = 600;
 	public static final int UPDATE_PANEL_HEIGHT = 100;
 	public static final int SIDE_PANEL_WIDTH = 300;
 	
@@ -76,13 +76,13 @@ public class GUI extends JFrame{
 
 		setDefaultCloseOperation(EXIT_ON_CLOSE);
 		setResizable(false);
-
+		
 		drawingPanel = new JPanel();
 		drawingPanel.setBorder(new LineBorder(Color.BLUE));
 		drawingPanel.setBackground(Color.WHITE);
 		drawingPanel.setPreferredSize(new Dimension(DRAWING_BOARD_WIDTH, DRAWING_BOARD_HEIGHT));
 		drawingPanel.setLayout(null);
-	
+		
 		getContentPane().add(drawingPanel, BorderLayout.CENTER);
 		
 		sidePanel = new JPanel();

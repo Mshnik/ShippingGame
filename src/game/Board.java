@@ -451,8 +451,8 @@ public class Board implements JSONString{
 	private static final int MIN_EDGE_LENGTH = 5;
 	private static final int MAX_EDGE_LENGTH = 60;
 
-	private static final int WIDTH = GUI.DRAWING_BOARD_WIDTH - Circle.DEFAULT_DIAMETER * 3;
-	private static final int HEIGHT = GUI.DRAWING_BOARD_HEIGHT - Circle.DEFAULT_DIAMETER * 3;
+	private static final int WIDTH = 1600 - Circle.DEFAULT_DIAMETER * 3;
+	private static final int HEIGHT = 1200 - Circle.DEFAULT_DIAMETER * 3;
 
 	private static final int MIN_TRUCKS = 5;
 	private static final int MAX_TRUCKS = 50;
@@ -561,6 +561,9 @@ public class Board implements JSONString{
 		}
 
 		spiderwebEdges(r);
+		
+		scaleComponents();
+		
 		updateMinMaxLength();
 		
 		initialParcelCount = parcels.size();
@@ -781,6 +784,18 @@ public class Board implements JSONString{
 		}
 	}
 
+	/** Scales the (x,y) coordinates of circles to fit the gui */
+	private void scaleComponents(){
+		double heightRatio = (double)(GUI.DRAWING_BOARD_HEIGHT - 2*Circle.DEFAULT_DIAMETER)/ (double)HEIGHT;
+		double widthRatio = (double)(GUI.DRAWING_BOARD_WIDTH - 2*Circle.DEFAULT_DIAMETER)/ (double)WIDTH;
+		
+		for(Node n : getNodes()){
+			Circle c = n.getCircle();
+			c.setX1((int) (c.getX1() * widthRatio) + Circle.DEFAULT_DIAMETER/2);
+			c.setY1((int) (c.getY1() * heightRatio) + Circle.DEFAULT_DIAMETER/2);
+		}
+	}
+	
 	/** Allows for sorting of Collections of Nodes by their gui distance to
 	 * each of the nodes in collection n.
 	 * The node that is closest in the collection to the given node is the one that counts.
