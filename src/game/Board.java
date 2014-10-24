@@ -57,10 +57,6 @@ public class Board implements JSONString{
 	protected final int initialParcelCount;	//Starting number of parcels
 	private Set<Parcel> parcels; //The parcels in this board - ones that have not been delivered yet
 
-	protected static final int PARCELS_ON_MAP = 0;
-	protected static final int PARCELS_ON_TRUCK = 1;
-	protected static final int PARCELS_DELIVERED = 2;
-
 	/** The game this board is for */
 	public final Game game;
 
@@ -113,11 +109,17 @@ public class Board implements JSONString{
 				Circle c = n.getCircle();
 				c.setX1(nodeJSON.getInt(BoardElement.X_TOKEN));
 				c.setY1(nodeJSON.getInt(BoardElement.Y_TOKEN));
+				n.x = c.getX1();
+				n.y = c.getY1();
 				getNodes().add(n);
 				if(n.name.equals(Board.TRUCK_HOME_NAME))
 					setTruckHome(n);
 			}
 		}
+		
+		//Scale the locations of the nodes based on the gui size
+		scaleComponents();
+		
 		//Read in all edges of board. Precondition - all nodes already read in
 		for(String key : obj.keySet()){
 			if(key.startsWith(Board.EDGE_TOKEN)){
@@ -533,6 +535,8 @@ public class Board implements JSONString{
 					}
 				}
 			}
+			n.x = n.getCircle().getX1();
+			n.y = n.getCircle().getY1();
 			getNodes().add(n);
 			if(n.name.equals(Board.TRUCK_HOME_NAME)){
 				setTruckHome(n);
@@ -857,11 +861,13 @@ public class Board implements JSONString{
 			return new ArrayList<String>();
 		}
 		ArrayList<String> result = new ArrayList<String>();
-		String line;
 		try{
+			String line;
 			while((line = read.readLine()) != null){
-				if(! line.equals(""))
-					result.add(line);
+				//Strip non-ascii or null characters out of string
+				line = line.replaceAll("[\uFEFF-\uFFFF \u0000]", "");
+				System.out.println();
+				result.add(line);
 			}
 			read.close();
 		}

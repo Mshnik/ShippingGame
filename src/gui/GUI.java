@@ -6,6 +6,7 @@ import javax.swing.JFrame;
 import javax.swing.JPanel;
 import java.awt.BorderLayout;
 import java.awt.Dimension;
+import java.awt.Toolkit;
 
 import javax.swing.JLabel;
 
@@ -31,7 +32,6 @@ import java.awt.event.ItemListener;
 import java.io.File;
 
 import javax.swing.BoxLayout;
-import java.awt.SystemColor;
 import javax.swing.JRadioButtonMenuItem;
 
 import java.awt.Font;
@@ -47,16 +47,19 @@ public class GUI extends JFrame{
 
 	private static final long serialVersionUID = 2941318999657277463L;
 
-	public static final int DRAWING_BOARD_WIDTH = 1000;	//Default
-	public static final int DRAWING_BOARD_HEIGHT = 500; //Default
+	public static final int X_OFFSET = 100;
+	public static final int Y_OFFSET = 100;
+	
+	public static final int DRAWING_BOARD_WIDTH;	//Default
+	public static final int DRAWING_BOARD_HEIGHT; //Default
 	
 	public static final int UPDATE_PANEL_HEIGHT = 100;
 	public static final int SIDE_PANEL_WIDTH = 300;
 	
-	//Figure out how to get screen size
 	static{
-//		DRAWING_BOARD_WIDTH = s.get_width() - SIDE_PANEL_WIDTH;
-//		DRAWING_BOARD_HEIGHT = s.get_height() - UPDATE_PANEL_HEIGHT;
+		Dimension s = Toolkit.getDefaultToolkit().getScreenSize();
+		DRAWING_BOARD_WIDTH = s.width - SIDE_PANEL_WIDTH - X_OFFSET * 2;
+		DRAWING_BOARD_HEIGHT = s.height - UPDATE_PANEL_HEIGHT - Y_OFFSET * 3;
 	}
 	
 	private int drawingBoardWidth;	//Most recent value of width
@@ -83,7 +86,7 @@ public class GUI extends JFrame{
 	private Thread updateThread;	//Thread that manages updating of stats
 
 	/** GUI constructor. Creates a window to show a game {@code g} */
-	public GUI(Game g) {
+	public GUI(Game g) {		
 		self = this;
 		interactable = true;
 		updateTime = DEFAULT_UPDATE_TIME;
@@ -91,7 +94,7 @@ public class GUI extends JFrame{
 		setDefaultCloseOperation(EXIT_ON_CLOSE);
 		
 		drawingPanel = new JPanel();
-		drawingPanel.setBorder(new LineBorder(Color.BLUE));
+		drawingPanel.setBorder(new LineBorder(new Color(131,155,255)));
 		drawingPanel.setBackground(Color.WHITE);
 		
 		drawingBoardWidth = DRAWING_BOARD_WIDTH;
@@ -111,28 +114,28 @@ public class GUI extends JFrame{
 		getContentPane().add(drawingPanel, BorderLayout.CENTER);
 		
 		sidePanel = new JPanel();
-		sidePanel.setBorder(new LineBorder(Color.BLACK));
-		sidePanel.setBackground(new Color(190, 230, 150));
+		sidePanel.setBorder(new LineBorder(new Color(131,155,255)));
+		sidePanel.setBackground(new Color(203, 255, 181));
 		sidePanel.setPreferredSize(new Dimension(SIDE_PANEL_WIDTH, DRAWING_BOARD_HEIGHT + UPDATE_PANEL_HEIGHT));
-		sidePanel.setLayout(new BoxLayout(sidePanel, BoxLayout.Y_AXIS));
+		sidePanel.setLayout(new BorderLayout());
 		
 		getContentPane().add(sidePanel, BorderLayout.EAST);
 		
 		JPanel bottomPanel = new JPanel();
 		bottomPanel.setPreferredSize(new Dimension(DRAWING_BOARD_WIDTH, UPDATE_PANEL_HEIGHT));
-		bottomPanel.setBackground(SystemColor.textHighlight);
+		bottomPanel.setBackground(new Color(181,255,252));
 		getContentPane().add(bottomPanel, BorderLayout.SOUTH);
 		bottomPanel.setLayout(new BoxLayout(bottomPanel, BoxLayout.Y_AXIS));
 
 		JPanel updatePanel = new JPanel();
-		updatePanel.setBackground(SystemColor.textHighlight);
+		updatePanel.setBackground(bottomPanel.getBackground());
 		bottomPanel.add(updatePanel);
 
 		lblUpdate = new JLabel("  ");
 		updatePanel.add(lblUpdate);
 
 		JPanel scorePanel = new JPanel();
-		scorePanel.setBackground(SystemColor.textHighlight);
+		scorePanel.setBackground(bottomPanel.getBackground());
 		bottomPanel.add(scorePanel);
 
 		JLabel lblScoreTitle = new JLabel("Score:");
@@ -263,6 +266,7 @@ public class GUI extends JFrame{
 		setGame(g);
 		initialized = true;
 		drawingPanelResized();
+		setLocation(X_OFFSET, Y_OFFSET/2);
 		setVisible(true);
 	}
 	
@@ -377,6 +381,7 @@ public class GUI extends JFrame{
 		game.setGUI(this);
 		game.getBoard().updateMinMaxLength();
 		drawMap();
+		drawingPanelResized();
 		updateSidePanel();
 		pack();
 		validate();
@@ -400,15 +405,17 @@ public class GUI extends JFrame{
 	/** Updates the info panel to the new game that was just loaded */
 	private void updateSidePanel(){
 		sidePanel.removeAll();
-		sidePanel.add(new JLabel("  ")); //Line of space at top
+		
+		JLabel gameLabel = null;
 		if(game.getFile() != null)
-			sidePanel.add(new JLabel("Game from File: " + game.getFile().getName()));
+			gameLabel = new JLabel("Game from File:" + game.getFile().getName());
 		else if(game.getSeed() != -1)
-			sidePanel.add(new JLabel("Game from Seed: " + game.getSeed()));
+			gameLabel = new JLabel("Game from Seed: " +  game.getSeed());
 		else
-			sidePanel.add(new JLabel("Custom Game"));
-		sidePanel.add(new JLabel("  "));
-				
+			gameLabel = new JLabel("Custom Game");
+		gameLabel.setFont(Font.decode("asdf-14"));
+		sidePanel.add(gameLabel, BorderLayout.NORTH);
+		
 		StatsTableModel basicModel = new StatsTableModel();
 		statsTable = new JTable(basicModel);		
 		basicModel.addColumn("Info");
@@ -438,7 +445,7 @@ public class GUI extends JFrame{
 		innerPanel.add(statsTable);
 		innerPanel.add(new JLabel(margin));
 		innerPanel.setBackground(sidePanel.getBackground());
-		sidePanel.add(innerPanel);
+		sidePanel.add(innerPanel, BorderLayout.CENTER);
 		statsTable.setFont(Font.decode("asdf-14")); //System default font with size 14
 		statsTable.setBackground(sidePanel.getBackground());
 		statsTable.setEnabled(false);
@@ -446,10 +453,17 @@ public class GUI extends JFrame{
 		statsTable.setSelectionBackground(statsTable.getBackground());
 		statsTable.setSelectionForeground(statsTable.getForeground());
 		statsTable.setRowHeight(18);
-		statsTable.getColumn(statsTable.getColumnName(0)).setPreferredWidth(200);
+		statsTable.getColumn(statsTable.getColumnName(0)).setPreferredWidth(160);
 
+		JPanel innerPanel2 = new JPanel();
+		innerPanel2.setLayout(new BoxLayout(innerPanel2, BoxLayout.X_AXIS));
+		innerPanel2.add(new JLabel(margin));
+		final JLabel sliderLabel = new JLabel("Update Time: " + updateTime + "ms  ");
+		sliderLabel.setFont(Font.decode("asdf-14")); //System default font with size 14
+		innerPanel2.add(sliderLabel);
 		JSlider updateSlider = new JSlider();
-		updateSlider.setMaximum(1000);
+		updateSlider.setMajorTickSpacing(25);
+		updateSlider.setMaximum(999);
 		updateSlider.setMinimum(25);
 		updateSlider.setValue((int)updateTime);
 		updateSlider.setToolTipText("Update timer for Parcel and Truck stats. Left for faster update, right for slower");
@@ -457,9 +471,15 @@ public class GUI extends JFrame{
 			@Override
 			public void stateChanged(ChangeEvent e) {
 				updateTime = ((JSlider)e.getSource()).getValue();
+				String s = "";
+				if(updateTime < 100) s = " ";
+				sliderLabel.setText("Update Time: " + s + updateTime + "ms  ");
 			}
-		});
-		sidePanel.add(updateSlider);
+		});		
+		innerPanel2.add(updateSlider);
+		innerPanel2.add(new JLabel(margin));
+		innerPanel2.setBackground(sidePanel.getBackground());
+		sidePanel.add(innerPanel2, BorderLayout.SOUTH);
 		
 		if(updateThread != null) updateThread.interrupt();
 		

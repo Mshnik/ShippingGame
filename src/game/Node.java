@@ -25,6 +25,9 @@ public class Node implements BoardElement{
 
 	private final Board board;		//The board this Node is contained in
 	
+	protected int x;				//X coordinate of this node in independent project space
+	protected int y;				//X coordinate of this node in independent project space
+	
 	private HashMap<Truck, Boolean> truckHere; //Maps truck -> is here
 
 	/** The name of this node. Set during construction */
@@ -326,8 +329,8 @@ public class Node implements BoardElement{
 	@Override
 	public String toJSONString(){
 		return "{\n" + Main.addQuotes(BoardElement.NAME_TOKEN) + ":" + Main.addQuotes(name) + ",\n"
-				+ Main.addQuotes(X_TOKEN) + ":"+ circle.getX1() + ",\n"
-				+ Main.addQuotes(Y_TOKEN) + ":" + circle.getY1() + "\n}";
+				+ Main.addQuotes(X_TOKEN) + ":"+ x + ",\n"
+				+ Main.addQuotes(Y_TOKEN) + ":" + y + "\n}";
 	}
 
 }
