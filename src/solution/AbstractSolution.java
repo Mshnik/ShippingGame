@@ -2,6 +2,7 @@ package solution;
 
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.PriorityQueue;
 
@@ -67,5 +68,21 @@ public abstract class AbstractSolution extends Manager{
 			}
 		}
 		return current.getPath();
+	}
+	
+	/** Returns the collective weight of the given path of nodes
+	 * by iterating along it and summing the weight of edges encountered */
+	protected int pathLength(LinkedList<Node> path){
+		int s = 0;
+		Iterator<Node> one = path.iterator();
+		Iterator<Node> two = path.iterator();
+		two.next(); //Advance two by one link
+		
+		while(two.hasNext()){
+			Node n1 = one.next();
+			Node n2 = two.next();
+			s += n1.getConnect(n2).length;
+		}
+		return s;
 	}
 }
