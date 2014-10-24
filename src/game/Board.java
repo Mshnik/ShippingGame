@@ -886,7 +886,6 @@ public class Board implements JSONString{
 			while((line = read.readLine()) != null){
 				//Strip non-ascii or null characters out of string
 				line = line.replaceAll("[\uFEFF-\uFFFF \u0000]", "");
-				System.out.println();
 				result.add(line);
 			}
 			read.close();

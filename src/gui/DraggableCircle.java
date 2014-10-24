@@ -57,9 +57,9 @@ public class DraggableCircle extends Circle {
 			public void mouseDragged(MouseEvent e) {
 				DraggableCircle c = (DraggableCircle)e.getSource();
 				Point p = e.getPoint();
-				c.represents.updateGUILocation(
-					    Math.min(maxX, Math.max(0, c.getX1() + p.x - clickPoint.x)), 
-						Math.min(maxY, Math.max(0, c.getY1() + p.y - clickPoint.y)));
+				int newX = Math.min(maxX, Math.max(0, c.getX1() + p.x - clickPoint.x));
+				int newY = Math.min(maxY, Math.max(0, c.getY1() + p.y - clickPoint.y));
+				c.represents.updateGUILocation(newX, newY);
 			}
 
 			@Override

@@ -50,6 +50,9 @@ public class GUI extends JFrame{
 	public static final int X_OFFSET = 100;
 	public static final int Y_OFFSET = 100;
 	
+	public static final int DRAWING_BOARD_WIDTH_MIN = 400;
+	public static final int DRAWING_BOARD_HEIGHT_MIN = 400;
+	
 	public static final int DRAWING_BOARD_WIDTH;	//Default
 	public static final int DRAWING_BOARD_HEIGHT; //Default
 	
@@ -91,6 +94,8 @@ public class GUI extends JFrame{
 		interactable = true;
 		updateTime = DEFAULT_UPDATE_TIME;
 
+		setMinimumSize(new Dimension(SIDE_PANEL_WIDTH + DRAWING_BOARD_WIDTH_MIN,
+									 UPDATE_PANEL_HEIGHT + DRAWING_BOARD_HEIGHT_MIN));
 		setDefaultCloseOperation(EXIT_ON_CLOSE);
 		
 		drawingPanel = new JPanel();
