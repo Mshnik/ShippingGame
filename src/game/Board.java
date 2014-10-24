@@ -53,7 +53,7 @@ public class Board implements JSONString{
 
 	private ArrayList<Truck> trucks; //The trucks in this board
 	private List<Truck> finishedTrucks; //The trucks that have terminated themselves 
-											 //because they are home and there are no more parcels
+	//because they are home and there are no more parcels
 	protected final int initialParcelCount;	//Starting number of parcels
 	private Set<Parcel> parcels; //The parcels in this board - ones that have not been delivered yet
 
@@ -80,13 +80,13 @@ public class Board implements JSONString{
 	 * Thus, the score value of  an on-color delivery is PAYOFF * ON_COLOR_MULTIPLIER
 	 */
 	public final int ON_COLOR_MULTIPLIER;
-	
+
 	/** Initializes the board from the given serialized version of the board for game g */
 	protected Board(Game g, JSONObject obj){
 		game = g;
-		
+
 		initCollections();
-		
+
 		//Read seed if possible, otherwise use -1.
 		if(obj.has(SEED_TOKEN)){
 			seed = obj.getLong(SEED_TOKEN);
@@ -116,10 +116,10 @@ public class Board implements JSONString{
 					setTruckHome(n);
 			}
 		}
-		
+
 		//Scale the locations of the nodes based on the gui size
 		scaleComponents();
-		
+
 		//Read in all edges of board. Precondition - all nodes already read in
 		for(String key : obj.keySet()){
 			if(key.startsWith(Board.EDGE_TOKEN)){
@@ -158,10 +158,10 @@ public class Board implements JSONString{
 			}
 		}
 		updateMinMaxLength();
-		
+
 		initialParcelCount = parcels.size();
 	}
-	
+
 	/** Initializes collections - call during construction */
 	private void initCollections(){
 		trucks = new ArrayList<Truck>();
@@ -251,7 +251,7 @@ public class Board implements JSONString{
 
 		return true;
 	}
-	
+
 	/** Adds the given truck to the list of finishedTrucks. Then if all trucks are finished, ends the game */
 	protected void addTruckToFinished(Truck t){
 		finishedTrucks.add(t);
@@ -565,11 +565,11 @@ public class Board implements JSONString{
 		}
 
 		spiderwebEdges(r);
-		
+
 		scaleComponents();
-		
+
 		updateMinMaxLength();
-		
+
 		initialParcelCount = parcels.size();
 	}
 
@@ -627,9 +627,30 @@ public class Board implements JSONString{
 		}
 		final int maxHull = hulls.size() - 1;
 
+		//If the innermost hull has size 1 or 2, add edges to guarantee that every node
+		//has degree at least 2
+		HashSet<Node> lastHull = hulls.get(hulls.size() - 1);
+		if(lastHull.size() < 3){
+			HashSet<Node> penultimateHull = hulls.get(hulls.size() - 2); //Exists. Just cause.
+			int e = 1;
+			if(lastHull.size() == 1) e = 2;
+			for(Node n : lastHull){
+				if(n.getExitsSize() < 2){
+					int i = 0;
+					while(i < e){
+						Node n2 = randomElement(penultimateHull, r);
+						if(! lineCrosses(n, n2) && ! n.isConnectedTo(n2)){
+							addEdge(r, n, n2);
+							i++;
+						}
+					}
+				}
+			}
+		}
+
 		int iterations = 0;
 
-		while(getEdges().size() < getNodes().size() * AVERAGE_DEGREE){
+		while(getEdges().size() < getNodes().size() * AVERAGE_DEGREE && iterations < MAX_EDGE_ITERATIONS){
 			//Get random node
 			Node n = randomElement(getNodes(), r);
 			int hull = hullMap.get(n);
@@ -652,7 +673,6 @@ public class Board implements JSONString{
 				}
 			}
 			iterations++;
-			if(iterations == MAX_EDGE_ITERATIONS) break;
 		}
 
 		//Fix triangulation such that it's cleaner.
@@ -750,7 +770,7 @@ public class Board implements JSONString{
 										Edge e24 = n2.getConnect(n4);
 										Edge e34 = n3.getConnect(n4);
 										if(e2.getLine().radAngle(e24.getLine())
-												+ e3.getLine().radAngle(e34.getLine()) < FLIP_CONDITION){
+												+ e3.getLine().radAngle(e34.getLine()) > FLIP_CONDITION){
 											//Store the dividing edge as needing a flip
 											Node[] newExits = {n2, n3};
 											needsFlip.put(e4, newExits);
@@ -792,14 +812,14 @@ public class Board implements JSONString{
 	private void scaleComponents(){
 		double heightRatio = (double)(GUI.DRAWING_BOARD_HEIGHT - 2*Circle.DEFAULT_DIAMETER)/ (double)HEIGHT;
 		double widthRatio = (double)(GUI.DRAWING_BOARD_WIDTH - 2*Circle.DEFAULT_DIAMETER)/ (double)WIDTH;
-		
+
 		for(Node n : getNodes()){
 			Circle c = n.getCircle();
 			c.setX1((int) (c.getX1() * widthRatio) + Circle.DEFAULT_DIAMETER/2);
 			c.setY1((int) (c.getY1() * heightRatio) + Circle.DEFAULT_DIAMETER/2);
 		}
 	}
-	
+
 	/** Allows for sorting of Collections of Nodes by their gui distance to
 	 * each of the nodes in collection n.
 	 * The node that is closest in the collection to the given node is the one that counts.

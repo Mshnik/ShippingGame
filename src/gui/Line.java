@@ -140,12 +140,14 @@ public class Line  extends JPanel{
 		return Math.abs(getY1() - getY2());
 	}
 
-	/** Call whenever circles move to fix the drawing boundaries of this */
+	/** Call whenever circles move to fix the drawing boundaries of this.
+	 * Dynamically resizes based on the height and width of the line,
+	 * with a minimum sized box of (40,40) */
 	public void fixBounds(){
 		int minX = Math.min(getX1(), getX2());
 		int minY = Math.min(getY1(), getY2());
 		int width = Math.max(Math.abs(getX1() - getX2()), 40);
-		int height = Math.abs(getY1() - getY2());
+		int height = Math.max(Math.abs(getY1() - getY2()), 40);
 		
 		setBounds(minX, minY, width + 2, height + 2);
 	}
@@ -230,11 +232,40 @@ public class Line  extends JPanel{
 	}
 	
 	/** Returns the angle between this line and line l, in radians.
-	 * Return is in the range [0 .. PI]
+	 * Return is in the range [0 .. PI].
+	 * 
+	 * Only able to get angle if the two share an endpoint. 
+	 * Throws an illegalArgumentException otherwise
 	 */
-	public double radAngle(Line l){
-		Vector v = new Vector(getX2() - getX1(), getY2() - getY1());
-		Vector v2 = new Vector(l.getX2() - l.getX1(), l.getY2() - l.getY1());
+	public double radAngle(Line l) throws IllegalArgumentException{
+		Circle commonEndpoint;
+		Circle otherPoint1;
+		Circle otherPoint2;
+		if(c1.locationEquals(l.c1)){
+			commonEndpoint = c1;
+			otherPoint1 = c2;
+			otherPoint2 = l.c2;
+		} else if(c1.locationEquals(l.c2)){
+			commonEndpoint = c1;
+			otherPoint1 = c2;
+			otherPoint2 = l.c1;
+		} else if(c2.locationEquals(l.c1)){
+			commonEndpoint = c2;
+			otherPoint1 = c1;
+			otherPoint2 = c2;
+		} else if(c2.locationEquals(l.c2)){
+			commonEndpoint = c2;
+			otherPoint1 = c1;
+			otherPoint2 = l.c1;
+		} else{
+			throw new IllegalArgumentException("Can't measure angle between " + this + " and " + l
+					+ " because they don't share an endpoint");
+		}
+		
+		Vector v = new Vector(otherPoint1.getX1() - commonEndpoint.getX1(), 
+							  otherPoint1.getY1() - commonEndpoint.getY1());
+		Vector v2 = new Vector(otherPoint2.getX1() - commonEndpoint.getX1(), 
+				  			   otherPoint2.getY1() - commonEndpoint.getY1());		
 		return Vector.radAngle(v, v2);
 	}
 
