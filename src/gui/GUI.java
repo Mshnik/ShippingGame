@@ -429,11 +429,11 @@ public class GUI extends JFrame{
 		basicModel.addRow(new Object[]{"Highways",game.getBoard().getEdgesSize()});
 		basicModel.addRow(new Object[]{"Trucks",game.getBoard().getTrucks().size()});
 		basicModel.addRow(new Object[]{"Parcels",game.getBoard().getParcels().size()});
-		basicModel.addRow(new Object[]{"Wait Cost", game.getBoard().WAIT_COST});
-		basicModel.addRow(new Object[]{"Pickup Cost", game.getBoard().PICKUP_COST});
-		basicModel.addRow(new Object[]{"Dropoff Cost", game.getBoard().DROPOFF_COST});
-		basicModel.addRow(new Object[]{"Parcel Payoff", game.getBoard().PAYOFF});
-		basicModel.addRow(new Object[]{"On Color Multiplier", game.getBoard().ON_COLOR_MULTIPLIER});
+		basicModel.addRow(new Object[]{"Wait Cost", game.getBoard().getWaitCost()});
+		basicModel.addRow(new Object[]{"Pickup Cost", game.getBoard().getPickupCost()});
+		basicModel.addRow(new Object[]{"Dropoff Cost", game.getBoard().getDropoffCost()});
+		basicModel.addRow(new Object[]{"Parcel Payoff", game.getBoard().getPayoff()});
+		basicModel.addRow(new Object[]{"On Color Multiplier", game.getBoard().getOnColorMultiplier()});
 		basicModel.addRow(new Object[]{"","  "});
 		basicModel.addRow(new Object[]{"Parcels in Cities",""});
 		basicModel.addRow(new Object[]{"Parcels on Trucks",""});

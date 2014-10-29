@@ -62,6 +62,7 @@ public class Truck implements BoardElement, Runnable{
 	private Node goingTo;			//The Node this truck will be at once it finishes its current travel queue.
 	private Edge travelingAlong;	//The Edge this Truck is currently traveling along
 
+	private boolean alive;			//True while this truck is executing its run loop, false before and after that
 	private Status status;			//This truck's status, either waiting or traveling
 	private boolean waitingForManager;	//True while this is waiting for manager input, false otherwise
 
@@ -115,7 +116,7 @@ public class Truck implements BoardElement, Runnable{
 		travel = Collections.synchronizedList(new LinkedList<Edge>());
 		color = c;
 		circle = new Circle(this, 0, 0, (int)((double)Circle.DEFAULT_DIAMETER * 0.8), c, false);
-
+		alive = false;
 	}
 
 	/** The Truck's main running routine. While the travel directions are empty,
@@ -129,11 +130,13 @@ public class Truck implements BoardElement, Runnable{
 	@Override
 	public void run(){
 		lastTravelTime = System.currentTimeMillis();
+		alive = true;
 		while(true){
 			if(getBoard().getParcels().isEmpty() && location.equals(getBoard().getTruckHome())){
 				getBoard().addTruckToFinished(this);
 				//Deduct final waiting points
 				fixLastTravelTime();
+				alive = false;
 				return;
 			}
 
@@ -144,6 +147,7 @@ public class Truck implements BoardElement, Runnable{
 				postManagerNotification();
 			}
 			catch (InterruptedException e){
+				alive = false;
 				return;
 			}
 
@@ -178,7 +182,7 @@ public class Truck implements BoardElement, Runnable{
 	private void fixLastTravelTime(){
 		long now = System.currentTimeMillis();
 		long diff = now - lastTravelTime;
-		getManager().getScoreObject().changeScore(getBoard().WAIT_COST * (int)(diff / WAIT_TIME));
+		getManager().getScoreObject().changeScore(getBoard().getWaitCost() * (int)(diff / WAIT_TIME));
 		lastTravelTime = now;
 	}
 
@@ -209,6 +213,11 @@ public class Truck implements BoardElement, Runnable{
 		name = newName;
 	}
 
+	/** Returns whether this Truck is alive (executing its run loop) or not */
+	public boolean isAlive(){
+		return alive;
+	}
+	
 	/** Returns the Truck's current location. 
 	 *  If this.status.equals(Status.TRAVELING) or the calling thread is interrupted, returns null 
 	 */
@@ -466,7 +475,7 @@ public class Truck implements BoardElement, Runnable{
 			}
 			parcelLock.release();
 
-			getManager().getScoreObject().changeScore(getBoard().PICKUP_COST);
+			getManager().getScoreObject().changeScore(getBoard().getPickupCost());
 			preManagerNotification();
 			game.getManager().truckNotification(this, Manager.Notification.PICKED_UP_PARCEL);
 			postManagerNotification();
@@ -498,7 +507,7 @@ public class Truck implements BoardElement, Runnable{
 		}
 		load = null;
 		parcelLock.release();
-		getManager().getScoreObject().changeScore(getBoard().DROPOFF_COST);
+		getManager().getScoreObject().changeScore(getBoard().getDropoffCost());
 		preManagerNotification();
 		game.getManager().truckNotification(this, Manager.Notification.DROPPED_OFF_PARCEL);
 		postManagerNotification();

@@ -79,8 +79,9 @@ public class AdvancedShnikSolution extends AbstractSolution {
 	public void truckNotification(Truck t, Notification message) {
 		if(! preprocessingDone) return;
 		
-		//Base case - at new node. Check if has parcel and should drop off.
-		if(message.equals(Notification.LOCATION_CHANGED)){
+		//Wait frame notification - logic branches a bit.
+		//if t is holding a load, travel to that location.
+		else if(message.equals(Notification.WAITING)){
 			if(t.getLoad() != null && t.getLoad().destination.equals(t.getLocation())){
 				t.dropoffLoad();
 				
@@ -93,16 +94,18 @@ public class AdvancedShnikSolution extends AbstractSolution {
 					assignParcelTo(t);
 				}
 			}
-		}
-		//Wait frame notification - logic branches a bit.
-		//if t is holding a load, travel to that location.
-		else if(message.equals(Notification.WAITING)){
-			if(t.getLoad() != null){
+			else if(t.getLoad() != null){
 				t.setTravelPath(dijkstra(t.getLocation(), t.getLoad().destination));
-			} else if(parcelsAssigned.containsKey(t)){
+			} else if(parcelsAssigned.containsKey(t) && t.getLocation().isParcelHere(parcelsAssigned.get(t))){
 				t.pickupLoad(parcelsAssigned.get(t));
+			} else if(parcelsAssigned.containsKey(t) && getParcels().contains(parcelsAssigned.get(t))){
 				t.setTravelPath(dijkstra(t.getLocation(), parcelsAssigned.get(t).getLocation()));
+			} else if(! parcelsAssigned.containsKey(t) || getParcels().isEmpty()){
+				t.setTravelPath(dijkstra(t.getLocation(), getBoard().getTruckHome()));
+			} else if(parcelsAssigned.containsKey(t) && ! getParcels().contains(parcelsAssigned.get(t))){
+				assignParcelTo(t);
 			}
+			
 		}
 		
 	}
