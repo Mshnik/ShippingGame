@@ -56,6 +56,8 @@ public abstract class AbstractSolution extends Manager{
 							if(set){
 								wrap.setDistance(current.getDistance() + e.length);
 								wrap.resetPath(current);
+								queue.remove(wrap);
+								queue.add(wrap);
 							}
 						}
 					}
