@@ -80,7 +80,7 @@ public class AdvancedShnikSolution extends AbstractSolution {
 	@Override
 	public void truckNotification(Truck t, Notification message) {
 		if(! preprocessingDone) return;
-
+		
 		//Wait frame notification - logic branches a bit.
 		//if t is holding a load, travel to that location.
 		else if(message.equals(Notification.WAITING)){

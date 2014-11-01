@@ -36,21 +36,26 @@ public abstract class Manager implements Runnable{
 	/** Behavior for the Manager and all trucks. To be overridden in subclasses */
 	public abstract void run();
 
-	/** Message options from a truck to a manager include the following:
+	/** Message options from a truck to a manager include the following. Unless otherwise noted,
+	 * the truck's status will be WAITING whenever a notification is fired. Exceptions are TRAVELING_TO_CHANGED (always)
+	 * and STATUS_CHANGED (sometimes)
 	 * 	<p>	WAITING - sent whenever a truck is waiting without any travel directions. Sent every time the
 	 * 			truck checks that it still has no travel directions (Truck.WAIT_TIME)
 	 *  <p> LOCATION_CHANGED - Sent whenever a truck's location field - what Node the truck is currently on - changes.
 	 *  		This occurs whenever a truck reaches a new node
 	 *  <p> TRAVELING_TO_CHANGED - Sent whenever a truck's travelingTo field - what Node the truck is currently traveling towards
-	 *  		- changes. This occurs whenever a truck leaves a node towards a new node.
+	 *  		- changes. This occurs whenever a truck leaves a node towards a new node. Thus this will only
+	 *  		be fired while a Truck is traveling, not waiting.
 	 *  <p> GOING_TO_CHANGED - Sent whenever a truck's goingTo field - what Node the truck will end up at when the current travel
 	 *  		queue is exhausted - changes. This occurs whenever a new edge is added to a truck's travel directions.
 	 *  <p> STATUS_CHANGED - Sent whenever a truck's traveling/waiting status changes. This occurs whenever a truck begins traveling
-	 *  		or stops traveling
+	 *  		or stops traveling. Status has successfully been changed when the notification is fired,
+	 *          so if the truck's status is TRAVELING and the STATUS_CHANGED notification is fired, the truck 
+	 *          just had its status changed to TRAVELING and is now TRAVELING.
 	 *  <p> PARCEL_AT_NODE - Sent whenever a truck arrives at a node that contains at least one parcel. A PARCEL_AT_NODE notification
 	 *  		is fired after a LOCATION_CHANGED notification
-	 *  <p> PICKED_UP_PARCEL - A subset of LOAD_CHANGED notifications. Sent whenever a truck picks up a parcel
-	 *  <p> DROPPED_OFF_PARCEL - A subset of LOAD_CHANGED notifications. Sent whenever a truck picks up a parcel
+	 *  <p> PICKED_UP_PARCEL - Sent whenever a truck picks up a parcel
+	 *  <p> DROPPED_OFF_PARCEL - Sent whenever a truck drops off up a parcel
 	 */
 	public enum Notification{
 		WAITING,
