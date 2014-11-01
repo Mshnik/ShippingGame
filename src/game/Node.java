@@ -24,17 +24,17 @@ import java.util.Set;
 public class Node implements BoardElement{
 
 	private final Board board;		//The board this Node is contained in
-	
+
 	protected int x;				//X coordinate of this node in independent project space
 	protected int y;				//X coordinate of this node in independent project space
-	
+
 	private HashMap<Truck, Boolean> truckHere; //Maps truck -> is here
 
 	/** The name of this node. Set during construction */
 	public final String name;
 	private Set<Edge> exits; 				//Edges leaving this Node
 	private Set<Parcel> parcels; 		//Parcels currently here and not on truck
-	
+
 	private Object userData;
 
 	private Circle circle;	//Circle that represents this graphically
@@ -86,18 +86,15 @@ public class Node implements BoardElement{
 	 */
 	public HashSet<Edge> getExits(){
 		HashSet<Edge> newExits = new HashSet<Edge>();
-		newExits.addAll(exits);
+		synchronized(exits){
+			newExits.addAll(exits);
+		}
 		return newExits;
 	}
 
 	/** Returns a random exit from exits */
 	public Edge getRandomExit(){
 		return Main.randomElement(exits);
-	}
-
-	/** Sets the value of exits to newExits */
-	protected void setExits(HashSet<Edge> newExits){
-		exits = newExits;
 	}
 
 	/** Adds newExit to this Node's set of exits */
@@ -181,21 +178,33 @@ public class Node implements BoardElement{
 		if(destination.equals(this))
 			return false;
 
-		for(Edge r : exits){
-			if(r.isExit(destination))
-				return true;
+		boolean b = false;
+		synchronized(exits){
+			for(Edge r : exits){
+				if(r.isExit(destination)){
+					b = true;
+					break;
+				}
+			}
 		}
 
-		return false;
+		return b;
 	}
 
 	/** Returns the road that this node shares with node other, or null if not connected */
 	public Edge getConnect(Node other){
-		for(Edge r : exits)
-			if(r.getOther(this).equals(other))
-				return r;
+		Edge n = null;
 
-		return null;
+		synchronized(exits){
+			for(Edge r : exits){
+				if(r.getOther(this).equals(other)){
+					n = r;
+					break;
+				}
+			}
+		}
+
+		return n;
 	}
 
 	/** Returns the userData stored in this Node. May be null if the user has not yet given this Node userData 
@@ -279,8 +288,10 @@ public class Node implements BoardElement{
 	@Override
 	public int trucksHere(){
 		int i = 0;
-		for(Boolean b : truckHere.values()){
-			if(b) i++;
+		synchronized(truckHere){
+			for(Boolean b : truckHere.values()){
+				if(b) i++;
+			}
 		}
 		return i;
 	}

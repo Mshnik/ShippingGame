@@ -14,6 +14,7 @@ import java.awt.Color;
 import javax.swing.border.LineBorder;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
+import javax.swing.table.DefaultTableModel;
 import javax.swing.ButtonGroup;
 import javax.swing.JFileChooser;
 import javax.swing.JMenuBar;
@@ -88,6 +89,22 @@ public class GUI extends JFrame{
 	private static final long DEFAULT_UPDATE_TIME = 200;
 	private Thread updateThread;	//Thread that manages updating of stats
 
+	
+	/** A simple extension of the DefaultTableModel that 
+	 * doesn't allow editing. Used to show stats on the side panel of the gui
+	 * @author MPatashnik
+	 */
+	private static class StatsTableModel extends DefaultTableModel {
+		private static final long serialVersionUID = 1L;
+		
+		/** No cells are editable in a stats table - always returns false */
+		@Override
+		public boolean isCellEditable(int row, int col){
+			return false;
+		}
+		
+	}
+	
 	/** GUI constructor. Creates a window to show a game {@code g} */
 	public GUI(Game g) {		
 		self = this;
@@ -193,8 +210,20 @@ public class GUI extends JFrame{
 		JMenuItem mntmStart = new JMenuItem("Start");
 		mntmStart.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
-				if(game != null && !game.isRunning())
+				if(game != null && game.isFinished()){
+					messageClearer.interrupt();
+					if(game.getFile() != null)
+						setGame(new Game(game.getManagerClassname(), game.getFile()));
+					else{
+						setGame(new Game(game.getManagerClassname(), game.getBoard().seed));
+					}
 					game.start();
+					setUpdateMessage("Game Started");
+				}
+				else if(game != null && !game.isRunning()){
+					game.start();
+					setUpdateMessage("Game Started");
+				}
 			}
 		});
 		mnGame.add(mntmStart);
@@ -204,11 +233,13 @@ public class GUI extends JFrame{
 			public void actionPerformed(ActionEvent arg0) {
 				int returnVal = JOptionPane.showConfirmDialog(null, "Are You Sure You Want to Reset?");
 				if(returnVal == JOptionPane.YES_OPTION){
+					messageClearer.interrupt();
 					if(game.getFile() != null)
 						setGame(new Game(game.getManagerClassname(), game.getFile()));
 					else{
 						setGame(new Game(game.getManagerClassname(), game.getBoard().seed));
 					}
+					setUpdateMessage("Game Reset");
 				}
 			}
 		});
@@ -568,7 +599,8 @@ public class GUI extends JFrame{
 				try {
 					Thread.sleep(MESSAGE_DELETE_TIME);
 					setUpdateMessage("  ");
-				} catch (InterruptedException e) {}
+				} catch (InterruptedException e) {
+				}
 			}
 		};
 		if(messageClearer != null && messageClearer.isAlive()){

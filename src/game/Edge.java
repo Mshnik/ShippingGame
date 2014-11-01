@@ -28,16 +28,16 @@ public class Edge implements BoardElement{
 	public static final int DEFAULT_MAX_LENGTH = 0;					//Min val an edge can have for length
 
 	private Node[] exits;	//The Nodes this edge connects. Always has length 2.
-	
+
 	/** Returns the length (weight) of this Edge. Uncorrelated with its graphical length on the GUI */
 	public final int length;		
 
 	private Map<Truck, Boolean> truckHere; //Maps truck -> is here
-	
+
 	private Object userData; //User data (if any) stored in this edge
 
 	private Line line; //Graphical representation of this Edge
-	
+
 	private final Board board;	//The board this Edge belongs to
 
 	/** Constructor. Accepts a non-null Node array of length 2 to be exits and an integer length
@@ -65,13 +65,13 @@ public class Edge implements BoardElement{
 		e[0] = firstExit;
 		e[1] = secondExit;
 		setExits(e);
-		
+
 		board = m;
 		truckHere = Collections.synchronizedMap(new HashMap<Truck, Boolean>());
 
 		if(lengthOfRoad <= 0)
 			throw new IllegalArgumentException("lengthOfRoad value " + lengthOfRoad + " is an illegal value.");
-		
+
 		length = lengthOfRoad;
 		line = new Line(firstExit.getCircle(), secondExit.getCircle(), this);
 	}
@@ -81,7 +81,7 @@ public class Edge implements BoardElement{
 	public Board getBoard(){
 		return board;
 	}
-	
+
 	/** Returns the exits of this line, a length 2 array of Nodes */
 	protected Node[] getTrueExits(){
 		return exits;
@@ -220,12 +220,12 @@ public class Edge implements BoardElement{
 	public String toString(){
 		return exits[0].name + " to " + exits[1].name; 
 	}
-	
+
 	/** Returns exits of this and the length for its JSON string */
 	@Override
 	public String toJSONString(){
 		return "{\n" + Main.addQuotes(BoardElement.LOCATION_TOKEN) + ":[" 
-				     + Main.addQuotes(exits[0].name) + "," + Main.addQuotes(exits[1].name) + "]," +
+				+ Main.addQuotes(exits[0].name) + "," + Main.addQuotes(exits[1].name) + "]," +
 				"\n" + Main.addQuotes(BoardElement.LENGTH_TOKEN) + ":" + length + 
 				"\n}";
 	}
@@ -259,13 +259,15 @@ public class Edge implements BoardElement{
 	public boolean isTruckHere(Truck t){
 		return truckHere.get(t);
 	}
-	
+
 	/** Returns the number of trucks here - currently traveling this edge. */
 	@Override
 	public int trucksHere(){
 		int i = 0;
-		for(Boolean b : truckHere.values()){
-			if(b) i++;
+		synchronized(truckHere){
+			for(Boolean b : truckHere.values()){
+				if(b) i++;
+			}
 		}
 		return i;
 	}

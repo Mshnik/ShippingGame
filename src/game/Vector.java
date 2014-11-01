@@ -144,14 +144,15 @@ public class Vector {
 		return radAngle(this, other);
 	}
 	
-	/** Hashes a vector based on its components, using the Objects.hash method. */
-	@Override
-	public int hashCode(){
-		return Objects.hash(x, y);
-	}
-	
 	/** Tolerance to consider two vector components equal */
 	public static final double TOLERANCE = 0.000001;
+	
+	/** Hashes a vector based on its components, using the Objects.hash method.
+	 * Rounds both components to the nearest TOLERANCE */
+	@Override
+	public int hashCode(){
+		return Objects.hash(Math.round(x/TOLERANCE)*TOLERANCE, Math.round(y/TOLERANCE)*TOLERANCE);
+	}
 	
 	/** Two vectors are equal if their components are equal.
 	 * To fix for precision, checks if components are within TOLERANCE of eachother */

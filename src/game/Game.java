@@ -4,6 +4,8 @@ import gui.TextIO;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Set;
 
 import org.json.JSONObject;
 
@@ -184,11 +186,14 @@ public class Game{
 	/** Returns the parcel stats for the current game in the form [on city, on truck, delivered */
 	public int[] parcelStats(){
 		int[] pArr = new int[3];
-		for(Parcel p : getBoard().getParcels()){
-			if(p.isHeld())
-				pArr[1]++;
-			else
-				pArr[0]++;
+		Set<Parcel> parcels = getBoard().getParcels();
+		synchronized(parcels){
+			for(Parcel p : parcels){
+				if(p.isHeld())
+					pArr[1]++;
+				else
+					pArr[0]++;
+			}
 		}
 		pArr[2] = getBoard().initialParcelCount - pArr[0] - pArr[1];
 		return pArr;
@@ -197,13 +202,16 @@ public class Game{
 	/** Returns the truck stats for the current game in the form [waiting, traveling, getting manager input] */
 	public int[] truckStats(){
 		int[] tArr = new int[3];
-		for(Truck t : getBoard().getTrucks()){
-			if(t.isWaitingForManager())
-				tArr[2]++;
-			else if(t.getStatus().equals(Truck.Status.WAITING))
-				tArr[0]++;
-			else
-				tArr[1]++;
+		ArrayList<Truck> trucks = getBoard().getTrucks();
+		synchronized(trucks){
+			for(Truck t : trucks){
+				if(t.isWaitingForManager())
+					tArr[2]++;
+				else if(t.getStatus().equals(Truck.Status.WAITING))
+					tArr[0]++;
+				else
+					tArr[1]++;
+			}
 		}
 		return tArr;
 	}

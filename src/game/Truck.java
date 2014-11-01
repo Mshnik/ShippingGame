@@ -129,42 +129,46 @@ public class Truck implements BoardElement, Runnable{
 	 */
 	@Override
 	public void run(){
-		lastTravelTime = System.currentTimeMillis();
-		alive = true;
-		while(true){
-			if(getBoard().getParcels().isEmpty() && location.equals(getBoard().getTruckHome())){
-				getBoard().addTruckToFinished(this);
-				//Deduct final waiting points
-				fixLastTravelTime();
-				alive = false;
-				return;
-			}
+		try{
+			lastTravelTime = System.currentTimeMillis();
+			alive = true;
+			while(true){
 
-			try{
+				locLock.acquire();
+				if(getBoard().getParcels().isEmpty() && location.equals(getBoard().getTruckHome())){
+					locLock.release();
+					getBoard().addTruckToFinished(this);
+					//Deduct final waiting points
+					fixLastTravelTime();
+					alive = false;
+					return;
+				}
+				locLock.release();
+
 				Thread.sleep(WAIT_TIME);
 				preManagerNotification();
 				game.getManager().truckNotification(this, Manager.Notification.WAITING);
 				postManagerNotification();
-			}
-			catch (InterruptedException e){
-				alive = false;
-				return;
-			}
 
-			setGoingTo(null);
-			fixLastTravelTime();
 
-			while(!travel.isEmpty() && game.isRunning()){
-				try {
-					Edge r = getTravel();
-					travel(r);
-				} catch (InterruptedException e){
-					e.printStackTrace();
-				} catch (IllegalArgumentException e) {
-					clearTravel(); //If traveling isn't valid, clear the queue
-				}
+				setGoingTo(null);
 				fixLastTravelTime();
+
+				while(!travel.isEmpty() && game.isRunning()){
+					try {
+						Edge r = getTravel();
+						travel(r);
+					} catch (IllegalArgumentException e) {
+						clearTravel(); //If traveling isn't valid, clear the queue
+					}
+					fixLastTravelTime();
+				}
 			}
+		}
+		//If interrupted exception occurs anywhere within run, just kill the truck
+		catch (InterruptedException e){
+			alive = false;
+			return;
 		}
 	}
 
@@ -173,7 +177,7 @@ public class Truck implements BoardElement, Runnable{
 		waitingForManager=true;
 	}
 
-	/** Call after a manager notification - sets this as finishing recieving manager input */
+	/** Call after a manager notification - sets this as finishing receiving manager input */
 	private void postManagerNotification(){
 		waitingForManager = false;
 	}
@@ -208,16 +212,17 @@ public class Truck implements BoardElement, Runnable{
 		return name;
 	}
 
-	/** Sets the name of this Truck*/
+	/** Sets the name of this Truck. Also sets the name of the thread this truck is running in */
 	public void setTruckName(String newName){
 		name = newName;
+		if(thread != null) setThread(thread);
 	}
 
 	/** Returns whether this Truck is alive (executing its run loop) or not */
 	public boolean isAlive(){
 		return alive;
 	}
-	
+
 	/** Returns the Truck's current location. 
 	 *  If this.status.equals(Status.TRAVELING) or the calling thread is interrupted, returns null 
 	 */
@@ -365,7 +370,7 @@ public class Truck implements BoardElement, Runnable{
 	/** Sets the current status of this Truck to status s and fires a Manager Notification.
 	 * Does not fire a Manager Notification if status.equals(s)
 	 * @throws InterruptedException */
-	protected void setStatus(Truck.Status s) throws InterruptedException{
+	private void setStatus(Truck.Status s) throws InterruptedException{
 		if(!status.equals(s)){
 			preManagerNotification();
 			statusLock.acquire();
@@ -450,7 +455,7 @@ public class Truck implements BoardElement, Runnable{
 	 */
 	public void pickupLoad(Parcel p) throws RuntimeException{
 		if(getStatus() == Status.TRAVELING)
-			return;
+			throw new RuntimeException("Can't Pickup Parcel while traveling");
 
 		if(load != null)
 			throw new RuntimeException("Can't Pickup Parcel with non-null load. Already holding a Parcel - " + load);
@@ -486,7 +491,7 @@ public class Truck implements BoardElement, Runnable{
 	 * Does nothing (doesn't drop off) if the calling thread is interrupted */
 	public void dropoffLoad() throws RuntimeException{
 		if(getStatus() == Status.TRAVELING)
-			return;
+			throw new RuntimeException("Can't Drop Off Parcel while traveling");
 
 		if(load == null)
 			throw new RuntimeException("Can't Drop Off a null parcel. No Parcel to drop off.");
@@ -557,8 +562,7 @@ public class Truck implements BoardElement, Runnable{
 	 * Returns null if the calling thread is interrupted.
 	 *  */
 	private Edge getTravel(){
-		Edge e = travel.remove(0);
-		return e;
+		return travel.remove(0);
 	}
 
 	/** Clears the Truck's travel plans, in a fashion that prevents thread collision.
@@ -626,15 +630,8 @@ public class Truck implements BoardElement, Runnable{
 			long finishTravelTime = System.currentTimeMillis();
 			lastTravelTime += (finishTravelTime - startTravelTime); //Discount the time spent traveling
 
-			//Change the status without firing an update.
-			//Status update on waiting should only come when the truck
-			//Out of travel directions entirely, which occurs in the run() method.
-			statusLock.acquire();
-			status = Status.WAITING;
-			//			game.getBoard().truckCounts.set(0, game.getBoard().truckCounts.get(0) + 1);
-			//			game.getBoard().truckCounts.set(1, game.getBoard().truckCounts.get(1) - 1);
-			//			game.getGUI().updateTruckStats();
-			statusLock.release();
+			//Done with this travel
+			setStatus(Status.WAITING);
 
 			setLocation(travelingTo);
 
