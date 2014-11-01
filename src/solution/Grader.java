@@ -1,7 +1,6 @@
 package solution;
 
-import java.io.File;
-import java.io.IOException;
+import java.io.*;
 import java.util.ConcurrentModificationException;
 import java.util.HashMap;
 
@@ -26,7 +25,7 @@ public class Grader {
 	private static final String GRADER_NETID = "MGP57";
 
 	/** Directory (within the project scope) where output files are written */
-	private static final String GRADING_OUTPUT_DIRECTORY = "GradingOutput";
+	private static final String GRADING_OUTPUT_DIRECTORY = "Submissions";
 
 	/** Instructor solution of shippingGame, classname */
 	private static final String INSTRUCTOR_SOLUTION_CLASSNAME = "solution.BasicShnikSolution";
@@ -41,6 +40,9 @@ public class Grader {
 	/** Number of random seeds to run each student's code on, in addition to the above maps */
 	private static final int NUMBER_RANDOM_MAPS = 10;
 
+	/** Use to do printing */
+	private static PrintStream stdout;
+	
 	/** Fills in the JSON_BOARD_MAP with the grading tuples - called at class compilation time */
 	static {
 		JSON_BOARD_MAP.clear();
@@ -62,9 +64,26 @@ public class Grader {
 	}
 
 	/**
-	 * @param args
+	 * @param args - [Name of grader, NetID of grader, [netID or group_of_netID1_netID2]]
+	 * Output should be printing
+	 * "NetID,grade"
+	 * 
+	 *  For groups of students, print on two different lines.
+	 *  Write longer feedback file to memory.
+	 * 
+	 * 
 	 */
 	public static void main(String[] args) {
+		stdout = System.out; //Use this to do printing. 
+		System.setOut(new PrintStream(new OutputStream(){
+			@Override
+			public void write(int b){
+				//YOU GET NOTHING
+				//TODO
+				//set flag to true if they've done printing - 5 point penalty
+			}
+		}));
+		
 		fillInManagerNetIDMap();
 
 		//Make sure the solution directory exists
@@ -85,11 +104,11 @@ public class Grader {
 
 		for(String managerClass : managerToNetIDMap.keySet()){
 			String netID = managerToNetIDMap.get(managerClass);
-			System.out.println("Grading Student " + netID);
+			stdout.println("Grading Student " + netID);
 			String feedback = runOn(Main.studentDirectory + "." + managerClass);
 
 			String finishedFeedback = header + "\n" + feedback;
-			System.out.println("Done. Writing output..");
+			stdout.println("Done. Writing output..");
 			
 			//Write each output to a file the grading directory.
 			//Will write based on netID, thus old runs with the same student netIdS
@@ -112,22 +131,22 @@ public class Grader {
 	private static String runOn(String managerClassname){
 		GameRunner gr = new GameRunner(managerClassname, SHOW_GUI, true);
 		String[] boards = JSON_BOARD_MAP.keySet().toArray(new String[0]);
-		System.out.println("Running student code on specified games..");
+		stdout.println("Running student code on specified games..");
 		GameScore[] fileScores = gr.runFiles(boards);
-		System.out.println("Ok.\n");
+		stdout.println("Ok.\n");
 
-		System.out.println("Running instructor solution on random maps..");
+		stdout.println("Running instructor solution on random maps..");
 		GameScore[] instructorRandomScores = INSTRUCTOR_GAME_RUNNER.runRandom(NUMBER_RANDOM_MAPS);
-		System.out.println("Ok.\n");
+		stdout.println("Ok.\n");
 
 		long[] randomSeeds = new long[NUMBER_RANDOM_MAPS];
 		for(int i = 0; i < NUMBER_RANDOM_MAPS; i++){
 			randomSeeds[i] = instructorRandomScores[i].game.getSeed();
 		}
 
-		System.out.println("Running student code on random maps..");
+		stdout.println("Running student code on random maps..");
 		GameScore[] randomScores = gr.runSeeds(randomSeeds);
-		System.out.println("Ok.\n");
+		stdout.println("Ok.\n");
 
 		//Start compiling feedback (without header - that will be added later)
 		double earnedPoints = 0;

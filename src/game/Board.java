@@ -506,7 +506,7 @@ public class Board implements JSONString{
 	 */
 	private static class BoardGeneration{
 		private static final int MIN_NODES = 5;
-		private static final int MAX_NODES = 20;
+		private static final int MAX_NODES = 100;
 
 		private static final double AVERAGE_DEGREE = 2.5;
 		private static final int MIN_EDGE_LENGTH = 5;
