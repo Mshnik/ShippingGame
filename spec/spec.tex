@@ -42,14 +42,30 @@ Cities in the map are labeled with their name, highways with their length. The s
 In order to accomplish this task, you have a fleet of trucks that you are able to control. At the beginning of the game you have the option to give your trucks instructions. Additionally, whenever a truck reaches an important point, such as reaching its destination after traveling a highway, it will let you know so you can give it additional instruction. All Trucks begin the game on the Truck Depot city (there will be exactly one truck depot in every map) and must return there after delivering all parcels for the game to end.
 
 \newpage
-\section{2. Installation}
-The code for this project is provided as a .jar file, without source-attachment. Start by downloading the .jar file from CMS, along with this writeup. From there...
+\section{2. Installation and Running}
+\subsection{Installation}
+The code for this project is provided as a .jar file, without source-attachment. Various data files are provided as text files in folders.
 \begin{enumerate}
-\item Create a new Java project in Eclipse, name it A6 or whatever you like.
-\item 
-
-
+\item Create a new Java project in Eclipse, name it A6.
+\item Download ShippingGame.jar and all of the data folders, drag them into your A6 folder. Don't change the names of any of the folders or the code won't be able to find the data.
+\item Right click A6 --> Build Path --> Add External Archives --> Select ShippingGame.jar and click Open.
+\item Right click A6 -> Build Path --> Configure Build Path... --> Expand ShippingGame.jar by clicking on the triangle to the left of it --> Select Javadoc Location --> Click Edit... --> Select "Javadoc URL" --> Click Browse... --> Select the "doc" folder (don't expand it) and click Open, Click Ok, Click Ok.
+\item Create a package in the src folder (right click src --> new... -> package) called \textbf{student}. All code you write for this project must be in the student package.
+\item Create a Class in the student package (called whatever you like) that extends \textbf{game.Manager}. Notably, you can't call it Manager. This is your manager class, and is your main submission.
 \end{enumerate}
+
+\subsection{Running}
+\begin{enumerate}
+\item Select A6 -> Run As... --> Run Configurations... --> New Launch Configuration (blank page with star in top left)
+\item Click Search... next to Main class --> Select game.main
+\item Switch to the Arguments tab --> Enter the name of your manager class that you created in the student class in the top text box. No .java necessary, just the name of the class.
+\item Click run.
+\item From here on out, the settings are saved, so you can simply run the project by clicking the green run button as usual.
+\end{enumerate}
+
+\subsection{Arguments}
+You can provide additional arguments to the runner to have it do different things. All argument combinations have to start with the name of your manager.
+	
 
 \newpage
 \section{3. Class Explanation}
