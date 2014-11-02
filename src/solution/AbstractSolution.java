@@ -4,6 +4,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedList;
+import java.util.Map;
 import java.util.PriorityQueue;
 
 import game.Edge;
@@ -20,7 +21,7 @@ import game.CS2110HeapInterface;
  */
 public abstract class AbstractSolution extends Manager {
 
-	private class NodeInfo {
+	private static class NodeInfo {
 		private Node previous;
 		private int distFromStart;
 
@@ -44,7 +45,7 @@ public abstract class AbstractSolution extends Manager {
 	 */
 	protected static LinkedList<Node> dijkstra(Node start, Node end) {
 		CS2110HeapInterface<Node> queue = new CS2110Heap<Node>();
-		HashMap<Node, Integer> nodeInfo = new HashMap<Node, NodeInfo>();
+		HashMap<Node, NodeInfo> nodeInfo = new HashMap<Node, NodeInfo>();
 
 		queue.add(start, 0);
 		nodeInfo.put(start, new NodeInfo());
@@ -56,12 +57,12 @@ public abstract class AbstractSolution extends Manager {
 			}
 
 			NodeInfo currentInfo = nodeInfo.get(current);
-			HashMap neighbors = current.getNeighbors();
+			HashMap<Node,Integer> neighbors = current.getNeighbors();
 
-			for (Map.Entry entry : neighbors.entrySet()) {
+			for (Map.Entry<Node, Integer> entry : neighbors.entrySet()) {
 				Node neighbor = entry.getKey();
 				int edgeWeight = entry.getValue();
-				int newDistToNeighbor = curNodeInfo.distFromStart + edgeWeight;
+				int newDistToNeighbor = currentInfo.distFromStart + edgeWeight;
 
 				NodeInfo neighborInfo = nodeInfo.get(neighbor);
 				boolean neverSeen = neighborInfo == null;
@@ -84,7 +85,7 @@ public abstract class AbstractSolution extends Manager {
 		return new LinkedList<Node>(); //no path was found
 	}
 
-	private static LinkedList<Node> reconstructPath(Node end, HashMap<Node, Node> nodeInfo) {
+	private static LinkedList<Node> reconstructPath(Node end, HashMap<Node, NodeInfo> nodeInfo) {
 		LinkedList<Node> path = new LinkedList<Node>();
 		Node current = end;
 		while (current != null) {

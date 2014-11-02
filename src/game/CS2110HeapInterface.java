@@ -1,4 +1,4 @@
-
+package game;
 /** Specifies a class that is able to act as a dynamically sized Min Heap.
  * @author MPatashnik
  * @param <T> - type of elements in the implementing class.
