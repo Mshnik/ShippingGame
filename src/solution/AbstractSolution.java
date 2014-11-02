@@ -9,6 +9,7 @@ import java.util.PriorityQueue;
 import game.Edge;
 import game.Manager;
 import game.Node;
+import game.CS2110HeapInterface;
 
 /** AbstractSolution is an abstract class which extends Manager.
  * 	The instructor solutions should all extend this class.
@@ -17,7 +18,19 @@ import game.Node;
  * @author Sandra Anderson
  *
  */
-public abstract class AbstractSolution extends Manager{
+public abstract class AbstractSolution extends Manager {
+
+	private class NodeInfo {
+		private Node previous;
+		private int distFromStart;
+
+		private NodeInfo(Node previous, int distFromStart) {
+			this.previous = previous;
+			this.distFromStart = distFromStart;
+		}
+
+		private NodeInfo() {}
+	}
 
 	/** Finds the shortest path from start to end, or the empty list
 	 *  if one does not exist. Uses Dijkstra's algorithm for a 
@@ -29,47 +42,56 @@ public abstract class AbstractSolution extends Manager{
 	 * including the start and the end. Returns the empty list
 	 * if no path exists. 
 	 */
-	protected static LinkedList<Node> dijkstra(Node start, Node end){
-		PriorityQueue<NodeWrapper> queue = new PriorityQueue<NodeWrapper>();
-		NodeWrapper current = new NodeWrapper(start);
-		current.setDistance(0);
-		current.addToPath(start);
-		//a copy of the current contents of the priority queue, indexed by node
-		HashMap<Node, NodeWrapper> unprocessed = new HashMap<Node, NodeWrapper>();
+	protected static LinkedList<Node> dijkstra(Node start, Node end) {
+		CS2110HeapInterface<Node> queue = new CS2110Heap<Node>();
+		HashMap<Node, Integer> nodeInfo = new HashMap<Node, NodeInfo>();
+
+		queue.add(start, 0);
+		nodeInfo.put(start, new NodeInfo());
 		
-		//inv: current is the next node to process
-		while(!current.node.equals(end)){
-			HashSet<Edge> edges = current.node.getExits();
-			//process edges out of current
-			for(Edge e : edges){
-				Node[] exits = e.getExits();
-				//process the nodes of that exit
-				for(Node n : exits){
-					if (!n.equals(current.node)){
-						NodeWrapper wrap = unprocessed.get(n);
-						if(wrap == null){
-							wrap = new NodeWrapper(n, current.getDistance() + e.length, current);
-							unprocessed.put(n, wrap);
-							queue.add(wrap);
-						}else{
-							boolean set = wrap.checkDistance(current.getDistance() + e.length);
-							if(set){
-								wrap.setDistance(current.getDistance() + e.length);
-								wrap.resetPath(current);
-								queue.remove(wrap);
-								queue.add(wrap);
-							}
-						}
-					}
+		while (!queue.isEmpty()) {
+			Node current = queue.poll();
+			if (current.equals(end)) {
+				return reconstructPath(current, nodeInfo);
+			}
+
+			NodeInfo currentInfo = nodeInfo.get(current);
+			HashMap neighbors = current.getNeighbors();
+
+			for (Map.Entry entry : neighbors.entrySet()) {
+				Node neighbor = entry.getKey();
+				int edgeWeight = entry.getValue();
+				int newDistToNeighbor = curNodeInfo.distFromStart + edgeWeight;
+
+				NodeInfo neighborInfo = nodeInfo.get(neighbor);
+				boolean neverSeen = neighborInfo == null;
+				boolean needToUpdate = neighborInfo != null && newDistToNeighbor < neighborInfo.distFromStart;
+
+				if (neverSeen) {
+					neighborInfo = new NodeInfo();
+					nodeInfo.put(neighbor, neighborInfo);
+					queue.add(neighbor, newDistToNeighbor);
+				} else if (needToUpdate) {
+					queue.updatePriority(neighbor, newDistToNeighbor);
+				}
+
+				if (neverSeen || needToUpdate) {
+					neighborInfo.previous = current;
+					neighborInfo.distFromStart = newDistToNeighbor;
 				}
 			}
-			unprocessed.remove(current.node);
-			current = queue.poll();
-			if(current == null){
-				return new LinkedList<Node>(); //no path was found
-			}
 		}
-		return current.getPath();
+		return new LinkedList<Node>(); //no path was found
+	}
+
+	private static LinkedList<Node> reconstructPath(Node end, HashMap<Node, Node> nodeInfo) {
+		LinkedList<Node> path = new LinkedList<Node>();
+		Node current = end;
+		while (current != null) {
+			path.addFirst(current);
+			current = nodeInfo.get(current).previous;
+		}
+		return path;
 	}
 	
 	/** Returns the collective weight of the given path of nodes
