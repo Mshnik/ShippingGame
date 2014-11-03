@@ -21,9 +21,6 @@ public class Grader {
 	 */
 	private static final boolean SHOW_GUI = false;
 
-	/** TODO Grader's Net ID */
-	private static final String GRADER_NETID = "MGP57";
-
 	/** Directory (within the project scope) where output files are written */
 	private static final String GRADING_OUTPUT_DIRECTORY = "Submissions";
 
@@ -42,25 +39,15 @@ public class Grader {
 
 	/** Use to do printing */
 	private static PrintStream stdout;
-	
+
+	/** Set to true if the student ever tries to print */
+	private static boolean printingFlag = false;
+
 	/** Fills in the JSON_BOARD_MAP with the grading tuples - called at class compilation time */
 	static {
 		JSON_BOARD_MAP.clear();
-	}
 
-	/** Filled in by main at beginning of grading program.
-	 * Grader should complete fillInManagerNetIDMap method so that this
-	 * collection is populated correctly.
-	 */
-	private static HashMap<String, String> managerToNetIDMap = new HashMap<String, String>();
-
-	private static void fillInManagerNetIDMap(){
-		managerToNetIDMap.clear();
-		//TODO - Add the mappings of names of manager classes -> net ids
-		//managerToNetIDMap.put("userManager1","abc12");
-		//...
-		//...
-		managerToNetIDMap.put("LarryManager", "LAR12");
+		//TODO - add required map jsons
 	}
 
 	/**
@@ -78,19 +65,28 @@ public class Grader {
 		System.setOut(new PrintStream(new OutputStream(){
 			@Override
 			public void write(int b){
-				//YOU GET NOTHING
-				//TODO
-				//set flag to true if they've done printing - 5 point penalty
+				//YOU GET NOTHING - 5 point penalty if student does printing
+				printingFlag = true;
 			}
 		}));
-		
-		fillInManagerNetIDMap();
+
+		//Get the netIDs from the args - will either have length 1 or 2.
+		String[] netIDs = null;
+		if(args[2].startsWith("group_of_")){
+			netIDs = new String[2];
+			String p = args[2].substring(10); //length of group_of_
+			netIDs[0] = p.substring(0, p.indexOf('_'));
+			netIDs[1] = p.substring(p.indexOf('_') + 1);
+		} else{
+			netIDs = new String[1];
+			netIDs[0] = args[2];
+		}
 
 		//Make sure the solution directory exists
 		File gradingRoot = new File(GRADING_OUTPUT_DIRECTORY);
 		if(! gradingRoot.exists()) gradingRoot.mkdir();
 
-		final String header = "Hello, this is " + GRADER_NETID + " grading your A6. Your A6 is graded in two steps.\n" +
+		final String header = "Hello, this is " + args[0] + "(" + args[1] + ") grading your A6. Your A6 is graded in two steps.\n" +
 				"First, we run your manager on a set of pre-determined maps, to test the corner cases of\n" +
 				"your code. Then we run it on a set of randomly generated maps, to test the regular behavior\n" +
 				"of your code.\n" +
@@ -101,52 +97,47 @@ public class Grader {
 				"After the grading program runs, I will look back through your code to see if any simple mistakes caused\n" +
 				"you to loose to many points. Now let's get shipping!\n" +
 				"<=|===================================================================================================|=>";
+				
+				
+		Feedback feedback = runOn(Main.studentDirectory + "." + ""); //TODO! fill in with how to get the manager classname, and where it is located
+		String finishedFeedback = header + "\n" + feedback.f;
 
-		for(String managerClass : managerToNetIDMap.keySet()){
-			String netID = managerToNetIDMap.get(managerClass);
-			stdout.println("Grading Student " + netID);
-			String feedback = runOn(Main.studentDirectory + "." + managerClass);
-
-			String finishedFeedback = header + "\n" + feedback;
-			stdout.println("Done. Writing output..");
-			
-			//Write each output to a file the grading directory.
-			//Will write based on netID, thus old runs with the same student netIdS
-			//Will be overwritten.
-			try {
-				TextIO.write(GRADING_OUTPUT_DIRECTORY + "/" + netID + "feedback.txt",finishedFeedback);
-			} catch (IOException e) {
-				System.err.println("Issue writing feedback to file for " + netID);
-				e.printStackTrace();
-			}
+		//Do grade printing to console where it will be picked up by graph
+		for(String id : netIDs){
+			stdout.println(id +"," + feedback.grade);
 		}
 		
-		//Actually terminate the goddam thing.
-		System.exit(0);
+		//Write each output to a file the grading directory.
+		//Will write based on netID, thus old runs with the same student netIdS
+		//Will be overwritten.
+		try {
+			TextIO.write(GRADING_OUTPUT_DIRECTORY + "/" + args[2] + "_feedback.txt",finishedFeedback);
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
 	}
 
-
+	/** Feedback with string and associated grade */
+	private static class Feedback{
+		private String f;
+		private double grade;
+	}
+	
 	/** Runs the given managerClassname on the set maps and the number of given maps.
 	 * Returns the  */
-	private static String runOn(String managerClassname){
+	private static Feedback runOn(String managerClassname){
 		GameRunner gr = new GameRunner(managerClassname, SHOW_GUI, true);
 		String[] boards = JSON_BOARD_MAP.keySet().toArray(new String[0]);
-		stdout.println("Running student code on specified games..");
 		GameScore[] fileScores = gr.runFiles(boards);
-		stdout.println("Ok.\n");
 
-		stdout.println("Running instructor solution on random maps..");
 		GameScore[] instructorRandomScores = INSTRUCTOR_GAME_RUNNER.runRandom(NUMBER_RANDOM_MAPS);
-		stdout.println("Ok.\n");
 
 		long[] randomSeeds = new long[NUMBER_RANDOM_MAPS];
 		for(int i = 0; i < NUMBER_RANDOM_MAPS; i++){
 			randomSeeds[i] = instructorRandomScores[i].game.getSeed();
 		}
 
-		stdout.println("Running student code on random maps..");
 		GameScore[] randomScores = gr.runSeeds(randomSeeds);
-		stdout.println("Ok.\n");
 
 		//Start compiling feedback (without header - that will be added later)
 		double earnedPoints = 0;
@@ -179,17 +170,26 @@ public class Grader {
 		}
 
 		//Add finishing stats.
+		Feedback f = new Feedback();
+		f.grade = Math.max(0, Math.min(1, earnedPoints / instructorPoints)) * 100;
+		
+		if(printingFlag){
+			f.grade -= 5;
+			s += "\n 5 point penalty - your code contained print statements. This is not good" +
+					"for code you are submitting.";
+		}
+		
 		s += "\n\n" +
 				"Earned Points: " + String.format("%11.0f", earnedPoints)+
 				"\t\tPossible Points: " + String.format("%11.0f", instructorPoints) + 
-				"\nGrade: " + String.format("%3.1f",Math.max(0, Math.min(1, earnedPoints / instructorPoints)) * 100);
-		
-		return s;
+				"\nGrade: " + String.format("%3.1f",f.grade);
+		f.f = s;
+		return f;
 	}
 
 	/** Instructor handicap */
 	private static final double INSTRUCTOR_HANDICAP = 0.9;
-	
+
 	/** Penalty for a heavy error */
 	private static final double HEAVY_PENALTY = 0.65;
 
@@ -198,7 +198,7 @@ public class Grader {
 
 	/** Penalty for other (light) error */
 	private static final double LIGHT_PENALTY = 0.85;
-	
+
 	/** Very small penalty for timeout - they were probably already losing points for it */
 	private static final double TIMEOUT_PENALTY = 0.98;
 
