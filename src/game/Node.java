@@ -92,6 +92,18 @@ public class Node implements BoardElement{
 		return newExits;
 	}
 
+	/** Returns a map of neighboring Node to length of the edge connecting this
+	 *  Node to the neighbor. To iterate over a HashMap, use HashMap.entrySet(). */
+	public HashMap<Node, Integer> getNeighbors() {
+		HashMap<Node, Integer> neighbors = new HashMap<Node, Integer>();
+		synchronized(exits) {
+			for (Edge e : exits) {
+				neighbors.put(e.getOther(this), e.length);
+			}
+		}
+		return neighbors;
+	}
+
 	/** Returns a random exit from exits */
 	public Edge getRandomExit(){
 		return Main.randomElement(exits);
