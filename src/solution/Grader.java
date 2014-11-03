@@ -62,6 +62,7 @@ public class Grader {
 	 */
 	public static void main(String[] args) {
 		stdout = System.out; //Use this to do printing. 
+		printingFlag = false;
 		System.setOut(new PrintStream(new OutputStream(){
 			@Override
 			public void write(int b){

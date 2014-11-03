@@ -908,9 +908,12 @@ public class Board implements JSONString{
 		}
 	}
 
+	/** Location of files for board generation */
+	public static final String BOARD_GENERATION_DIRECTORY = "data/BoardGeneration";
+	
 	/** Returns an array of the city names listed in BoardGeneration/cities.txt */
 	private static ArrayList<String> cityNames(){
-		File f = new File("BoardGeneration/cities.txt");
+		File f = new File(BOARD_GENERATION_DIRECTORY + "/cities.txt");
 		BufferedReader read;
 		try {
 			read = new BufferedReader(new FileReader(f));

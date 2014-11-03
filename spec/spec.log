@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.1415926-2.5-1.40.14 (TeX Live 2013) (format=pdflatex 2013.5.30)  1 NOV 2014 15:41
+This is pdfTeX, Version 3.1415926-2.5-1.40.14 (TeX Live 2013) (format=pdflatex 2013.5.30)  3 NOV 2014 00:25
 entering extended mode
  restricted \write18 enabled.
  file:line:error style messages enabled.
@@ -847,44 +847,44 @@ e
 ))
 ABD: EveryShipout initializing macros [1
 
-{/usr/local/texlive/2013/texmf-var/fonts/map/pdftex/updmap/pdftex.map}] <map1.p
-ng, id=13, 465.74pt x 375.4025pt>
+{/usr/local/texlive/2013/texmf-var/fonts/map/pdftex/updmap/pdftex.map}] [2] <ma
+p1.png, id=17, 465.74pt x 375.4025pt>
 File: map1.png Graphic file (type png)
 
 <use map1.png>
-Package pdftex.def Info: map1.png used on input line 39.
+Package pdftex.def Info: map1.png used on input line 51.
 (pdftex.def)             Requested size: 372.5925pt x 300.3224pt.
 
-Underfull \hbox (badness 10000) in paragraph at lines 38--41
+Underfull \hbox (badness 10000) in paragraph at lines 50--53
 
  []
 
-[2 <./map1.png>] [3] <hirearchy.png, id=23, 768.8725pt x 331.2375pt>
+[3 <./map1.png>] [4] <hirearchy.png, id=26, 778.91pt x 338.26375pt>
 File: hirearchy.png Graphic file (type png)
 
 <use hirearchy.png>
-Package pdftex.def Info: hirearchy.png used on input line 71.
-(pdftex.def)             Requested size: 538.20708pt x 231.86465pt.
- [4 <./hirearchy.png>] [5] [6]
-Underfull \hbox (badness 10000) in paragraph at lines 105--106
+Package pdftex.def Info: hirearchy.png used on input line 87.
+(pdftex.def)             Requested size: 545.23329pt x 236.78299pt.
+ [5 <./hirearchy.png>] [6] [7]
+Underfull \hbox (badness 10000) in paragraph at lines 123--124
 
  []
 
-<fry.jpg, id=34, 803.0pt x 602.25pt>
+<fry.jpg, id=37, 803.0pt x 602.25pt>
 File: fry.jpg Graphic file (type jpg)
  <use fry.jpg>
-Package pdftex.def Info: fry.jpg used on input line 108.
+Package pdftex.def Info: fry.jpg used on input line 126.
 (pdftex.def)             Requested size: 321.1943pt x 240.89572pt.
 
-Underfull \hbox (badness 10000) in paragraph at lines 112--113
+Underfull \hbox (badness 10000) in paragraph at lines 130--131
 
  []
 
-[7 <./fry.jpg>] (./spec.aux) ) 
+[8 <./fry.jpg>] (./spec.aux) ) 
 Here is how much of TeX's memory you used:
  12030 strings out of 493315
  215649 string characters out of 6137904
- 265464 words of memory out of 5000000
+ 265462 words of memory out of 5000000
  15209 multiletter control sequences out of 15000+600000
  35979 words of font info for 26 fonts, out of 8000000 for 9000
  957 hyphenation exceptions out of 8191
@@ -896,10 +896,10 @@ r/local/texlive/2013/texmf-dist/fonts/type1/public/lm/lmr10.pfb></usr/local/tex
 live/2013/texmf-dist/fonts/type1/public/lm/lmr12.pfb></usr/local/texlive/2013/t
 exmf-dist/fonts/type1/public/lm/lmr17.pfb></usr/local/texlive/2013/texmf-dist/f
 onts/type1/public/lm/lmri10.pfb>
-Output written on spec.pdf (7 pages, 408642 bytes).
+Output written on spec.pdf (8 pages, 412444 bytes).
 PDF statistics:
- 62 PDF objects out of 1000 (max. 8388607)
- 41 compressed objects within 1 object stream
+ 64 PDF objects out of 1000 (max. 8388607)
+ 43 compressed objects within 1 object stream
  0 named destinations out of 1000 (max. 500000)
  28 words of extra memory for PDF output out of 10000 (max. 10000000)
 
