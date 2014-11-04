@@ -6,17 +6,16 @@ import java.util.Comparator;
 
 public class HeapTester{
 
-	/** Tests the user defined heap. args[0] should be the name of the implementing class.
-	 * Prints results tests to console.
+	/** Test the user-defined heap. args[0] should be the name of the implementing class.
+	 * Print results tests on console.
 	 */
-	public static void main(String[] args){
+	public static void main(String[] args) {
 		System.out.println("Testing heap adding " + (testAdding() ? " Ok" : " err"));
 		System.out.println("Testing polling order " + (testPollingOrder() ? " Ok" : " err"));
 		System.out.println("Testing update priority " + (testUpdatePriority() ? " Ok" : " err"));
-
 	}
 
-	/** Creates and returns an instance of the user defined manager class
+	/** Create and return an instance of the user-defined manager class
 	 * @param userHeapClass - the String Name of the class to define
 	 * @return - An instance of the user defined class
 	 * @throws ClassNotFoundException - If the string class is not found
@@ -25,51 +24,57 @@ public class HeapTester{
 	 * @throws IllegalArgumentException - If the given class is not a subclass of Manager.
 	 */
 	@SuppressWarnings("unchecked")
-	private static MinHeap<Integer> createUserManager(String userHeapClass) throws ClassNotFoundException, InstantiationException, IllegalAccessException, IllegalArgumentException{
+	private static MinHeap<Integer> createUserManager(String userHeapClass)
+	        throws ClassNotFoundException, InstantiationException, IllegalAccessException,
+	        IllegalArgumentException {
 		String heapClass = "";
-		if(userHeapClass.startsWith("<s>"))
+		if (userHeapClass.startsWith("<s>"))
 			heapClass = "solution." + userHeapClass.substring(4);
 		else
 			heapClass = "student." + userHeapClass;
 
 		@SuppressWarnings("rawtypes")
 		Class c= Class.forName(heapClass);
-		if(!MinHeap.class.isAssignableFrom(c))
-			throw new IllegalArgumentException("Class " + heapClass + " Does not Extend MinHeap Class");
+		if (!MinHeap.class.isAssignableFrom(c))
+			throw new IllegalArgumentException("Class " + heapClass + 
+			        " Does not Extend Heap Class");
 
-		return (MinHeap<Integer>) c.newInstance();//OK because default constructor is only constructor that should be used.
+		return (MinHeap<Integer>) c.newInstance();//OK because default constructor
+		                   // is only constructor that should be used.
 	}
 
-	private static class Thingy{
+	/** Objects of this class are placed in the heap, using their dist values
+	 * for comparison. The field is private but it can be referenced in HeapTester. */
+	private static class Thingy {
 		private int dist;
-		Thingy(int d){
+		Thingy(int d) {
 			dist = d;
 		}
 	}
 
-	/** Tests adding non-distinct values don't get added.
-	 * Also tests the isEmpty() and size() functions. */
-	public static boolean testAdding(){
+	/** Test that adding non-distinct values don't get added.
+	 * Also test functions isEmpty() and size(). */
+	public static boolean testAdding() {
 		MinHeap<Thingy> heap = null; /////TODO
 
 		Thingy[] t = {new Thingy(1), new Thingy(2), new Thingy(3), new Thingy(4), new Thingy(5)};
-		if(! heap.isEmpty()) return false;
+		if (! heap.isEmpty()) return false;
 
-		for(int i = 0; i < t.length; i++){
+		for (int i = 0; i < t.length; i++) {
 			heap.add(t[i], t[i].dist);
-			if(heap.isEmpty()) return false;
-			if(heap.size() != i) return false;
+			if (heap.isEmpty()) return false;
+			if (heap.size() != i) return false;
 		}
 		
-		for(int i = 0; i < t.length; i++){
+		for (int i = 0; i < t.length; i++) {
 			heap.add(t[i], t[i].dist);
-			if(heap.isEmpty()) return false;
-			if(heap.size() != t.length) return false;
+			if (heap.isEmpty()) return false;
+			if (heap.size() != t.length) return false;
 		}
 		return true;
 	}
 
-	/** Returns true if values removed from a heap are always in increasing order */
+	/** Return true iff values removed from a heap are in increasing order */
 	public static boolean testPollingOrder() {
 		MinHeap<Thingy> heap = null;/////TODO
 
@@ -77,10 +82,11 @@ public class HeapTester{
 			int dist = (int) (Math.random() * 1000);
 			heap.add(new Thingy(dist), dist);
 		}
+		
 		int lowest = Integer.MIN_VALUE;
 		while (!heap.isEmpty()) {
 			Thingy next = heap.poll();
-			if(lowest > next.dist){
+			if (lowest > next.dist) {
 				return false;
 			}
 			lowest = next.dist;
@@ -88,14 +94,14 @@ public class HeapTester{
 		return true;
 	}
 
-	/** Returns true if updating priorities functions correctly */
-	public static boolean testUpdatePriority(){
+	/** Return true iff updating priorities functions correctly */
+	public static boolean testUpdatePriority() {
 		
 		ArrayList<Thingy> arr = new ArrayList<Thingy>();
 		
-		final Comparator<Thingy> comp = new Comparator<Thingy>(){
+		final Comparator<Thingy> comp = new Comparator<Thingy>() {
 			@Override
-			public int compare(Thingy t1, Thingy t2){
+			public int compare(Thingy t1, Thingy t2) {
 				return t1.dist - t2.dist;
 			}
 		};
@@ -111,7 +117,7 @@ public class HeapTester{
 		}
 		
 		//Change some priorities
-		for(int i = 0; i < 1000; i++){
+		for (int i = 0; i < 1000; i++) {
 			Thingy t = arr.get((int)(Math.random())*arr.size());
 			heap.updatePriority(t, (int)(Math.random()*1000));
 		}
@@ -119,9 +125,9 @@ public class HeapTester{
 		Collections.sort(arr, comp);
 		//See if everything leaves in the same order
 		
-		for(Thingy t : arr){
+		for (Thingy t : arr) {
 			Thingy t2 = heap.poll();
-			if(t != t2) return false;
+			if (t != t2) return false;
 		}
 		return true;
 	}

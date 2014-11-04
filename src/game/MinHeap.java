@@ -1,39 +1,39 @@
 package game;
 
-/** Specifies a class that is able to act as a dynamically sized Min Heap.
+/** Specify a class that is able to act as a dynamically sized Min Heap.
+ * Below, N is used as the number of elements currently in the heap.
  * @author MPatashnik
  * @param <T> - type of elements in the implementing class.
  */
 public interface MinHeap<T> {
 
-	/** Returns a string that represents this heap, in format:
+	/** Return a string that represents this heap, in the format:
 	 * [item1:priority1, item2:priority2, ... itemN:priorityN]
-	 * Use the toString() method for strings for item1, item2, etc. 
+	 * Use the toString() function of the items. 
 	 */
 	public String toString();
 	
-	/** Removes and returns the minimum valued element from the Heap.
-	 *  Precondition: the heap is not empty.
-	 *  Ideal - O(log(N)). Minimum - O(N) */
+	/** Remove and return the minimum-valued element from the Heap,
+	 * in worst-case time no more than O(log N).
+	 *  Precondition: the heap is not empty. */
 	public T poll();
 	
-	/** Change the priority of item.
-	 *  Precondition: priority is less than or equal to item's previous priority.
+	/** Change the priority of t to p.
+	 *  Precondition: p <= t's previous priority.
 	 *  May be unused in less complex implementations.
-	 *  Implement in at worst O(log(N)) time.
+	 *  Must take worst-case time no more than O(log N).
 	 */
-	public void updatePriority(T item, double priority);
+	public void updatePriority(T t, double p);
 	
-	/** Adds item to the Heap. Min valued priority is at top of heap
-	 *  Precondition: item is not already in the heap.
-	 *  Throw an illegalArgumentException if {@code item} is already in the heap
-	 *  Implement in at worst O(log(N)) time. */ 
-	public void add(T item, double priority) throws IllegalArgumentException;
+	/** Add t with priority p to the Heap.
+	 *  Throw an illegalArgumentException if t is already in the heap
+	 *  Implement in worst-case time no more than O(log N). */ 
+	public void add(T t, double priority) throws IllegalArgumentException;
 	
-	/** Returns the size of the Heap. Implement in O(1) time. */
+	/** Return the size of the Heap. Implement in O(1) time. */
 	public int size();
 	
-	/** Returns true if the Heap is empty. false otherwise. Implement in O(1) time */
+	/** Return true iff the Heap is empty. Implement in O(1) time */
 	public boolean isEmpty();
 	
 }

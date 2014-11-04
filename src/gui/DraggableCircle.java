@@ -7,7 +7,7 @@ import java.awt.event.MouseMotionListener;
 
 import game.BoardElement;
 
-/** A circle that can be dragged by the user on the gui */
+/** An instance is a circle that can be dragged by the user on the gui */
 public class DraggableCircle extends Circle {
 
 	private static final long serialVersionUID = -3983152780751574074L;
@@ -16,22 +16,22 @@ public class DraggableCircle extends Circle {
 	private int maxY;   //Boundary for dragging on the y
 	
 	
-	/** Constructs a DraggableCircle
-	 * @param represents - the game pice that this circle is drawn for
+	/** Constructor: an instance at (x, y) of diameter d that represents r.
+	 * @param r - the game piece that this circle is drawn for
 	 * @param x - the starting x coordinate (center point)
 	 * @param y - the starting y coordinate (center point)
-	 * @param diameter - the diameter of the circle
+	 * @param d - the diameter of the circle
 	 */
-	public DraggableCircle(final BoardElement represents, int x, int y, int diameter) {
-		super(represents, x, y, diameter);
+	public DraggableCircle(final BoardElement r, int x, int y, int d) {
+		super(r, x, y, d);
 		
 		MouseListener clickListener = new MouseListener(){
 			
-			/** When this is clicked, store the initial point at which this is clicked */
+			/** When clicked, store the initial point at which this is clicked. */
 			@Override
 			public void mousePressed(MouseEvent e) {
-				maxX = represents.getBoard().game.getGUI().getDrawingPanel().getWidth();
-				maxY = represents.getBoard().game.getGUI().getDrawingPanel().getHeight();
+				maxX = r.getBoard().game.getGUI().getDrawingPanel().getWidth();
+				maxY = r.getBoard().game.getGUI().getDrawingPanel().getHeight();
 				clickPoint = e.getPoint();
 			}
 			
@@ -50,9 +50,8 @@ public class DraggableCircle extends Circle {
 		
 		MouseMotionListener motionListener = new MouseMotionListener(){
 
-			/** When this is dragged, perform the translation from the point where this was clicked
-			 * to the new dragged point
-			 */
+			/** When this is dragged, perform the translation from the point
+			 * where this was clicked to the new dragged point. */
 			@Override
 			public void mouseDragged(MouseEvent e) {
 				DraggableCircle c = (DraggableCircle)e.getSource();

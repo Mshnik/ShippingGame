@@ -1,19 +1,19 @@
 package game;
 import java.awt.Color;
 
-/** The Score Class is a convenient way to monitor the score of a Game for a given Manager. <br>
- * The method that allows changing the value of the score is protected, so only files in the gameFiles
- * package are able to change the score. This prevents the user from altering the score, though the
- * getScore() method is public. <br><br>
- * Also maintains methods for computing the cost of traveling at a given speed for trucks,
- * and validates colors for parcels and trucks.
+/** Class Score monitors the score of a Game for a given Manager. <br>
+ * The method that allows changing the value of the score is protected, so only
+ * files in package gameFiles are able to change the score. This prevents the user
+ * from altering the score, though function getScore() is public. <br><br>
+ * Also maintains methods for computing the cost of traveling at a given speed
+ * for trucks and validates colors for parcels and trucks.
  * @author MPatashnik
  */
 public class Score {
 
-	/** The Colors that are in the game. Colors of Trucks and of Parcels are chosen from this Array.
-	 * Other colors are not allowed in the game, as setColor(Color c) methods must check for c being
-	 * contained in COLOR before setting */
+	/** The Colors in the game. Colors of Trucks and Parcels are chosen from this Array.
+	 * Other colors are not allowed in the game, so setColor(Color c) methods mus
+	 * check for c being contained in COLOR before setting. */
 	public static final Color[] COLOR = {
 		new Color(198, 0, 0),	//Mid Red
 		new Color(198, 0, 144),	//Mid Pink
@@ -30,46 +30,46 @@ public class Score {
 		new Color(109, 43, 140)//Dark Purple
 	};	
 
-	/** Returns a random Color from Score.Color */
-	public static Color getRandomColor(){
-		return COLOR[(int)(Math.random()*(double)COLOR.length)];
+	/** Return a random Color from Score.Color. */
+	public static Color getRandomColor() {
+		return COLOR[(int)(Math.random() * (double)COLOR.length)];
 	}
 
 
-	/** Returns true if Color c is in Score.COLOR, false otherwise.
-	 * Use to check validity of a color assignment to any colorable thing
+	/** Return true iff c is in Score.COLOR.
+	 * Use to check validity of a color assignment to any colorable thing.
 	 * @param c - the Color to check
 	 * @return true if c in COLOR, false otherwise.
 	 */
-	public static boolean colorContains(Color c){
-		for(Color c2 : COLOR){
-			if(c.equals(c2))
+	public static boolean colorContains(Color c) {
+		for (Color c2 : COLOR) {
+			if (c.equals(c2))
 				return true;
 		}
 
 		return false;
 	}
 
-	/** Returns the color represented by String s, that color's toString() output.
-	 * Returns null if no such color exits, or if the color isn't in COLOR.
+	/** Return the color represented by s, that color's toString() output.
+	 * (null if no such color exits, or if the color isn't in COLOR).
 	 */
-	public static Color getColor(String color){
-		for(Color c : COLOR){
-			if(c.toString().equals(color))
+	public static Color getColor(String s) {
+		for (Color c : COLOR) {
+			if (c.toString().equals(s))
 				return c;
 		}
 		return null;
 	}
 
-	/** Returns the cost of traveling one frame at a rate of speed.
-	 * Most efficient speed is in middle.
+	/** Return the cost of traveling one frame at rate of speed s.
+	 * The most efficient speed is in middle.
 	 * See Truck.MIN_SPEED, Truck.MAX_SPEED for boundary values,
 	 * Truck.EFFICIENT_SPEED for most cost-effective speed to travel.
 	 * <br><br>
 	 * {@code Cost =} <br>
-	 *        {@code if (speed < Efficient_Speed) -> speed + 1} <br>
-	 *        {@code else if (speed > Efficient_Speed) -> speed + fib(speed - Efficient_Speed)} <br>
-	 *        {@code else -> speed }
+	 *        {@code if (s < Efficient_Speed) -> s + 1} <br>
+	 *        {@code else if (s > Efficient_Speed) -> s + fib(s - Efficient_Speed)} <br>
+	 *        {@code else -> s }
 	 * <br> 1 : 2
 	 * <br> 2 : 3
 	 * <br> 3 : 4
@@ -80,59 +80,59 @@ public class Score {
 	 * <br> 8 : 13
 	 * <br> 9 : 17
 	 * <br> 10 : 22   
-	 * @throws IllegalArgumentException if speed is out of the range [min,max] speed.
-	 * @return -Cost, calculated using the above equation. Sample values are in table 
+	 * @throws IllegalArgumentException if s is out of the range min..max.
+	 * @return -Cost, calculated using the above equation. Sample values are in table. 
 	 */
-	public static int cost(int speed) throws IllegalArgumentException{
-		if (speed < Truck.MIN_SPEED || speed > Truck.MAX_SPEED)
-			throw new IllegalArgumentException("Can't calculated cost for speed " + speed);
+	public static int cost(int s) throws IllegalArgumentException{
+		if (s < Truck.MIN_SPEED || s > Truck.MAX_SPEED)
+			throw new IllegalArgumentException("Can't calculated cost for speed " + s);
 
-		if(speed < Truck.EFFICIENT_SPEED)
-			return -(speed + 1);
-		else if (speed > Truck.EFFICIENT_SPEED)
-			return -(speed + Main.fib(speed - Truck.EFFICIENT_SPEED));
+		if (s < Truck.EFFICIENT_SPEED)
+			return -(s + 1);
+		else if (s > Truck.EFFICIENT_SPEED)
+			return -(s + Main.fib(s - Truck.EFFICIENT_SPEED));
 		else
-			return -(speed);
+			return -s;
 	}
 
 	private int score; //The score maintained by this score object
 	
-	/** The manager this Score object keeps track of the score for */
+	/** The manager for which this Score object keeps track. */
 	public final Manager manager;
 
-	/** Constructor. Creates an instance to keep track of the score */
-	protected Score(Manager m){
+	/** Constructor: an instance for manager m and with initial score 0. */
+	protected Score(Manager m) {
 		manager = m;
 		score = 0;
 	}
 
-	/** Constructor. Creates an instance to keep track of the score.
-	 * @param score - the Initial score of this Game
+	/** Constructor: an instance for manager m and with initial score s.
+	 * @param s - the Initial score of this Game
 	 */
-	protected Score(Manager m, int score){
+	protected Score(Manager m, int s) {
 		this(m);
-		this.score = score;
+		this.score = s;
 	}
 
-	/** Adds addToScore to score */
-	protected void changeScore(int addToScore){
-		score += addToScore;
-		if(manager.getGame().getGUI() != null) manager.getGame().getGUI().updateScore(score);
+	/** Add s to the score. */
+	protected void changeScore(int s) {
+		score += s;
+		if (manager.getGame().getGUI() != null) manager.getGame().getGUI().updateScore(score);
 	}
 
-	/** Returns the current score */
-	public int getScore(){
+	/** Return the current score. */
+	public int getScore() {
 		return score;
 	}
 
-	/** Returns the current score */
-	public int value(){
+	/** Return the current score. */
+	public int value() {
 		return getScore();
 	}
 
-	/** Returns the current score value as the string version of this score. */
+	/** Return the current score value as a String. */
 	@Override
-	public String toString(){
+	public String toString() {
 		return "" + getScore();
 	}
 }

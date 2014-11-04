@@ -9,68 +9,81 @@ public class HeapSolution<T> extends ArrayList<T> implements MinHeap<T> {
 
 	private static final long serialVersionUID = 1L;
 	
-	// Maps items in the heap to an entry that stores their index and priority.
+	// Maps items in the heap to an entry that contains their index and priority.
 	private HashMap<T, ItemInfo> itemInfoMap;
 
+	/** Constructor: an empty heap. */
 	public HeapSolution() {
 		itemInfoMap = new HashMap<T, ItemInfo>();
 	}
 
+	/** Return a representation of this min heap. */
 	@Override
 	public String toString(){
-		if(isEmpty()) return "[]";
+		if (isEmpty()) return "[]";
 		String s = "[";
-		Iterator<T> iter = iterator();
-		while(iter.hasNext()){
-			T t = iter.next();
-			s += t.toString() + ":" + itemInfoMap.get(t).priority + ", ";
+		for (T t : this) {
+		    s += t.toString() + ":" + itemInfoMap.get(t).priority + ", ";
 		}
+		//Iterator<T> iter = iterator();
+		//while (iter.hasNext()) {
+		//	T t = iter.next();	
+		//}
 		return s.substring(0, s.length()-2) +"]";
 	}
 	
 	@Override
+	/** Remove and return the min value in this heap.
+	 * Precondiiton: The heap is not empty. */
 	public T poll() {
 		T rtnVal = super.get(0);
 		setAt(0, super.get(size() - 1));
 		itemInfoMap.remove(rtnVal);
 		super.remove(size() - 1);
-		rotateDown(0);
+		bubbleDown(0);
 		return rtnVal;
 	}
 
 	@Override
-	public void add(T item, double priority) throws IllegalArgumentException {
+	/** Add item with priority p to this heap. */
+	public void add(T item, double p) throws IllegalArgumentException {
 		if (itemInfoMap.containsKey(item)) {
 			throw new IllegalArgumentException("Cannot add duplicate elements to the heap");
 		}
-		itemInfoMap.put(item, new ItemInfo(priority, size()));
+		itemInfoMap.put(item, new ItemInfo(p, size()));
 		super.add(item);
-		rotateUp(size() - 1);
+		bubbleUp(size() - 1);
 	}
 
 	@Override
-	public void updatePriority(T item, double priority) {
+	/** Change the priority of item to p.
+	 * Precondition: p <= to item's current priority. */
+	public void updatePriority(T item, double p) {
 		ItemInfo entry = itemInfoMap.get(item);
-		if (priority > entry.priority) {
+		if (p > entry.priority) {
 			throw new IllegalArgumentException("Cannot increase priority with the decreaesePriority method");
 		}
-		entry.priority = priority;
-		rotateUp(entry.index);
+		entry.priority = p;
+		bubbleUp(entry.index);
 	}
 
-	/** Bubbles the element at index up until it reaches its correct position in the
-	 * heap. Precondition: index is correctly ordered with respect to its children. */
-	private void rotateUp(int index) {
+	/** Bubble the element at index up until it reaches its correct position in the
+	 * heap.
+	 * Precondition: the heap satisfies all heap properties except that item
+	 * get[index] may be smaller than its parent. */
+	private void bubbleUp(int index) {
 		if (index == 0) return;
 		int parent = parentIndex(index);
 		if (comesBefore(parent, index)) return;
 		swap(parent, index);
-		rotateUp(parent);
+		bubbleUp(parent);
 	}
 
-	/** Bubbles the element at index down until it reaches its correct position in the
-	 * heap. Precondition: index is correctly ordered with respect to its parent. */
-	private void rotateDown(int index) {
+	/** Bubble the element at index down until it reaches its correct position in the
+	 * heap.
+	 * Precondition: the heap satisfies all heap properties except that item
+     * get[index] may be larger than a child. */
+	private void bubbleDown(int index) {
 		int hiPriChild = leftChildIndex(index);
 		if (hiPriChild >= size()) return;
 		int rChildIndex = rightChildIndex(index);
@@ -79,46 +92,48 @@ public class HeapSolution<T> extends ArrayList<T> implements MinHeap<T> {
 		}
 		if (comesBefore(index, hiPriChild)) return;
 		swap(index, hiPriChild);
-		rotateDown(hiPriChild);
+		bubbleDown(hiPriChild);
 	}
 
-	/** Returns true iff parent is less than or equal to child (they are in order). */
+	/** Return true iff parent <= child (they are in order). */
 	private boolean comesBefore(int parent, int child) {
 		return itemInfoMap.get(super.get(parent)).priority <= itemInfoMap.get(super.get(child)).priority;
 	}
 
-	/** Swaps the items at index a and b. */
+	/** Swap the items at index a and b. */
 	private void swap(int a, int b) {
 		T temp = super.get(a);
 		setAt(a, super.get(b));
 		setAt(b, temp);
 	}
 	
-	/** Sets the item at index to item, and remaps item to index in the indices map. */
+	/** Set the item at index to item, and remap item to index in the indices map. */
 	private void setAt(int index, T item) {
 		super.set(index, item);
 		itemInfoMap.get(item).index = index;
 	}
 
-	/** Returns the index of the left child of the item at index i. */
+	/** Return the index of the left child of the item at index i. */
 	private int leftChildIndex(int i) {
-		return 2 * i + 1;
+		return 2*i + 1;
 	}
 	
-	/** Returns the index of the right child of the item at index i. */
+	/** Return the index of the right child of the item at index i. */
 	private int rightChildIndex(int i) {
-		return 2 * i + 2;
+		return 2*i + 2;
 	}
 
-	/** Returns the index of the parent of the item at index i. */
+	/** Return the index of the parent of the item at index i. */
 	private int parentIndex(int i) {
-		return (i - 1) / 2;
+		return (i - 1)/2;
 	}
 	
+	/** An instance is an item in the heap, with an index and a priority. */
 	private static class ItemInfo {
 		private double priority;
 		private int index;
 		
+		/** Constructor: an instance with priority p at index i. */
 		private ItemInfo(double p, int i) {
 			priority = p;
 			index = i;

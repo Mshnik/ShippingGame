@@ -3,171 +3,175 @@ package game;
 import java.awt.Point;
 import java.util.Objects;
 
-/** A simple geometric vector class (a la Point) that allows doubles for its fields */
+/** A simple geometric vector class (a la Point), which allows doubles for its fields */
 public class Vector {
 
 	private double x;
 	private double y;
 	
-	/** Constructs a vector with values <0,0> */
-	public Vector(){
+	/** Constructor: a vector <0,0>. */
+	public Vector() {
 		x = 0;
 		y = 0;
 	}
 	
-	/** Constructs a vector with the given inputs  */
-	public Vector(double x, double y){
+	/** Constructor: a vector <x,y>.  */
+	public Vector(double x, double y) {
 		this.x = x;
 		this.y = y;
 	}
 	
-	/** Constructs a vector with the same values as the input vector */
-	public Vector(Vector v){
+	/** Constructor: a vector with same values as v. */
+	public Vector(Vector v) {
 		this.x = v.x;
 		this.y = v.y;
 	}
 	
-	/** Returns this vector's x component */
-	public double getX(){
+	/** Return this vector's x component. */
+	public double getX() {
 		return x;
 	}
 	
-	/** Returns this double's y component */
-	public double getY(){
+	/** Return this double's y component. */
+	public double getY() {
 		return y;
 	}
 	
-	/** Adds vector v's components to this vector.
-	 * Returns a reference to itself */
-	public Vector addVector(Vector v){
-		this.x += v.x;
-		this.y += v.y;
+	/** Add v's components to this vector and
+	 * return this Vector */
+	public Vector addVector(Vector v) {
+		x += v.x;
+		y += v.y;
 		return this;
 	}
 	
-	/** Multiplies both of this vector's components by the given scalar 
-	 * Returns a reference to itself */
-	public Vector mult(double scalar){
-		this.x *= scalar;
-		this.y *= scalar;
+	/** Multiply both of this vector's components by s and 
+	 * return this Vector. */
+	public Vector mult(double s) {
+		x *= s;
+		y *= s;
 		return this;
 	}
 	
-	/** Inverts both of this' components - changes the vector to <1/x, 1/y> 
-	 * Returns a reference to itself*/
-	public Vector invert(){
-		this.x = 1/this.x;
-		this.y = 1/this.y;
+	/** Invert both of this' components - change this vector to <1/x, 1/y> -- 
+	 * and returns this Vector.
+	 * Precondition: the x and y components are not 0. */
+	public Vector invert() {
+		x = 1/x;
+		y = 1/y;
 		return this;
 	}
 	
-	/** Makes this vector have length 1, with the same direction.
-	 * Returns a reference to itself */
-	public Vector unit(){
+	/** Make this vector have length 1, with the same direction, and
+	 * Return this Vector. */
+	public Vector unit() {
 		double l = length();
 		x = x/l;
 		y = y/l;
 		return this;
 	}
 	
-	/** Returns the dot product of the two given vectors */
-	public static double dot(Vector a, Vector b){
+	/** Return the dot product of a and b/ */
+	public static double dot(Vector a, Vector b) {
 		return a.x * b.x + a.y * b.y;
 	}
 	
-	/** Returns the dot product of this and the vector other */
-	public double dot(Vector other){
-		return dot(this, other);
+	/** Return the dot product of this Vector and b. */
+	public double dot(Vector b) {
+		return dot(this, b);
 	}
 	
-	/** Returns the cross product of the two given vectors.
+	/** Return the cross product of a and b.
 	 * Because vectors are 2-d, the return is a vector of the form <0, 0, z>
 	 * So a 1-D vector. */
-	public static double cross(Vector a, Vector b){
+	public static double cross(Vector a, Vector b) {
 		return a.x * b.y - b.x * a.y;
 	}
 	
-	/** Returns the cross product of this and vector other */
-	public double cross(Vector other){
-		return cross(this, other);
+	/** Return the cross product of this and b. */
+	public double cross(Vector b) {
+		return cross(this, b);
 	}
 	
-	/** Returns the length of the given vector */
-	public static double length(Vector a){
+	/** Return the length of a. */
+	public static double length(Vector a) {
 		return a.length();
 	}
 	
-	/** Returns the length of this vector */
-	public double length(){
-		return Math.sqrt(Math.pow(x, 2) + Math.pow(y, 2));
+	/** Returns the length of this vector. */
+	public double length() {
+		return Math.sqrt(x*x + y*y);
 	}
 	
-	/** Returns the length of this vector */
-	public double magnitude(){
+	/** Return the length of this vector. */
+	public double magnitude() {
 		return length();
 	}
 	
-	/** Returns the distance between the two input vectors */
-	public static double distance(Vector a, Vector b){
+	/** Return the distance between a and b. */
+	public static double distance(Vector a, Vector b) {
 		return Point.distance(a.x, a.y, b.x, b.y);
 	}
 	
-	/** Returns the distance between this vector and that vector */
-	public double distance(Vector there){
-		return distance(this, there);
+	/** Return the distance between this vector and b. */
+	public double distance(Vector b) {
+		return distance(this, b);
 	}
 	
-	/** Returns a new vector from this to there */
-	public Vector to(Vector there){
-		return new Vector(there.x - x, there.y - y);
+	/** Return a new vector from this to b. */
+	public Vector to(Vector b) {
+		return new Vector(b.x - x, b.y - y);
 	}
 	
-	/** Returns the cosine of the angle between a and b */
-	public static double cos(Vector a, Vector b){
+	/** Return the cosine of the angle between a and b */
+	public static double cos(Vector a, Vector b) {
 		return dot(a,b)/(a.length()*b.length());
 	}
 	
-	/** Returns the cosine of the angle between this and vector other */
-	public double cos(Vector other){
-		return cos(this, other);
+	/** Return the cosine of the angle between this and b. */
+	public double cos(Vector b) {
+		return cos(this, b);
 	}
 	
-	/** Returns the angle between a and b, in radians.
-	 * Return is in the range [0.. PI] */
-	public static double radAngle(Vector a, Vector b){
+	/** Return the angle between a and b, in radians.
+	 * Return is in the range 0.. PI */
+	public static double radAngle(Vector a, Vector b) {
 		return Math.acos(cos(a,b));
 	}
 	
-	/** Returns the angle between this and other, in radians.
-	 * Return is in the range [0 .. PI] */
-	public double radAngle(Vector other){
-		return radAngle(this, other);
+	/** Returns the angle between this and b, in radians.
+	 * Return is in the range 0 .. PI */
+	public double radAngle(Vector b) {
+		return radAngle(this, b);
 	}
 	
-	/** Tolerance to consider two vector components equal */
+	/** Tolerance to consider two vector components equal. */
 	public static final double TOLERANCE = 0.000001;
 	
-	/** Hashes a vector based on its components, using the Objects.hash method.
-	 * Rounds both components to the nearest TOLERANCE */
+	/** Hashe a vector based on its components, using function Objects.hash.
+	 * Round both components to the nearest TOLERANCE */
 	@Override
-	public int hashCode(){
+	public int hashCode() {
 		return Objects.hash(Math.round(x/TOLERANCE)*TOLERANCE, Math.round(y/TOLERANCE)*TOLERANCE);
 	}
 	
-	/** Two vectors are equal if their components are equal.
-	 * To fix for precision, checks if components are within TOLERANCE of eachother */
+	/** Return true iff ob is a Vector and is equal to this one.
+	 * Two vectors are equal if their components are equal.
+	 * To fix for precision, checks if components are within TOLERANCE of each other.
+	 * THIS ACTUALLY IS FRAUGHT WITH DANGER, because it is not transitive, and equals functions
+	 * should be transitive. So be wary of using this. */
 	@Override
-	public boolean equals(Object o){
-		if(! (o instanceof Vector))
+	public boolean equals(Object ob) {
+		if (!(ob instanceof Vector))
 			return false;
 		
-		Vector v = (Vector)o;
+		Vector v = (Vector)ob;
 		return Math.abs(x - v.x) < TOLERANCE && Math.abs(y - v.y) < TOLERANCE;
 	}
 
-	/** Returns a simple string representation of this vector */
+	/** Return a string representation of this vector: <x, y> . */
 	@Override
-	public String toString(){
+	public String toString() {
 		return "<" + x + "," + y + ">";
 	}
 }

@@ -5,7 +5,7 @@ import java.util.LinkedList;
 import game.Node;
 
 /**	An instance wraps a Node, including that node's path
- * 	from some starting node, and the distance of that path. 
+ * 	from some start node and the distance of that path. 
  * 
  * @author Sandra Anderson
  *
@@ -17,6 +17,8 @@ public class NodeWrapper implements  Comparable<NodeWrapper> {
 	private LinkedList<Node> path; 
 	private int distance;
 	
+	/** Constructor: an instance for node n. The distance is MAX_VALUE and
+	 * the path contains only the starting node. */
 	NodeWrapper(Node n) {
 		node = n;
 		distance = Integer.MAX_VALUE;
@@ -29,27 +31,27 @@ public class NodeWrapper implements  Comparable<NodeWrapper> {
 		resetPath(pathThrough);
 	}
 	
-	/** Returns the path to this node. */
+	/** Return the path to this node. */
 	LinkedList<Node> getPath(){
 		return path;
 	}
 	
-	/** Adds the specified node to this node's path. */
+	/** Add n to this node's path. */
 	void addToPath(Node n){
 		path.add(n);
 	}
 	
-	/** Adds the contents of the given list to this node's path, in order. */
-	void addToPath(LinkedList<Node> l){
-		path.addAll(l);
+	/** Add the contents of list to this node's path, in order. */
+	void addToPath(LinkedList<Node> list){
+		path.addAll(list);
 	}
 	
-	/** Resets this node's path to the empty list. */
+	/** Reset this node's path to the empty list. */
 	void setPath(){
 		path = new LinkedList<Node>();
 	}
 	
-	/** Resets the path to "reset" so that it passes through "current"
+	/** Reset the path to "reset" so that it passes through "current"
 	 * Preconditions: an edge exists between "reset" and "current"
 	 */
 	void resetPath(NodeWrapper through){
@@ -58,42 +60,34 @@ public class NodeWrapper implements  Comparable<NodeWrapper> {
 		path.add(node);
 	}
 	
-	/** Returns the distance to this node. */
+	/** Return the distance to this node. */
 	int getDistance(){
 		return distance;
 	}
 	
-	/** Returns true if the given distance is shorter
-	 * 	than the distance currently in this NodeWrapper,
-	 * 	and false otherwise. 
-	 */
+	/** Return true iff d is shorter than the distance currently in
+	 * this NodeWrapper.  */
 	boolean checkDistance(int d){
-		return (d < distance);
+		return d < distance;
 	}
 	
-	/** Sets the distance of this node to d */
+	/** Set the distance of this node to d */
 	void setDistance(int d){
 		distance = d;
 	}
 	
-	/**	Returns a negative, zero, or positive integer
-	 * 	as this NodeWrapper is less than, equal to, or
-	 * 	greater than the given NodeWrapper. Comparison is 
-	 * 	made on distance.  
-	 */
+	/**	Return a negative, zero, or positive integer as this NodeWrapper
+	 * distance is less than, equal to, or greater than w's distance. */
 	public int compareTo(NodeWrapper w){
 		return distance - w.distance; 
 	}
 	
-	/**	Returns true if and only if this node equals the 
-	 * 	given object. That object must also be a node-wrapper,
-	 * 	and the nodes they wrap must also be equal. 
+	/**	Return true iff obj is a NodeWrapper and this and obj wrap
+	 * equal nodes. 
 	 */
 	public @Override boolean equals(Object obj){
-		if(obj instanceof NodeWrapper){
-			return node.equals(((NodeWrapper) obj).node);
-		}
-		return false;
+		if (!(obj instanceof NodeWrapper)) return false;
+		return node.equals(((NodeWrapper) obj).node);
 	}
 
 }

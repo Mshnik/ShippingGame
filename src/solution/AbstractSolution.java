@@ -9,46 +9,51 @@ import game.Manager;
 import game.Node;
 import game.MinHeap;
 
-/** AbstractSolution is an abstract class which extends Manager.
+/** Abstract class AbstractSolution extends Manager.
  * 	The instructor solutions should all extend this class.
  * 	An implementation of Dijkstra's algorithm is included.
  * 
  * @author Sandra Anderson
- *
  */
 public abstract class AbstractSolution extends Manager {
 
+    /** An instance contains information about a node: the previous
+     * node on a path from the start node to this node and the distance
+     * of this node from the start node. */
 	private static class NodeInfo {
 		private Node previous;
 		private int distFromStart;
 
-		private NodeInfo(Node previous, int distFromStart) {
-			this.previous = previous;
-			this.distFromStart = distFromStart;
+		/** Constructor: an instance with previous node p and distance d from
+		 * the start node.*/
+		private NodeInfo(Node p, int d) {
+			previous = p;
+			distFromStart = d;
 		}
 
+		/** Constructor: an instance with a null previous node and distance 0. */
 		private NodeInfo() {}
 	}
 
-	/** Finds the shortest path from start to end, or the empty list
+	/** Find the shortest path from start to end, or the empty list
 	 *  if one does not exist. Uses Dijkstra's algorithm for a 
 	 *  weighted, bidirectional graph. 
 	 * 	
-	 * @param start Where the path starts from.
-	 * @param end Where the path ends. 
+	 * @param start The path start node.
+	 * @param end The end node. 
 	 * @return A linked list containing every node on the shortest path,
-	 * including the start and the end. Returns the empty list
+	 * including the start and the end. Return the empty list
 	 * if no path exists. 
 	 */
 	protected static LinkedList<Node> dijkstra(Node start, Node end) {
-		MinHeap<Node> queue = new HeapSolution<Node>();
+		MinHeap<Node> frontier = new HeapSolution<Node>();
 		HashMap<Node, NodeInfo> nodeInfo = new HashMap<Node, NodeInfo>();
 
-		queue.add(start, 0);
+		frontier.add(start, 0);
 		nodeInfo.put(start, new NodeInfo());
 		
-		while (!queue.isEmpty()) {
-			Node current = queue.poll();
+		while (!frontier.isEmpty()) {
+			Node current = frontier.poll();
 			if (current.equals(end)) {
 				return reconstructPath(current, nodeInfo);
 			}
@@ -68,9 +73,9 @@ public abstract class AbstractSolution extends Manager {
 				if (neverSeen) {
 					neighborInfo = new NodeInfo();
 					nodeInfo.put(neighbor, neighborInfo);
-					queue.add(neighbor, newDistToNeighbor);
+					frontier.add(neighbor, newDistToNeighbor);
 				} else if (needToUpdate) {
-					queue.updatePriority(neighbor, newDistToNeighbor);
+					frontier.updatePriority(neighbor, newDistToNeighbor);
 				}
 
 				if (neverSeen || needToUpdate) {
@@ -82,6 +87,9 @@ public abstract class AbstractSolution extends Manager {
 		return new LinkedList<Node>(); //no path was found
 	}
 
+	/** Return the path from the start node to end.
+	 * Precondition: nodeInfo contains all the necessary information about
+	 * the path. */
 	private static LinkedList<Node> reconstructPath(Node end, HashMap<Node, NodeInfo> nodeInfo) {
 		LinkedList<Node> path = new LinkedList<Node>();
 		Node current = end;
@@ -92,15 +100,15 @@ public abstract class AbstractSolution extends Manager {
 		return path;
 	}
 	
-	/** Returns the collective weight of the given path of nodes
-	 * by iterating along it and summing the weight of edges encountered */
-	protected int pathLength(LinkedList<Node> path){
+	/** Return the collective weight of the given path of nodes
+	 * by iterating along it and summing the weight of edges encountered. */
+	protected int pathLength(LinkedList<Node> path) {
 		int s = 0;
 		Iterator<Node> one = path.iterator();
 		Iterator<Node> two = path.iterator();
 		two.next(); //Advance two by one link
 		
-		while(two.hasNext()){
+		while (two.hasNext()) {
 			Node n1 = one.next();
 			Node n2 = two.next();
 			s += n1.getConnect(n2).length;
