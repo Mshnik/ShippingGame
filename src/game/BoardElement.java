@@ -1,7 +1,5 @@
 package game;
 
-import java.awt.Color;
-
 import org.json.JSONString;
 
 /** Interface BoardElement can be implemented by any class that wants to be drawn
@@ -53,11 +51,7 @@ public interface BoardElement extends JSONString, Colorable, UserData {
 	 * Probably will require a lock maintained internally. */
 	public int trucksHere();
 	
-	/** Return the Color of this BoardElement. */
-	@Override
-	public Color getColor();
-	
-	/** Update the location of this on the gui (change it to (x, y). */
+	/** Update the location of this on the gui (change it to (x, y)). */
 	public void updateGUILocation(int x, int y);
 	
 	/** Return the board to which this BoardElement. */

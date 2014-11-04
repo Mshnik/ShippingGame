@@ -258,7 +258,7 @@ public class Board implements JSONString {
         if (finishedTrucks.containsAll(trucks)) game.finish();
     }
 
-    /** Return the parcels in this boardthat have not yet been delivered. */
+    /** Return the parcels in this board that have not yet been delivered. */
     public Set<Parcel> getParcels() {
         return parcels;
     }

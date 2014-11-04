@@ -148,7 +148,7 @@ public class Vector {
 	/** Tolerance to consider two vector components equal. */
 	public static final double TOLERANCE = 0.000001;
 	
-	/** Hashe a vector based on its components, using function Objects.hash.
+	/** Hashes a vector based on its components, using function Objects.hash.
 	 * Round both components to the nearest TOLERANCE */
 	@Override
 	public int hashCode() {
@@ -156,17 +156,14 @@ public class Vector {
 	}
 	
 	/** Return true iff ob is a Vector and is equal to this one.
-	 * Two vectors are equal if their components are equal.
-	 * To fix for precision, checks if components are within TOLERANCE of each other.
-	 * THIS ACTUALLY IS FRAUGHT WITH DANGER, because it is not transitive, and equals functions
-	 * should be transitive. So be wary of using this. */
+	 * Two vectors are equal if their components are equal -
+	 * thus checks if they have the same hashcodes, which are built off of their components */
 	@Override
 	public boolean equals(Object ob) {
 		if (!(ob instanceof Vector))
 			return false;
 		
-		Vector v = (Vector)ob;
-		return Math.abs(x - v.x) < TOLERANCE && Math.abs(y - v.y) < TOLERANCE;
+		return hashCode() == ob.hashCode();
 	}
 
 	/** Return a string representation of this vector: <x, y> . */
