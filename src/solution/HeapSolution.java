@@ -51,11 +51,13 @@ public class HeapSolution<T> extends ArrayList<T> implements MinHeap<T> {
 	@Override
 	public void updatePriority(T item, double priority) {
 		ItemInfo entry = itemInfoMap.get(item);
-		if (priority > entry.priority) {
-			throw new IllegalArgumentException("Cannot increase priority with the decreaesePriority method");
-		}
+		double oldPriority = entry.priority;
 		entry.priority = priority;
-		rotateUp(entry.index);
+		if (priority > oldPriority) {
+			rotateDown(entry.index);
+		} else {
+			rotateUp(entry.index);
+		}
 	}
 
 	/** Bubbles the element at index up until it reaches its correct position in the

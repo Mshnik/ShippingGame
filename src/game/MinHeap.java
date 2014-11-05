@@ -18,8 +18,6 @@ public interface MinHeap<T> {
 	public T poll();
 	
 	/** Change the priority of item.
-	 *  Precondition: priority is less than or equal to item's previous priority.
-	 *  May be unused in less complex implementations.
 	 *  Implement in at worst O(log(N)) time.
 	 */
 	public void updatePriority(T item, double priority);
