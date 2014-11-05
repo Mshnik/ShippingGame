@@ -94,12 +94,6 @@ public class Parcel implements BoardElement {
 	public Color getColor() {
 		return color;
 	}
-	
-    /** Return true - the color of Parcels is significant */
-    @Override
-    public boolean isColorSignificant(){
-    	return true;
-    }
 
 	/** Return the userData stored in this Node (may be null). */
 	@Override
@@ -149,8 +143,8 @@ public class Parcel implements BoardElement {
 		}
 
 		if (holder.getLocation().equals(destination)) {
-			parcelLock.release();
 			reachedDestination();
+			parcelLock.release();
 			return;
 		}
 
