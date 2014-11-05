@@ -50,15 +50,18 @@ public class HeapSolution<T> extends ArrayList<T> implements MinHeap<T> {
 	}
 
 	@Override
-	/** Change the priority of item to p.
-	 * Precondition: p <= to item's current priority. */
+	/** Change the priority of item to p. */
 	public void updatePriority(T item, double p) throws IllegalArgumentException {
 		ItemInfo entry = itemInfoMap.get(item);
-		if (p > entry.priority) {
-			throw new IllegalArgumentException("Cannot increase priority with the decreaesePriority method");
-		}
+		if(entry == null) 
+			throw new IllegalArgumentException("Cannot update priority for element not in heap");
+		double oldPriority = entry.priority;
 		entry.priority = p;
-		bubbleUp(entry.index);
+		if (p > oldPriority) {
+			bubbleDown(entry.index);
+		} else {
+			bubbleUp(entry.index);
+		}
 	}
 
 	/** Bubble the element at index up until it reaches its correct position in the

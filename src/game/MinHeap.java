@@ -19,7 +19,6 @@ public interface MinHeap<T> {
 	public T poll();
 	
 	/** Change the priority of t to p.
-	 *  Precondition: p <= t's previous priority.
 	 *  May be unused in less complex implementations.
 	 *  Must take worst-case time no more than O(log N).
 	 */
