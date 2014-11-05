@@ -1,7 +1,5 @@
 package game;
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.Set;
+import java.util.*;
 
 /** Class Manager determines the the behavior of the Trucks.
  * In addition to function getGame(), other getters are available for ease of use.
@@ -149,14 +147,7 @@ public abstract class Manager implements Runnable{
 	/** Called by the game when the game is over.
 	 * If thread is null, do nothing because it was never started in the first place. */
 	final void gameOver() {
-		if (thread != null) {
-			try {
-				thread.join(1000); //Wait some time
-				thread.interrupt(); //Just interrupt it
-			} catch (InterruptedException e) {
-				thread.interrupt(); //Just interrupt it
-			}
-		}
+		if (thread != null) thread.interrupt();
 	}
 
 }

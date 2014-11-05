@@ -1,16 +1,6 @@
 package gui;
-import game.Edge;
-import game.Board;
-import game.BoardElement;
-import game.Vector;
-
-import java.awt.BasicStroke;
-import java.awt.Color;
-import java.awt.Dimension;
-import java.awt.Graphics;
-import java.awt.Graphics2D;
-import java.awt.Point;
-import java.awt.RenderingHints;
+import game.*;
+import java.awt.*;
 import java.awt.geom.Line2D;
 
 import javax.swing.JPanel;

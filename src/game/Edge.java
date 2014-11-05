@@ -2,9 +2,7 @@ package game;
 import gui.Line;
 
 import java.awt.Color;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
 
 /** Class Edge in ShippingGame allows creation of the connections between Nodes
  * along which Trucks can travel.

@@ -3,12 +3,7 @@ import gui.Circle;
 import gui.DraggableCircle;
 
 import java.awt.Color;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Set;
-
+import java.util.*;
 
 /** A Node (vertex) on the board of the game. Each Node maintains
  *  (1) a set of edges that exit it,

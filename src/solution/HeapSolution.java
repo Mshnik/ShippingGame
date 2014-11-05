@@ -1,9 +1,7 @@
 package solution;
 
 import game.MinHeap;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Iterator;
+import java.util.*;
 
 public class HeapSolution<T> extends ArrayList<T> implements MinHeap<T> {
 

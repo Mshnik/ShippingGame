@@ -1,13 +1,7 @@
 package solution;
 
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.LinkedList;
-import java.util.Map;
-
-import game.Manager;
-import game.Node;
-import game.MinHeap;
+import java.util.*;
+import game.*;
 
 /** Abstract class AbstractSolution extends Manager.
  * 	The instructor solutions should all extend this class.

@@ -1,7 +1,8 @@
 package solution;
 
-import java.util.*;
 import game.*;
+import java.util.*;
+
 
 /** A simple solution to the shipping game problem.
  * Greedy solution: assign each parcel to a truck, that truck gets it, 

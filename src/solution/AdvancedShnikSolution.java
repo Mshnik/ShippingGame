@@ -1,14 +1,7 @@
 package solution;
 
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.LinkedList;
-import java.util.Map;
-import java.util.Set;
-
 import game.*;
+import java.util.*;
 
 /** A more complex solution.
  * Works on colorizing and having trucks pick up the parcels closest to them.

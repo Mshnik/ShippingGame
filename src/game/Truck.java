@@ -2,9 +2,7 @@ package game;
 import gui.Circle;
 
 import java.awt.Color;
-import java.util.Collections;
-import java.util.LinkedList;
-import java.util.List;
+import java.util.*;
 import java.util.concurrent.Semaphore;
 
 /** CLass Truck is a runnable object that represents a single Truck in the game.
@@ -573,22 +571,27 @@ public class Truck implements BoardElement, Runnable {
         travel.add(r);
     }
 
-    /** Set the travel queue to travel the given list of edges, in order. */
+    /** Clear the Travel queue, then 
+     *  Set the travel queue to travel the given list of edges, in order. */
     public void setTravelQueue(List<Edge> path) {
+    	clearTravel();
         for (Edge e : path) {
             addToTravel(e);
         }
     }
 
-    /** Set the travel queue to travel the given path.
+    /** Clear the travel queue, then
+     * Set the travel queue to travel the given path.
      * First element is the truck's current location, and the last
      * is the expected destination.
      * @throws RuntimeException if the truck isn't currently at the first node in the path.
      */
     public void setTravelPath(List<Node> path) throws RuntimeException {
-        if (path.get(0) != getLocation())
+        if (status == Status.WAITING && path.get(0) != getLocation()
+        	|| status == Status.TRAVELING && path.get(0) != getTravelingTo())
             throw new RuntimeException("Can't start travel at " + path.get(0) +
                     " because " + this + " is currently at " + getLocation());
+        clearTravel();
         Node prev = null;
         for (Node n : path){
             if (prev != null){
@@ -749,14 +752,8 @@ public class Truck implements BoardElement, Runnable {
      * If thread is null, do nothing because this truck was never started. */
     protected void gameOver(){
         clearTravel();
-        if (thread != null) {
-            try {
-                thread.join(1000); //Try to join it.
-                thread.interrupt(); //Failed - just interrupt
-            } catch(InterruptedException e) {
-                if (thread != null) thread.interrupt(); //Failed - just interrupt
-            }
-        }
+        if (thread != null) thread.interrupt(); 
+        alive = false;
     }
 
     /** Return a JSON String of this truck. This is just the basic truck
