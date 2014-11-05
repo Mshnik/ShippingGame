@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.1415926-2.5-1.40.14 (TeX Live 2013) (format=pdflatex 2013.5.30)  3 NOV 2014 00:25
+This is pdfTeX, Version 3.1415926-2.5-1.40.14 (TeX Live 2013) (format=pdflatex 2013.5.30)  5 NOV 2014 13:23
 entering extended mode
  restricted \write18 enabled.
  file:line:error style messages enabled.
@@ -859,47 +859,87 @@ Underfull \hbox (badness 10000) in paragraph at lines 50--53
 
  []
 
-[3 <./map1.png>] [4] <hirearchy.png, id=26, 778.91pt x 338.26375pt>
-File: hirearchy.png Graphic file (type png)
+[3 <./map1.png>] [4]
+LaTeX Font Info:    Try loading font information for OT1+lmr on input line 81.
+ (/usr/local/texlive/2013/texmf-dist/tex/latex/lm/ot1lmr.fd
+File: ot1lmr.fd 2009/10/30 v1.6 Font defs for Latin Modern
+)
+LaTeX Font Info:    Try loading font information for OML+lmm on input line 81.
+ (/usr/local/texlive/2013/texmf-dist/tex/latex/lm/omllmm.fd
+File: omllmm.fd 2009/10/30 v1.6 Font defs for Latin Modern
+)
+LaTeX Font Info:    Try loading font information for OMS+lmsy on input line 81.
 
-<use hirearchy.png>
-Package pdftex.def Info: hirearchy.png used on input line 87.
+
+(/usr/local/texlive/2013/texmf-dist/tex/latex/lm/omslmsy.fd
+File: omslmsy.fd 2009/10/30 v1.6 Font defs for Latin Modern
+)
+LaTeX Font Info:    Try loading font information for OMX+lmex on input line 81.
+
+
+(/usr/local/texlive/2013/texmf-dist/tex/latex/lm/omxlmex.fd
+File: omxlmex.fd 2009/10/30 v1.6 Font defs for Latin Modern
+)
+LaTeX Font Info:    External font `lmex10' loaded for size
+(Font)              <10.95> on input line 81.
+LaTeX Font Info:    External font `lmex10' loaded for size
+(Font)              <8> on input line 81.
+LaTeX Font Info:    External font `lmex10' loaded for size
+(Font)              <6> on input line 81.
+LaTeX Font Info:    Try loading font information for U+msa on input line 81.
+
+(/usr/local/texlive/2013/texmf-dist/tex/latex/amsfonts/umsa.fd
+File: umsa.fd 2013/01/14 v3.01 AMS symbols A
+)
+LaTeX Font Info:    Try loading font information for U+msb on input line 81.
+
+(/usr/local/texlive/2013/texmf-dist/tex/latex/amsfonts/umsb.fd
+File: umsb.fd 2013/01/14 v3.01 AMS symbols B
+) [5]
+<hirearchy.png, id=32, 778.91pt x 338.26375pt>
+File: hirearchy.png Graphic file (type png)
+ <use hirearchy.png>
+Package pdftex.def Info: hirearchy.png used on input line 96.
 (pdftex.def)             Requested size: 545.23329pt x 236.78299pt.
- [5 <./hirearchy.png>] [6] [7]
-Underfull \hbox (badness 10000) in paragraph at lines 123--124
+ [6 <./hirearchy.png>] [7] [8]
+Underfull \hbox (badness 10000) in paragraph at lines 132--133
 
  []
 
-<fry.jpg, id=37, 803.0pt x 602.25pt>
+<fry.jpg, id=43, 803.0pt x 602.25pt>
 File: fry.jpg Graphic file (type jpg)
  <use fry.jpg>
-Package pdftex.def Info: fry.jpg used on input line 126.
+Package pdftex.def Info: fry.jpg used on input line 135.
 (pdftex.def)             Requested size: 321.1943pt x 240.89572pt.
 
-Underfull \hbox (badness 10000) in paragraph at lines 130--131
+Underfull \hbox (badness 10000) in paragraph at lines 139--140
 
  []
 
-[8 <./fry.jpg>] (./spec.aux) ) 
+[9 <./fry.jpg>] (./spec.aux) ) 
 Here is how much of TeX's memory you used:
- 12030 strings out of 493315
- 215649 string characters out of 6137904
- 265462 words of memory out of 5000000
- 15209 multiletter control sequences out of 15000+600000
- 35979 words of font info for 26 fonts, out of 8000000 for 9000
+ 12120 strings out of 493315
+ 217754 string characters out of 6137904
+ 265464 words of memory out of 5000000
+ 15267 multiletter control sequences out of 15000+600000
+ 48235 words of font info for 42 fonts, out of 8000000 for 9000
  957 hyphenation exceptions out of 8191
  56i,8n,55p,586b,240s stack positions out of 5000i,500n,10000p,200000b,80000s
 {/usr/local/texlive/2013/texmf-dist/fonts/enc/dvi
-ps/lm/lm-ec.enc}</usr/local/texlive/2013/texmf-dist/fonts/type1/public/lm/lmbx1
-0.pfb></usr/local/texlive/2013/texmf-dist/fonts/type1/public/lm/lmbx12.pfb></us
-r/local/texlive/2013/texmf-dist/fonts/type1/public/lm/lmr10.pfb></usr/local/tex
-live/2013/texmf-dist/fonts/type1/public/lm/lmr12.pfb></usr/local/texlive/2013/t
-exmf-dist/fonts/type1/public/lm/lmr17.pfb></usr/local/texlive/2013/texmf-dist/f
-onts/type1/public/lm/lmri10.pfb>
-Output written on spec.pdf (8 pages, 412444 bytes).
+ps/lm/lm-ec.enc}{/usr/local/texlive/2013/texmf-dist/fonts/enc/dvips/lm/lm-maths
+y.enc}{/usr/local/texlive/2013/texmf-dist/fonts/enc/dvips/lm/lm-mathit.enc}{/us
+r/local/texlive/2013/texmf-dist/fonts/enc/dvips/lm/lm-rm.enc}</usr/local/texliv
+e/2013/texmf-dist/fonts/type1/public/lm/lmbx10.pfb></usr/local/texlive/2013/tex
+mf-dist/fonts/type1/public/lm/lmbx12.pfb></usr/local/texlive/2013/texmf-dist/fo
+nts/type1/public/lm/lmmi10.pfb></usr/local/texlive/2013/texmf-dist/fonts/type1/
+public/lm/lmr10.pfb></usr/local/texlive/2013/texmf-dist/fonts/type1/public/lm/l
+mr12.pfb></usr/local/texlive/2013/texmf-dist/fonts/type1/public/lm/lmr17.pfb></
+usr/local/texlive/2013/texmf-dist/fonts/type1/public/lm/lmri10.pfb></usr/local/
+texlive/2013/texmf-dist/fonts/type1/public/lm/lmsy10.pfb>
+Output written on spec.pdf (9 pages, 420202 bytes).
 PDF statistics:
- 64 PDF objects out of 1000 (max. 8388607)
- 43 compressed objects within 1 object stream
+ 80 PDF objects out of 1000 (max. 8388607)
+ 56 compressed objects within 1 object stream
  0 named destinations out of 1000 (max. 500000)
  28 words of extra memory for PDF output out of 10000 (max. 10000000)
 

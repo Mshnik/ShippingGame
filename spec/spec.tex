@@ -76,8 +76,17 @@ The code for this project is provided as a .jar file, without source-attachment.
 \end{enumerate}
 
 \subsection{Arguments}
-You can provide additional arguments to the runner to have it do different things. All argument combinations have to start with the name of your manager.
-TODO!	
+You can provide additional arguments to the runner to have it do different things. All argument combinations have to start with the name of your manager. With just the manager classname provided, the game will launch in GUI mode. There are no other applicable arguments for this mode. Any other combination of arguments will launch the game in GameRunner mode instead, where the game will automatically run your manager on a sequence of maps. 
+
+To run GameRunner on a series of seeds <seed1> <seed2> <seed3> such as $15, 12345, 907230587$, use each seed as an argument, separated by a space. (replace MyManager with the name of your Manager):
+\begin{center}
+MyManager 15 12345 907230587
+\end{center}
+To run GameRunner on a series of $n$ random seeds, use the $-r$ flag, followed by the number of random seeds to run (replace MyManager with the name of your Manager). For example, to run your manager on 10 random seeds:
+\begin{center}
+MyManager -r 10
+\end{center}
+
 
 \newpage
 \section{4. Class Explanation}
