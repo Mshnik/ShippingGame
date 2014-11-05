@@ -25,10 +25,6 @@ public class HeapSolution<T> extends ArrayList<T> implements MinHeap<T> {
 		for (T t : this) {
 		    s += t.toString() + ":" + itemInfoMap.get(t).priority + ", ";
 		}
-		//Iterator<T> iter = iterator();
-		//while (iter.hasNext()) {
-		//	T t = iter.next();	
-		//}
 		return s.substring(0, s.length()-2) +"]";
 	}
 	
@@ -58,7 +54,7 @@ public class HeapSolution<T> extends ArrayList<T> implements MinHeap<T> {
 	@Override
 	/** Change the priority of item to p.
 	 * Precondition: p <= to item's current priority. */
-	public void updatePriority(T item, double p) {
+	public void updatePriority(T item, double p) throws IllegalArgumentException {
 		ItemInfo entry = itemInfoMap.get(item);
 		if (p > entry.priority) {
 			throw new IllegalArgumentException("Cannot increase priority with the decreaesePriority method");

@@ -55,7 +55,7 @@ public class GUI extends JFrame{
     public static final int DRAWING_BOARD_HEIGHT_MIN = 400;
 
     public static final int DRAWING_BOARD_WIDTH;	//Default
-    public static final int DRAWING_BOARD_HEIGHT; //Default
+    public static final int DRAWING_BOARD_HEIGHT; 	//Default
 
     public static final int UPDATE_PANEL_HEIGHT = 100;
     public static final int SIDE_PANEL_WIDTH = 300;
@@ -532,6 +532,7 @@ public class GUI extends JFrame{
                         Thread.sleep(updateTime);
                         updateParcelAndTruckStats();
                     } catch (InterruptedException e) {
+                        updateParcelAndTruckStats();
                         return; //Terminates this thread upon interruption
                     }
                 }
@@ -563,6 +564,7 @@ public class GUI extends JFrame{
         }
         else {
             mntmReset.setEnabled(game.isFinished());
+            updateThread.interrupt();
         }
     }
 

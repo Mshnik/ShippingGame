@@ -45,14 +45,16 @@ public class Line  extends JPanel{
     public static final Color GRADIENT_LONG_COLOR = Color.BLACK;
 
     /** The different ways to draw the edges of the graph.
-     * <br>Default: all single color
-     * <br>Highlight color: all default color but highlighted when a truck is traveling it
-     * <br>Distance gradient: shorter edges lighter, longer edges darker
      * @author MPatashnik
      */
     public enum ColorPolicy{
+    	/** All edges drawn as a single dark-gray color */
         DEFAULT,
+        /** Edges that trucks are currently traveling drawn red, others drawn dark-gray */
         HIGHLIGHT_TRAVEL,
+        /** Edges drawn as a linear interpolation of their weights
+         * relative to other edges in the graph. Lighter edges are shorter.
+         */
         DISTANCE_GRADIENT
     }
 
@@ -162,7 +164,7 @@ public class Line  extends JPanel{
         return color;
     }
 
-    /** Update the Color according to the color policy. */
+    /** Update the Color of this Line according to the currently selected color policy. */
     public void updateToColorPolicy() {
         switch (colorPolicy) {
             case DEFAULT:
@@ -191,7 +193,8 @@ public class Line  extends JPanel{
     private Color getDistGradientColor() {
         Board m = represents.getBoard();
         if (m.getMaxLength() == Edge.DEFAULT_MAX_LENGTH || 
-                m.getMinLength() == Edge.DEFAULT_MIN_LENGTH)
+            m.getMinLength() == Edge.DEFAULT_MIN_LENGTH ||
+            ! (represents instanceof Edge))
             return DEFAULT_COLOR;
 
         Edge e = (Edge)represents;
@@ -199,12 +202,14 @@ public class Line  extends JPanel{
         int min = m.getMinLength();
         double v = (double)(e.length - min) / ((double)(max - min));
 
-        return new Color( (int)( (double)GRADIENT_LONG_COLOR.getRed() * v) + 
-                (int)( (double)GRADIENT_SHORT_COLOR.getRed() * (1-v)),
-                (int)( (double)GRADIENT_LONG_COLOR.getGreen() * v) + 
+        return new Color( 
+        		(int)( (double)GRADIENT_LONG_COLOR.getRed()    *    v) + 
+                (int)( (double)GRADIENT_SHORT_COLOR.getRed()   * (1-v)),
+                (int)( (double)GRADIENT_LONG_COLOR.getGreen()  *    v) + 
                 (int)( (double)GRADIENT_SHORT_COLOR.getGreen() * (1-v)),
-                (int)( (double)GRADIENT_LONG_COLOR.getBlue() * v) + 
-                (int)( (double)GRADIENT_SHORT_COLOR.getBlue() * (1-v)));
+                (int)( (double)GRADIENT_LONG_COLOR.getBlue()   *    v) + 
+                (int)( (double)GRADIENT_SHORT_COLOR.getBlue()  * (1-v))
+                );
     }
 
     /** Return the color policy for painting roads.
