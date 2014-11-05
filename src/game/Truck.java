@@ -2,7 +2,9 @@ package game;
 import gui.Circle;
 
 import java.awt.Color;
-import java.util.*;
+import java.util.Collections;
+import java.util.LinkedList;
+import java.util.List;
 import java.util.concurrent.Semaphore;
 
 /** CLass Truck is a runnable object that represents a single Truck in the game.
@@ -30,27 +32,14 @@ public class Truck implements BoardElement, Runnable {
      * Every Truck's status field is always one of these values.
      * @author MPatashnik
      */
-    public static enum Status {
-    	/** Status while a truck is traveling.
-    	 * While traveling, Parcel operations will not function correctly.
-    	 * The get methods for traveling (travelingTo, travelingAlong, comingFrom, goingTo)
-    	 * are available. Additional travel instructions can still be provided.
-    	 */
-    	TRAVELING, 
-    	/** Status while a truck is waiting.
-    	 * While waiting, Parcel operations will function. The getLocation() method
-    	 * is the only valid location getting method. 
-    	 * Travel instructions can be provided to make this truck start traveling
-    	 */
-    	WAITING};
+    public static enum Status {TRAVELING, WAITING};
 
     /** Milliseconds per travel increment. Wait time between travel updates.
      * A lower value means a faster game -- more penalty for computation.
      * A higher value means a slower game -- less penalty for computation. */
     public static final int FRAME = 40;
 
-    /** Milliseconds between wait updates - a truck calling
-     * Manager.truckNotification(this, Notification.WAITING) .*/
+    /** Milliseconds between wait updates.*/
     public static final int WAIT_TIME = 5;
 
     /** Maximum length/frame speed that a truck can travel. */
@@ -192,7 +181,7 @@ public class Truck implements BoardElement, Runnable {
         waitingForManager= true;
     }
 
-    /** Set this as finishing receiving manager input. Must be called after any
+    /** Set this as finishing receiving manager input Must be called after a
      * manager notification. */
     private void postManagerNotification() {
         waitingForManager = false;
@@ -406,17 +395,9 @@ public class Truck implements BoardElement, Runnable {
         return waitingForManager;
     }
 
-    /** Return the parcel this Truck is carrying. (null if none).
-     * Return null if the calling thread is interrupted */
+    /** Return the parcel this Truck is carrying. (null if none). */
     public Parcel getLoad() {
-    	try{
-    		parcelLock.acquire();
-    	}catch(InterruptedException e){
-    		return null;
-    	}
-    	Parcel p = load;
-    	parcelLock.release();
-        return p;
+        return load;
     }
 
     /** Return the Color of this Truck. Because the color of a truck has game
@@ -424,12 +405,6 @@ public class Truck implements BoardElement, Runnable {
     @Override
     public Color getColor() {
         return color;
-    }
-    
-    /** Return true - the color of Trucks is significant */
-    @Override
-    public boolean isColorSignificant(){
-    	return true;
     }
 
     /** Set the Color of this Truck to c.
@@ -540,15 +515,16 @@ public class Truck implements BoardElement, Runnable {
             return;
         }
         location.getTrueParcels().add(load);
-        parcelLock.release();
         try {
             load.droppedOff();
         } catch (InterruptedException e) {
             //Undo drop off
             location.getTrueParcels().remove(load);
+            parcelLock.release();
             return;
         }
         load = null;
+        parcelLock.release();
         getManager().getScoreObject().changeScore(getBoard().getDropoffCost());
         preManagerNotification();
         game.getManager().truckNotification(this, Manager.Notification.DROPPED_OFF_PARCEL);
@@ -571,27 +547,22 @@ public class Truck implements BoardElement, Runnable {
         travel.add(r);
     }
 
-    /** Clear the Travel queue, then 
-     *  Set the travel queue to travel the given list of edges, in order. */
+    /** Set the travel queue to travel the given list of edges, in order. */
     public void setTravelQueue(List<Edge> path) {
-    	clearTravel();
         for (Edge e : path) {
             addToTravel(e);
         }
     }
 
-    /** Clear the travel queue, then
-     * Set the travel queue to travel the given path.
+    /** Set the travel queue to travel the given path.
      * First element is the truck's current location, and the last
      * is the expected destination.
      * @throws RuntimeException if the truck isn't currently at the first node in the path.
      */
     public void setTravelPath(List<Node> path) throws RuntimeException {
-        if (status == Status.WAITING && path.get(0) != getLocation()
-        	|| status == Status.TRAVELING && path.get(0) != getTravelingTo())
+        if (path.get(0) != getLocation())
             throw new RuntimeException("Can't start travel at " + path.get(0) +
                     " because " + this + " is currently at " + getLocation());
-        clearTravel();
         Node prev = null;
         for (Node n : path){
             if (prev != null){
@@ -752,8 +723,14 @@ public class Truck implements BoardElement, Runnable {
      * If thread is null, do nothing because this truck was never started. */
     protected void gameOver(){
         clearTravel();
-        if (thread != null) thread.interrupt(); 
-        alive = false;
+        if (thread != null) {
+            try {
+                thread.join(1000); //Try to join it.
+                thread.interrupt(); //Failed - just interrupt
+            } catch(InterruptedException e) {
+                if (thread != null) thread.interrupt(); //Failed - just interrupt
+            }
+        }
     }
 
     /** Return a JSON String of this truck. This is just the basic truck

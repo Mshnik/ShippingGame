@@ -2,16 +2,40 @@ package gui;
 
 import game.*;
 
-import javax.swing.*;
-import java.awt.*;
+import javax.swing.JFrame;
+import javax.swing.JPanel;
+import java.awt.BorderLayout;
+import java.awt.Dimension;
+import java.awt.Toolkit;
 
-import java.awt.event.*;
+import javax.swing.JLabel;
+
+import java.awt.Color;
 import javax.swing.border.LineBorder;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 import javax.swing.table.DefaultTableModel;
+import javax.swing.ButtonGroup;
+import javax.swing.JFileChooser;
+import javax.swing.JMenuBar;
+import javax.swing.JMenu;
+import javax.swing.JOptionPane;
+import javax.swing.JMenuItem;
+import javax.swing.JSlider;
+import javax.swing.JTable;
+
+import java.awt.event.ActionListener;
+import java.awt.event.ActionEvent;
+import java.awt.event.ComponentEvent;
+import java.awt.event.ComponentListener;
+import java.awt.event.ItemEvent;
+import java.awt.event.ItemListener;
 import java.io.File;
 
+import javax.swing.BoxLayout;
+import javax.swing.JRadioButtonMenuItem;
+
+import java.awt.Font;
 
 /** Class GUI creates the JFrame that shows the game.
  * Class Game and other classes in package game send updates to the gui
@@ -31,7 +55,7 @@ public class GUI extends JFrame{
     public static final int DRAWING_BOARD_HEIGHT_MIN = 400;
 
     public static final int DRAWING_BOARD_WIDTH;	//Default
-    public static final int DRAWING_BOARD_HEIGHT; 	//Default
+    public static final int DRAWING_BOARD_HEIGHT; //Default
 
     public static final int UPDATE_PANEL_HEIGHT = 100;
     public static final int SIDE_PANEL_WIDTH = 300;
@@ -516,24 +540,6 @@ public class GUI extends JFrame{
         updateParcelAndTruckStats();
     }
 
-    /** Remove the given parcel from the gui - called internally by game
-     * when a parcel is successfully delivered. Puts the event on the AWT
-     * event thread to correctly handle multi-threaded parcel removal.
-     * Students - Do Not Call
-     */
-    public void removeParcel(final Parcel p){
-    	try {
-			SwingUtilities.invokeAndWait(new Runnable(){
-				@Override
-				public void run(){
-					getDrawingPanel().remove(p.getCircle());
-				}
-			});
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
-    }
-    
     /** Toggle the  interactability. When this isn't uninteractable,
      * doesn't allow user to provide any input
      */
@@ -557,7 +563,6 @@ public class GUI extends JFrame{
         }
         else {
             mntmReset.setEnabled(game.isFinished());
-            updateThread.interrupt();
         }
     }
 

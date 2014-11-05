@@ -50,8 +50,7 @@ public class Score {
 		return false;
 	}
 
-	/** Return the color represented by s (its toString format), 
-	 * that color's toString() output.
+	/** Return the color represented by s, that color's toString() output.
 	 * (null if no such color exits, or if the color isn't in COLOR).
 	 */
 	public static Color getColor(String s) {

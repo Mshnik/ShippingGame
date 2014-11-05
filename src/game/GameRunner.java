@@ -126,24 +126,23 @@ public class GameRunner {
 	}
 	
 	/** Different results of a game.
+	 * SUCCESS: game ended successfully
+	 * TIMEOUT: game was terminated by the runner because it ran too long
+	 * ERROR: game terminated itself because of internal error.
 	 * @author MPatashnik
 	 */
 	public enum GameStatus {
-		/** Game ended successfully */
 		SUCCESS,
-		/** Game was terminated by the runner because it ran too long */
 		TIMEOUT,
-		/** Game terminated itself because of an internal error. */
 		ERROR
 	}
 	
 	
 	/** A holder for a run on a single game.
-	 * Records the game that was run and the score received,
-	 * along with other information about the game.
+	 * Records the game that was run and the score received.
 	 * @author MPatashnik
 	 */
-	public static class GameScore {
+	public class GameScore {
 	    /** the game. */
 		public final Game game;
 		

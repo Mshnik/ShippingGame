@@ -3,7 +3,12 @@ import gui.Circle;
 import gui.DraggableCircle;
 
 import java.awt.Color;
-import java.util.*;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Set;
+
 
 /** A Node (vertex) on the board of the game. Each Node maintains
  *  (1) a set of edges that exit it,
@@ -38,7 +43,7 @@ public class Node implements BoardElement {
      * with drawing circle c.
      * @param m - the Board to which this Node belongs
      * @param name - the name of this Node
-     * @param c - The (draggable) circle object to draw for this Node*/
+     * @param circle - The (draggable) circle object to draw for this Node*/
     protected Node(Board m, String name, DraggableCircle c) {
         this(m, name, c, null);
     }
@@ -48,7 +53,7 @@ public class Node implements BoardElement {
      * @param m - the Board to which this Node belongs 
      * @param name - the name of this Node
      * @param exits - the exits of this node
-     * @param c - The (draggable) circle object to draw for this Node
+     * @param circle - The (draggable) circle object to draw for this Node
      */
     protected Node(Board m, String name, DraggableCircle c, Set<Edge> exits) {
         board = m;
@@ -156,18 +161,13 @@ public class Node implements BoardElement {
         }
         return parcelClone;
     }
-    
+
     /** Return a random parcel at this node.
      * Precondition: at least one parcel is at this node. */
     public Parcel getRandomParcel() {
         return Main.randomElement(parcels);
     }
 
-    /** Return true iff there is at least one parcel on this node */
-    public boolean isParcelHere(){
-    	return ! parcels.isEmpty();
-    }
-    
     /** Return true iff p is on this node. */
     public boolean isParcelHere(Parcel p) {
         return parcels.contains(p);
@@ -324,12 +324,6 @@ public class Node implements BoardElement {
         return circle.getColor();
     }
 
-    /** Return false - the color of Nodes is not significant */
-    @Override
-    public boolean isColorSignificant(){
-    	return false;
-    }
-    
     /** Return the name of this Node. */
     @Override
     public String toString() {

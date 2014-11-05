@@ -2,7 +2,9 @@ package game;
 import gui.Line;
 
 import java.awt.Color;
-import java.util.*;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.Map;
 
 /** Class Edge in ShippingGame allows creation of the connections between Nodes
  * along which Trucks can travel.
@@ -89,18 +91,17 @@ public class Edge implements BoardElement{
         return board;
     }
 
-    /** Return the exits of this line, a length 2 array.
-     * Order of nodes in returned array has no significance. */
+    /** Return the exits of this line, a length 2 array. */
     protected Node[] getTrueExits() {
         return exits;
     }
 
-    /** Return the first exit of this Edge. Which node is the first exit has no significance. */
+    /** Return the first exit of this Edge. */
     public Node getFirstExit() {
         return exits[0];
     }
 
-    /** Return the second exit of this Edge. Which node is the second exit has no significance. */
+    /** Return the second exit of this Edge. */
     public Node getSecondExit() {
         return exits[1];
     }
@@ -199,12 +200,6 @@ public class Edge implements BoardElement{
     public Color getColor() {
         return line.getColor();
     }
-    
-    /** Return false - the color of Edges is not significant */
-    @Override
-    public boolean isColorSignificant(){
-    	return false;
-    }
 
     /** Return true iff this edge and e are equal.
      * Two Edges are equal if they have the same exits, even if they have different lengths.
@@ -230,14 +225,14 @@ public class Edge implements BoardElement{
         return exits[0].hashCode() + exits[1].hashCode();
     }
 
-    /** Return a String representation of this edge:
+    /** Return a String representation of this object:
      * {@code getFirstExit().name + " to " + getSecondExit().name} */
     @Override
     public String toString() {
         return exits[0].name + " to " + exits[1].name; 
     }
 
-    /** Return the  exits and length for an edge's JSON string */
+    /** Return the  exits and length for its JSON string */
     @Override
     public String toJSONString() {
         return "{\n" + Main.addQuotes(BoardElement.LOCATION_TOKEN) + ":[" 
