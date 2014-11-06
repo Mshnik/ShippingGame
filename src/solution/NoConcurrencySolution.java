@@ -2,7 +2,6 @@ package solution;
 
 import java.util.*;
 import game.*;
-import game.Manager.Notification;
 
 /** A simple solution designed to not have to do any thread safety measures
  * 

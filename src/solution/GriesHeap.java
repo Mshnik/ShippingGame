@@ -6,8 +6,6 @@ import java.util.HashMap;
 
 /** An instance is a heap of elements of type T. */
 public class GriesHeap<T> implements MinHeap<T> {
-
-    private static final long serialVersionUID = 1L;
     
     // The heap consists of the b.size() elements in b.
     // They satisfy the heap properties:
