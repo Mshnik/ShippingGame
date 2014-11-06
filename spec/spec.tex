@@ -30,6 +30,7 @@
 \item Installation
 \item Class Explanation
 \item Your Tasks
+\item Concurrency
 \end{large}\end{enumerate}
 \end{center}
 \newpage
@@ -86,6 +87,18 @@ To run GameRunner on a series of $n$ random seeds, use the $-r$ flag, followed b
 \begin{center}
 MyManager -r 10
 \end{center}
+The GameRunner mode includes the GUI to show the progression of the run games. It also prints output of the games to the console. If you would like to just see the output and not show the GUI (headless), add the $-h$ tag. Thus, either:
+\begin{center}
+MyManager -h 15 12345 907230587
+\end{center}
+or
+\begin{center}
+MyManager -h -r 10
+\end{center}
+\begin{figure}[h]
+\centerline{\includegraphics[scale=0.65]{args.png}} 
+\caption{\em{Running MyManager in headless mode on 9001 random seeds.}}
+\end{figure}
 
 
 \newpage
@@ -140,5 +153,8 @@ run() is called by the game as soon as the game begins, and allows you to do ini
 
 truckNotification(Truck t, Notification message) is called by trucks whenever they do something of note. For a full list of the reasons why a truck would call this method, see Manager.Notification in the previous section and in the javadoc. This method is called by the truck in its own thread in order to ask for more instructions. For example, upon arrival at a new node in the graph, the truck may send a notification that there is at least one parcel at the current node. Perhaps you want that truck to pick up that parcel before continuing on its route.
 
+\newpage
+\section{6. Concurrency}
+TODO
 
 \end{document}
