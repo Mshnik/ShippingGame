@@ -7,7 +7,7 @@ import java.util.Comparator;
 
 public class HeapTester{
 
-    public static boolean giveDebugOutput= true;
+    public static boolean giveDebugOutput= false;
     public static int maxHeapSizeForPolling= 1000; 
     public static int maxHeapSizeForUpdate= 30;
     public static int prioritiesToUpdate= 6;
@@ -19,6 +19,9 @@ public class HeapTester{
      */
     public static void main(String[] args) {
         userClassName= args[0];
+        if(args.length > 1 && args[1].equals("-d")){
+        	giveDebugOutput = true;
+        }
         System.out.println("Testing heap adding " + (testAdding() ? " Ok" : " err"));
         System.out.println("Testing polling order " + (testPollingOrder() ? " Ok" : " err"));
         System.out.println("Testing update priority " + (testUpdatePriority() ? " Ok" : " err"));
