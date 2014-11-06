@@ -7,7 +7,10 @@
 
 \usepackage{lmodern}
 \usepackage{amssymb,amsmath}
+\usepackage{algorithm,algorithmic}
+\usepackage{hyperref}
 \usepackage{graphicx}
+\usepackage{listings}
 \usepackage[11pt]{moresize}
 
 \setcounter{secnumdepth}{0}
@@ -19,6 +22,7 @@
 \usepackage{xcolor,colortbl}
 
 \begin{document}
+\lstset{language=Java}
 \begin{center}
 \begin{HUGE}{\bf A6 - Shipping Game}\\ \end{HUGE}
 \vspace{10mm}
@@ -155,6 +159,69 @@ truckNotification(Truck t, Notification message) is called by trucks whenever th
 
 \newpage
 \section{6. Concurrency}
-TODO
+Because every Truck you are interacting with exists in its own thread, Shipping Game is inherently multithread. Your manager has to be able to handle multiple trucks calling truckNotification concurrently, without crashing or giving incorrect instructions. That said, depending on the complexity of your solution, you may not need to worry about concurrency at all. For example, consider the following pseudo-code approach to the shipping game problem.
+\begin{algorithm}
+\caption{Basic Preprocessing} \label{alg:ls}
+\begin{algorithmic}[1]
+\FOR{Parcel p}
+\STATE Choose arbitrary truck $t$ to deliver $p$. Store $p$ in a data structure in $t$'s user data.
+\ENDFOR
+\end{algorithmic}
+\end{algorithm}
+\begin{algorithm}
+\caption{Basic Truck Notification ($t$)} \label{alg:ls}
+\begin{algorithmic}[1]
+\IF{Preprocessing not done}
+\STATE Return
+\ENDIF
+\IF{Undelivered Parcel in game}
+\IF{$t$ holding parcel}
+\STATE Route $t$ to its parcel's destination, then drop off the parcel
+\ELSE
+\STATE find the next parcel assigned to $t$, route to that parcel.
+\ENDIF
+\ELSE
+\STATE Route $t$ home
+\ENDIF
+\end{algorithmic}
+\end{algorithm}
+\\This algorithm makes use of every truck, but because there are no data structures that are accessed by multiple trucks and all internal data structures are guaranteed to be thread-safe, there is no need for worry over currency. Assuming no errors, a correctly implemented version of this algorithm  would probably net at minimum a good grade, likely higher.\\
+
+If, however, you're shooting for a perfect grade, you may have to do some amount of work to ensure that your complex network of information sharing between trucks remains thread safe. Concurrent modifications of most data structures cause incorrect states, usually leading to null pointers or array index OOB errors. Failure to write thread safe code might lead to unpredictable and catastrophic errors.\\
+\begin{figure}[h]
+\centerline{\includegraphics[scale=0.65]{collision.png}} 
+\caption{\em{Don't rely on Spongebob to keep your code thread safe.}}
+\end{figure}
+\\In this vein, you have a few different options to keep code thread-safe. The more powerful the tool, however, the greater the possibility of creating new and more difficult problems. Ideally, come up with a strategy, than pick the least-comprehensive tool that gives you just enough capability to prevent potential thread safety problems.
+\subsection{Approaches to Concurrency}
+\begin{itemize}
+\item \textbf{wait() and notify()} - Power: medium. Possibility for Error: very high.\\
+Java's built-in concurrency system. Threads are able to cause themselves to wait, using any object as a key, and to "wake up" other threads waiting on a given object. Working out a system of wait() and notify() calls that correctly limits thread movement is surprisingly difficult. At the end of the day, there are higher level systems that are able to accomplish the same tasks in a much more safe way. Don't use these unless you really want to get your hands dirty.
+\item \textbf{Synchronized Collections} - Power: low. Possibility for error: none. \\
+The collection class \href{http://docs.oracle.com/javase/7/docs/api/java/util/Collections.html\#synchronizedCollection(java.util.Collection)}{({\color{blue}\underline{API}})} provides the ability to create a synchronized collection (or synchronized set, list, map, etc...). These collections are inherently thread-safe for basic operations, including adding elements, removing elements, getting elements, and checking the size of the collection. Notably, you can't iterate over a synchronized collection without a synchronized block (see next section), so complex operations that require iterating aren't safe. If you can get away with just using Synchronized Collections, you should do so and won't have any problems.
+\item \textbf{Synchronized Blocks} - Power: medium. Possibility for Error: low.\\
+A synchronized block limits one thread to executing its body at a time. Other threads wait on before the statement until the executing thread finishes the block. Moreover, each synchronized block is called on some object in the form:
+\begin{lstlisting}[frame=single]
+synchronized(obj){
+//...Do things that only one thread should be doing.
+}
+\end{lstlisting}
+And only one thread can access any synchronized block that is associated with that block at a time. This means that if there are two synchronized blocks with the same object:
+\begin{lstlisting}[frame=single]
+synchronized(obj){
+processA();
+}
+synchronized(obj){ //Note - synchronized on same obj
+processB();
+}
+\end{lstlisting}
+processA() and processB() could not possibly be executed concurrently, because a thread's presence in one of the two blocks prevents other threads from being in either of the two blocks.\\
+The simplest way to use synchronized blocks on Synchronized collections to allow iteration \href{http://docs.oracle.com/javase/7/docs/api/java/util/Collections.html\#synchronizedCollection(java.util.Collection)}{({\color{blue}\underline{See API}})}. That way only one complex (iterative) process can occur on the collection at a time, and nothing can go wrong. \textbf{This combination is probably the best solution for this project, and should be considered first}.
+\item \textbf{Locks and Locking} - Power: High. Possibility for Error: High\\
+Locks (and Semaphores and other equivalent classes) take the two pieces of a synchronized block - preventing other threads from accessing code, and letting other threads know that the going is clear - and separate them into two individual lines of code. Only one thread can "own" a mutex at a time (semaphores are generalized to allow N threads), so when a thread acquires a Lock l, all other threads that attempt to call l.lock() are forced to wait until the thread that owns the lock calls l.unlock(), at which point an arbitrarily chosen thread that is waiting will call l.lock() and proceed. This gives you the ultimate control over which threads execute what where and when, but is very prone to issues such as deadlock in which two threads are each waiting to acquire a lock owned by the other. These are overkill for all but the most complex solutions, and most likely not necessary for this project. 
+
+
+
+\end{itemize}
 
 \end{document}

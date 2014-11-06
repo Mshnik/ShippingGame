@@ -1,0 +1,25 @@
+\BOOKMARK [1][-]{section*.1}{1. Heaps}{}% 1
+\BOOKMARK [1][-]{section*.2}{2. Game Overview}{}% 2
+\BOOKMARK [1][-]{section*.3}{3. Installation and Running}{}% 3
+\BOOKMARK [2][-]{section*.4}{Installation}{section*.3}% 4
+\BOOKMARK [2][-]{section*.5}{Running}{section*.3}% 5
+\BOOKMARK [2][-]{section*.6}{Arguments}{section*.3}% 6
+\BOOKMARK [1][-]{section*.7}{4. Class Explanation}{}% 7
+\BOOKMARK [2][-]{section*.8}{Colorable}{section*.7}% 8
+\BOOKMARK [2][-]{section*.9}{UserData}{section*.7}% 9
+\BOOKMARK [2][-]{section*.10}{BoardElement}{section*.7}% 10
+\BOOKMARK [2][-]{section*.11}{Truck}{section*.7}% 11
+\BOOKMARK [2][-]{section*.12}{Node}{section*.7}% 12
+\BOOKMARK [2][-]{section*.13}{Edge}{section*.7}% 13
+\BOOKMARK [2][-]{section*.14}{Parcel}{section*.7}% 14
+\BOOKMARK [2][-]{section*.15}{Board}{section*.7}% 15
+\BOOKMARK [2][-]{section*.16}{Score}{section*.7}% 16
+\BOOKMARK [2][-]{section*.17}{Vector}{section*.7}% 17
+\BOOKMARK [2][-]{section*.18}{Main}{section*.7}% 18
+\BOOKMARK [2][-]{section*.19}{Manager}{section*.7}% 19
+\BOOKMARK [2][-]{section*.20}{Game}{section*.7}% 20
+\BOOKMARK [2][-]{section*.21}{Game Runner}{section*.7}% 21
+\BOOKMARK [2][-]{section*.22}{Your Manager}{section*.7}% 22
+\BOOKMARK [1][-]{section*.23}{5. Your Tasks}{}% 23
+\BOOKMARK [1][-]{section*.24}{6. Concurrency}{}% 24
+\BOOKMARK [2][-]{section*.25}{Approaches to Concurrency}{section*.24}% 25
