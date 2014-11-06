@@ -1,30 +1,13 @@
 package game;
 
-import gui.Circle;
-import gui.GUI;
-import gui.Line;
+import gui.*;
 
 import java.awt.Color;
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.FileReader;
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.List;
+import java.io.*;
+import java.util.*;
 import java.util.Map.Entry;
-import java.util.Random;
-import java.util.Set;
 
-import org.json.JSONArray;
-import org.json.JSONObject;
-import org.json.JSONString;
+import org.json.*;
 
 /** A Board represents a game state. It is a container for the HashSets of Edges and
  * Nodes that make up the playing field of the game. Because of this, each board
@@ -258,7 +241,7 @@ public class Board implements JSONString {
         if (finishedTrucks.containsAll(trucks)) game.finish();
     }
 
-    /** Return the parcels in this boardthat have not yet been delivered. */
+    /** Return the parcels in this board that have not yet been delivered. */
     public Set<Parcel> getParcels() {
         return parcels;
     }
@@ -286,7 +269,7 @@ public class Board implements JSONString {
 
         parcels.remove(p);
         n.removeParcel(p);
-        if (game.getGUI() != null) game.getGUI().getDrawingPanel().remove(p.getCircle());
+        if (game.getGUI() != null) game.getGUI().removeParcel(p);
     }
 
     /** Return the set of Edges in this board. 

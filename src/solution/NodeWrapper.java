@@ -1,8 +1,7 @@
 package solution;
 
-import java.util.LinkedList;
-
 import game.Node;
+import java.util.LinkedList;
 
 /**	An instance wraps a Node, including that node's path
  * 	from some start node and the distance of that path. 

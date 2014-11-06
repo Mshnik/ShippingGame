@@ -15,4 +15,7 @@ public interface Colorable {
 
 	/** Return the color of this object. */
 	public Color getColor();
+	
+	/** Return true iff the color of this object has significance within the game */
+	public boolean isColorSignificant();
 }

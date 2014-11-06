@@ -1,13 +1,7 @@
 package solution;
 
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.LinkedList;
-import java.util.Map;
-
-import game.Manager;
-import game.Node;
-import game.MinHeap;
+import java.util.*;
+import game.*;
 
 /** Abstract class AbstractSolution extends Manager.
  * 	The instructor solutions should all extend this class.
@@ -17,9 +11,9 @@ import game.MinHeap;
  */
 public abstract class AbstractSolution extends Manager {
 
-    /** An instance contains information about a node: the previous
-     * node on a path from the start node to this node and the distance
-     * of this node from the start node. */
+	/** An instance contains information about a node: the previous
+	 * node on a path from the start node to this node and the distance
+	 * of this node from the start node. */
 	private static class NodeInfo {
 		private Node previous;
 		private int distFromStart;
@@ -51,7 +45,7 @@ public abstract class AbstractSolution extends Manager {
 
 		frontier.add(start, 0);
 		nodeInfo.put(start, new NodeInfo());
-		
+
 		while (!frontier.isEmpty()) {
 			Node current = frontier.poll();
 			if (current.equals(end)) {
@@ -99,20 +93,22 @@ public abstract class AbstractSolution extends Manager {
 		}
 		return path;
 	}
-	
+
 	/** Return the collective weight of the given path of nodes
 	 * by iterating along it and summing the weight of edges encountered. */
 	protected int pathLength(LinkedList<Node> path) {
-		int s = 0;
-		Iterator<Node> one = path.iterator();
-		Iterator<Node> two = path.iterator();
-		two.next(); //Advance two by one link
-		
-		while (two.hasNext()) {
-			Node n1 = one.next();
-			Node n2 = two.next();
-			s += n1.getConnect(n2).length;
+		synchronized(path){
+			int s = 0;
+			Iterator<Node> one = path.iterator();
+			Iterator<Node> two = path.iterator();
+			two.next(); //Advance two by one link
+
+			while (two.hasNext()) {
+				Node n1 = one.next();
+				Node n2 = two.next();
+				s += n1.getConnect(n2).length;
+			}
+			return s;
 		}
-		return s;
 	}
 }

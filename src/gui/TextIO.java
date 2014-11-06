@@ -30,7 +30,7 @@ public class TextIO {
 
 		br.write(s);
 
-		br.flush();
+		br.flush(); 
 		br.close();
 	}
 	

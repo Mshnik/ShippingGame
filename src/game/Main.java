@@ -2,10 +2,7 @@ package game;
 
 import gui.GUI;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Iterator;
-import java.util.Random;
+import java.util.*;
 import java.util.concurrent.Semaphore;
 
 /** Game starting methods. Also serves as a util holder */

@@ -1,9 +1,7 @@
 package solution;
 
 import game.MinHeap;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Iterator;
+import java.util.*;
 
 public class HeapSolution<T> extends ArrayList<T> implements MinHeap<T> {
 
@@ -25,10 +23,6 @@ public class HeapSolution<T> extends ArrayList<T> implements MinHeap<T> {
 		for (T t : this) {
 		    s += t.toString() + ":" + itemInfoMap.get(t).priority + ", ";
 		}
-		//Iterator<T> iter = iterator();
-		//while (iter.hasNext()) {
-		//	T t = iter.next();	
-		//}
 		return s.substring(0, s.length()-2) +"]";
 	}
 	
@@ -56,9 +50,8 @@ public class HeapSolution<T> extends ArrayList<T> implements MinHeap<T> {
 	}
 
 	@Override
-	/** Change the priority of item to p.
-	 * Precondition: item is in the Heap */
-	public void updatePriority(T item, double p) {
+	/** Change the priority of item to p. */
+	public void updatePriority(T item, double p) throws IllegalArgumentException {
 		ItemInfo entry = itemInfoMap.get(item);
 		if(entry == null) 
 			throw new IllegalArgumentException("Cannot update priority for element not in heap");

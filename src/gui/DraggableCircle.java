@@ -1,10 +1,7 @@
 package gui;
 
 import java.awt.Point;
-import java.awt.event.MouseEvent;
-import java.awt.event.MouseListener;
-import java.awt.event.MouseMotionListener;
-
+import java.awt.event.*;
 import game.BoardElement;
 
 /** An instance is a circle that can be dragged by the user on the gui */

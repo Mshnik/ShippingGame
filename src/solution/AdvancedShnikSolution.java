@@ -1,14 +1,9 @@
 package solution;
 
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.LinkedList;
-import java.util.Map;
-import java.util.Set;
-
 import game.*;
+import game.Manager.Notification;
+
+import java.util.*;
 
 /** A more complex solution.
  * Works on colorizing and having trucks pick up the parcels closest to them.
@@ -45,10 +40,10 @@ public class AdvancedShnikSolution extends AbstractSolution {
      * If unassignedParcels is empty, do nothing (return).
      */
     private void assignParcelTo(final Truck t) {
-        if (unassignedParcels.isEmpty()) return;
-
         //If possible, build same color list of parcels
         synchronized(unassignedParcels) {
+            if (unassignedParcels.isEmpty()) return;
+
             HashSet<Parcel> sameColorParcels = new HashSet<Parcel>();
             for (Parcel p : unassignedParcels) {
                 if (p.getColor().equals(t.getColor())) {
