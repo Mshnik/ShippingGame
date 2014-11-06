@@ -14,14 +14,48 @@ public class HeapTester{
 
     static String userClassName;
 
+    /** Handle program arguments */
+    private static void handleArgs(String[] args){
+    	int i = 1;
+    	while (i < args.length){
+    		switch(args[i]){
+    		case "-d":
+    			giveDebugOutput = true;
+    			break;
+    		case "-p":
+    			if(i + 1 >= args.length){
+    				break;
+    			}
+    			maxHeapSizeForPolling = Integer.parseInt(args[++i]);
+    			break;
+    			case "-s":
+        			if(i + 1 >= args.length){
+        				break;
+        			}
+        			maxHeapSizeForUpdate = Integer.parseInt(args[++i]);
+        			break;
+        		case "-u":
+        			if(i + 1 >= args.length){
+        				break;
+        			}
+        			prioritiesToUpdate = Integer.parseInt(args[++i]);
+        			break;
+    			}
+    			i++;
+    		}
+    	}
+    
     /** Test the user-defined heap. args[0] should be the name of the implementing class.
+     * Additional arguments:
+     *      -d Print additional debugging information
+     *      -p [n] Set the max heap size for polling to n
+     *      -s [n] Set the max heap size for update to n
+     *      -u [n] Set the number of priorities to update to n
      * Print results of tests on console.
      */
     public static void main(String[] args) {
         userClassName= args[0];
-        if(args.length > 1 && args[1].equals("-d")){
-        	giveDebugOutput = true;
-        }
+        handleArgs(args);
         System.out.println("Testing heap adding " + (testAdding() ? " Ok" : " err"));
         System.out.println("Testing polling order " + (testPollingOrder() ? " Ok" : " err"));
         System.out.println("Testing update priority " + (testUpdatePriority() ? " Ok" : " err"));
