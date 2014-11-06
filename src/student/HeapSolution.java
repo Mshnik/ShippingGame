@@ -1,4 +1,4 @@
-package solution;
+package student;
 
 import game.MinHeap;
 import java.util.ArrayList;

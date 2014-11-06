@@ -1,4 +1,4 @@
-package solution;
+package student;
 
 import java.util.*;
 import game.*;
@@ -43,7 +43,7 @@ public class BasicShnikSolution extends AbstractSolution {
 
 	@Override
 	public void truckNotification(Truck t, Notification message) {
-		if (!preprocessingDone) return;
+		if (! preprocessingDone) return;
 		
 		//Base case - at new node. Check if has parcel and should drop off.
 		if (message.equals(Notification.LOCATION_CHANGED)) {
