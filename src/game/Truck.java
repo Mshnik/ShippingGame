@@ -44,11 +44,6 @@ public class Truck implements BoardElement, Runnable {
     	 */
     	WAITING};
 
-    /** Milliseconds per travel increment. Wait time between travel updates.
-     * A lower value means a faster game -- more penalty for computation.
-     * A higher value means a slower game -- less penalty for computation. */
-    public static final int FRAME = 40;
-
     /** Milliseconds between wait updates - a truck calling
      * Manager.truckNotification(this, Notification.WAITING) .*/
     public static final int WAIT_TIME = 5;
@@ -648,7 +643,7 @@ public class Truck implements BoardElement, Runnable {
             int progress = 0;
             long startTravelTime = System.currentTimeMillis();
             while (progress < r.length) {
-                Thread.sleep(FRAME);
+                Thread.sleep(getBoard().game.getFrame());
 
                 //Get the speed lock, begin speed and cost computations
                 speedLock.acquire();

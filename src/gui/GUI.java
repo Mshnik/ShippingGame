@@ -61,6 +61,8 @@ public class GUI extends JFrame{
     private JMenuBar menuBar;    //The menu bar at the top of the gui
     private JMenuItem mntmReset; //The button that resets the game
 
+    private JLabel frameLabel;   //Label that shows the current frame rate. Red if it's been altered
+    
     private long updateTime;	//How quickly the parcel/truck stats should update (ms)
     private static final long DEFAULT_UPDATE_TIME = 200;
     private Thread updateThread;	//Thread that manages updating of stats
@@ -471,15 +473,54 @@ public class GUI extends JFrame{
         statsTable.setRowHeight(18);
         statsTable.getColumn(statsTable.getColumnName(0)).setPreferredWidth(160);
 
+        JPanel bottomPanel = new JPanel();
+        bottomPanel.setLayout(new BoxLayout(bottomPanel, BoxLayout.Y_AXIS));
+        sidePanel.add(bottomPanel, BorderLayout.SOUTH);
+        
+        //Frame Panel
+        JPanel innerPanel3 = new JPanel();
+        innerPanel3.setLayout(new BoxLayout(innerPanel3, BoxLayout.X_AXIS));
+        innerPanel3.add(new JLabel(margin));
+        frameLabel = new JLabel("Frame: " + fixNumber(game.getFrame(), 4, "") + "ms  ");
+        frameLabel.setFont(Font.decode("asdf-14")); //System default font with size 14
+        innerPanel3.add(frameLabel);
+        JSlider frameSlider = new JSlider();
+        frameSlider.setMajorTickSpacing(1);
+        frameSlider.setMaximum(2000);
+        frameSlider.setMinimum(1);
+        frameSlider.setValue((int)game.getFrame());
+        frameSlider.setToolTipText("Frame rate (ms) for Truck movement");
+        frameSlider.addChangeListener(new ChangeListener() {
+            @Override
+            public void stateChanged(ChangeEvent e) {
+                int f = ((JSlider)e.getSource()).getValue();
+                game.setFrame(f);
+                frameLabel.setText("Frame: " + fixNumber(f, 4, "") + "ms  ");
+                if(game.isFrameAltered()){
+                	frameLabel.setForeground(Color.RED);
+                }
+            }
+        });		
+        if(game.isFrameAltered()){
+        	frameLabel.setForeground(Color.RED);
+        }
+        innerPanel3.add(frameSlider);
+        innerPanel3.add(new JLabel(margin));
+        innerPanel3.setBackground(sidePanel.getBackground());
+        bottomPanel.add(innerPanel3);
+        
+        
+        //Update Panel
         JPanel innerPanel2 = new JPanel();
         innerPanel2.setLayout(new BoxLayout(innerPanel2, BoxLayout.X_AXIS));
         innerPanel2.add(new JLabel(margin));
-        final JLabel sliderLabel = new JLabel("Update Time: " + updateTime + "ms  ");
+        final JLabel sliderLabel = new JLabel("Update Time: " + 
+          fixNumber((int)updateTime, 4, "") + "ms  ");
         sliderLabel.setFont(Font.decode("asdf-14")); //System default font with size 14
         innerPanel2.add(sliderLabel);
         JSlider updateSlider = new JSlider();
         updateSlider.setMajorTickSpacing(25);
-        updateSlider.setMaximum(999);
+        updateSlider.setMaximum(2000);
         updateSlider.setMinimum(25);
         updateSlider.setValue((int)updateTime);
         updateSlider.setToolTipText("Update timer for Parcel and Truck stats. " +
@@ -488,15 +529,13 @@ public class GUI extends JFrame{
             @Override
             public void stateChanged(ChangeEvent e) {
                 updateTime = ((JSlider)e.getSource()).getValue();
-                String s = "";
-                if (updateTime < 100) s = " ";
-                sliderLabel.setText("Update Time: " + s + updateTime + "ms  ");
+                sliderLabel.setText("Update Time: " + fixNumber((int)updateTime, 4, "") + "ms ");
             }
         });		
         innerPanel2.add(updateSlider);
         innerPanel2.add(new JLabel(margin));
         innerPanel2.setBackground(sidePanel.getBackground());
-        sidePanel.add(innerPanel2, BorderLayout.SOUTH);
+        bottomPanel.add(innerPanel2);
 
         if (updateThread != null) updateThread.interrupt();
 
@@ -514,6 +553,18 @@ public class GUI extends JFrame{
             }
         });
         updateParcelAndTruckStats();
+    }
+    
+    /** Recursively pad zeroes on left such that the resulting string has digits characters */
+    private static String fixNumber(int x, int digits, String s){
+    	int a = 0;
+    	if(x == 1){
+    		 a = 1;
+    	} else{
+    		 a = (int)Math.ceil(Math.log10(x));
+    	}
+    	if(digits == a) return s + x;
+    	return fixNumber(x, digits-1, s + "0");
     }
 
     /** Remove the given parcel from the gui - called internally by game
@@ -554,6 +605,9 @@ public class GUI extends JFrame{
         if (running) {
             mntmReset.setEnabled(true);
             updateThread.start();
+            if(game.isFrameAltered()){
+            	frameLabel.setForeground(Color.RED);
+            }
         }
         else {
             mntmReset.setEnabled(game.isFinished());

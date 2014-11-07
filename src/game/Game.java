@@ -25,6 +25,11 @@ public class Game {
 	private File file;	//The file from which this game was loaded. Null if none.
 	private String managerClass; //The name of the class from which the manager was created.
 
+	private int frame; // Duration of a frame for this game, in ms. 
+	                   // A higher value causes trucks to move slower.
+	
+	private boolean frameAltered; //True if at any point in running, this game's frame rate
+								  //Is anything other than DEFAULT_FRAME.
 	private GUI gui;
 	private Manager manager;
 	private ThreadGroup gameThreads;	//The Truck and Manager threads that are running
@@ -36,6 +41,11 @@ public class Game {
 	protected Throwable throwable;	//The throwable that has been thrown and not caught by this game, if any
 	protected Thread monitoringThread;	//The thread that is monitoring this Game - null if none
 
+	/** The default frame value. Other frame values can be used for testing,
+	 * but only games run with this frame value are fair for scoring.
+	 */
+	public static final int DEFAULT_FRAME = 40;
+		
 	/** Set the manager to managerClassname, make game not running, not finished, with no
 	 * gui and a new GameThreadGroup. */
 	private Game(String managerClassname) {
@@ -45,6 +55,7 @@ public class Game {
 		finished = false;
 		gui = null;
 		gameThreads = new GameThreadGroup();
+		frame = DEFAULT_FRAME;
 	}
 
 	/** Constructor: a game instance with a set Board that is read from File f, using
@@ -59,6 +70,13 @@ public class Game {
 			e1.printStackTrace();
 		}
 	}
+	
+	/** Constructor: a game instance with a set Board that is read from File f, using
+	 * the manager whose class name is managerClassname, and uses the given frame rate */
+	public Game(String managerClassname, File f, int frame){
+		this(managerClassname, f);
+		setFrame(frame);
+	}
 
 	/** Constructor: a game instance with a random board from seed seed using
 	 * the manager whose class name is managerClassname. */
@@ -66,6 +84,13 @@ public class Game {
 		this(managerClassname);
 		file = null;
 		board = Board.randomBoard(this, seed);
+	}
+	
+	/** Constructor: a game instance with a random board from seed seed using
+	 * the manager whose class name is managerClassname, and uses the given frame rate. */
+	public Game(String managerClassname, long seed, int frame){
+		this(managerClassname, seed);
+		setFrame(frame);
 	}
 
 	/** If the manager and managerClass are null, set the manager to the class whose
@@ -87,7 +112,33 @@ public class Game {
 		}
 		return true;
 	}
+	
+	/** Return the duration of a frame for this game, in milliseconds */
+	public int getFrame(){
+		return frame;
+	}
+	
+	/** Set the duration of a frame for this game, in milliseconds.
+	 * If this value of f is new and the game is currently running,
+	 * trips the frameAltered flag. 
+	 * A lower value means a faster game -- more penalty for computation.
+     * A higher value means a slower game -- less penalty for computation.
+     * 
+	 * @throws IllegalArgumentException if f <= 0
+	 */
+	public void setFrame(int f) throws IllegalArgumentException {
+		if(f <= 0) throw new IllegalArgumentException("Can't set frame rate for " + this + " to " + f);
+		if(isRunning() && (f != DEFAULT_FRAME)) frameAltered = true;
+		frame = f;
+	}
 
+	/** Return true iff the frame rate of this game was altered in 
+	 * such a way that changed the running of the game
+	 */
+	public boolean isFrameAltered(){
+		return frameAltered;
+	}
+	
 	/** Return true iff this game is currently running (in progress, not completed). */
 	public boolean isRunning() {
 		return running;
@@ -142,7 +193,9 @@ public class Game {
 	 * Additional calls to this method after the first call do nothing. */
 	public void start() {
 		if (! running && !finished) {
-			setRunning(true);
+			if(frame != DEFAULT_FRAME) frameAltered = true;
+
+			setRunning(true);			
 
 			Thread m = new Thread(gameThreads, manager);
 			manager.setThread(m);
