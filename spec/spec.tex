@@ -48,7 +48,7 @@ As a prologue to Shipping Game, you have to implement a Heap. Heaps are extremel
 
 Write a class that implements the MinHeap interface and sticks to the given time bounds. To test your code, run the HeapTester main method with your heap implementation classname as an argument. If all of the tests pass, then you're ready to go!
 
-Due to the nature of the project, writing the Heap is a very small part of the project from a conceptual sense. Try to have the heap finished \textbf{one week} after starting the project, so that you have enough time to work on the rest of the project.
+Due to the nature of the project, writing the Heap is a very small part of the project from a conceptual sense. Try to have the heap finished \textbf{early} (see section 8) after starting the project, so that you have enough time to work on the rest of the project.
 
 TODO: Expand on this section.
 
@@ -111,7 +111,68 @@ MyManager -h -r 10
 
 \newpage
 \section{4. Using the GUI}
-TODO!
+\begin{figure}[h]
+\centerline{\includegraphics[scale=0.45]{gui.png}} 
+\caption{\em{The Shipping Game GUI. Now with 50\% less (visual) sugar!}}
+\end{figure}
+
+Assuming the installation process went correctly and you've created a class that extends manager, you should be able to run the main class and see the above gui. {\em(Note, generated map may be different than pictured above)}. In addition to being fully resizable, the gui has a number of features for your use. All of the cities (nodes) on the board are draggable to allow you to make the graph look cleaner, but note that this is a purely visual change and has no impact on the underlying board state.
+
+\subsection{4a. Menu Bar}
+\begin{itemize}
+\item File...
+\begin{itemize}
+\item Open... - Opens a JFileChooser rooted at the data/maps directory. Allows you to choose a map (in JSON format) to load on the gui.
+\item Quit - Closes the current gui and quits the program.
+\end{itemize}
+\item Game...
+\begin{itemize}
+\item Start - begins the currently displayed game. Clicking this additional times after the game has begun does nothing.
+\item Reset - Resets the currently displayed game to its pre-start state. Only available once the game has begun.
+\item New Random Map... - Generates a new random map with the seed given to the popup window. If a non-digit character is provided, asks for a new seed. Exit this option by clicking cancel on the popup window.
+\item Print Game JSON - prints a JSON string representing this game to the eclipse console. Useful to save an interesting board by resetting it, printing the game JSON and creating a new text file in the data/maps directory with the game JSON as its contents.
+\end{itemize}
+\item GUI...
+\begin{itemize}
+\item Repaint - repaints the gui. Try clicking this if the gui looks strange before trying other solutions.
+\item Edge Coloring - controls how edges are colored on the gui.
+\begin{itemize}
+\item Default - colors all edges as a dark gray
+\item Highlight-Travel - colors edges that are currently being traveled by a truck as red, others as dark gray. Will draw all edges as dark gray if the game hasn't started yet or is over (as no trucks are currently traveling).
+\item Distance Gradient - colors edges by a linear interpolation from light to dark, based on their weights. Shorter (lighter) edges are painted in a lighter color, and longer (heavier) edges are painted in a  darker color.
+\end{itemize}
+\end{itemize}
+\end{itemize}
+
+\subsection{4b. Info Panel}
+The panel on the right is the info panel - it displays useful information about the currently displayed game.
+The top block of data is static data - it will not change as the game runs.
+\begin{itemize}
+\item Game From... - A description of the current game - either from seed, from file, or custom
+\item Cities - the number of nodes
+\item Highways - the number of edges
+\item Trucks - the number of available trucks
+\item Parcels - the total number of parcels, including delivered parcels
+\item Wait Cost - the cost (per frame) of a truck doing nothing
+\item Pickup Cost - the singleton cost of a truck picking up a parcel
+\item Dropoff Cost - the singleton cost of a truck dropping off a parcel
+\item Parcel Payoff - the singleton value of dropping off a parcel at its location
+\item On Color Multiplier - the multiplier applied to the parcel payoff if the delivering truck and the parcel share a color.
+\end{itemize}
+
+The next two blocks are non-static data. They are changed through the course of the game.
+\begin{itemize}
+\item Parcels in Cities - the number of undelivered parcels that are not currently held by trucks (thus on cities)
+\item Parcels on Trucks - the number of undelivered parcels that are currently held by trucks
+\item Delivered Parcels - the number of delivered parcels that have been removed from the map
+\item Trucks Waiting - the number of trucks that are currently doing nothing
+\item Trucks Traveling - the number of trucks that are currently traveling an edge
+\item Trucks com w/ Manager - the number of trucks that are currently communicating with the Manager - thus have called truckNotification(...) and are waiting for a response.
+\end{itemize}
+
+You control how often non-static data is refreshed using the bottom slider labeled Update Time. Dragging the slider to the left updates the data more often at the cost of using a tiny bit more processing power. Thus, for debugging purposes it is useful to have the data update as quickly as possible, whereas once your code works correctly you can have the data rarely update to get the best possible score.
+
+Finally, the upper slider labeled Frame controls how quickly the game progresses. A higher value (drag right) causes the trucks to travel more slowly and favors more computationally complex solutions, and a lower value (drag left) causes the trucks to travel more quickly and favors more computationally simple solutions. It can be useful in debugging to drag the slider far to the right to watch the trucks move in slow motion. However, be wary that altering the slider at all causes your score to change, and will change the color of the Frame label to red. \textbf{All grading will be done on boards at a Frame rate of 40ms, so when checking your scores make sure that you have not moved this slider}.
 
 \newpage
 \section{5. Class Explanation}
@@ -119,6 +180,7 @@ Assuming your installation worked correctly, you should be able to see the javad
 The game structure follows the below diagram.
 \begin{figure}[h]
 \centerline{\includegraphics[scale=0.7]{hirearchy.png}} 
+\caption{\em{Class Layout of package game. More lines and circles.}}
 \end{figure}
 \\Each interface and class in the figure is briefly explained below. For a more thorough  explanation or the method list of a certain interface or class, see the javadoc spec for that interface or class.
 \subsection{Colorable}

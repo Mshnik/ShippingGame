@@ -5,23 +5,25 @@
 \BOOKMARK [2][-]{section*.5}{Running}{section*.3}% 5
 \BOOKMARK [2][-]{section*.6}{Arguments}{section*.3}% 6
 \BOOKMARK [1][-]{section*.7}{4. Using the GUI}{}% 7
-\BOOKMARK [1][-]{section*.8}{5. Class Explanation}{}% 8
-\BOOKMARK [2][-]{section*.9}{Colorable}{section*.8}% 9
-\BOOKMARK [2][-]{section*.10}{UserData}{section*.8}% 10
-\BOOKMARK [2][-]{section*.11}{BoardElement}{section*.8}% 11
-\BOOKMARK [2][-]{section*.12}{Truck}{section*.8}% 12
-\BOOKMARK [2][-]{section*.13}{Node}{section*.8}% 13
-\BOOKMARK [2][-]{section*.14}{Edge}{section*.8}% 14
-\BOOKMARK [2][-]{section*.15}{Parcel}{section*.8}% 15
-\BOOKMARK [2][-]{section*.16}{Board}{section*.8}% 16
-\BOOKMARK [2][-]{section*.17}{Score}{section*.8}% 17
-\BOOKMARK [2][-]{section*.18}{Vector}{section*.8}% 18
-\BOOKMARK [2][-]{section*.19}{Main}{section*.8}% 19
-\BOOKMARK [2][-]{section*.20}{Manager}{section*.8}% 20
-\BOOKMARK [2][-]{section*.21}{Game}{section*.8}% 21
-\BOOKMARK [2][-]{section*.22}{Game Runner}{section*.8}% 22
-\BOOKMARK [2][-]{section*.23}{Your Manager}{section*.8}% 23
-\BOOKMARK [1][-]{section*.24}{6. Your Tasks}{}% 24
-\BOOKMARK [1][-]{section*.25}{7. Concurrency}{}% 25
-\BOOKMARK [2][-]{section*.26}{Approaches to Concurrency}{section*.25}% 26
-\BOOKMARK [1][-]{section*.27}{8. Project Schedule}{}% 27
+\BOOKMARK [2][-]{section*.8}{4a. Menu Bar}{section*.7}% 8
+\BOOKMARK [2][-]{section*.9}{4b. Info Panel}{section*.7}% 9
+\BOOKMARK [1][-]{section*.10}{5. Class Explanation}{}% 10
+\BOOKMARK [2][-]{section*.11}{Colorable}{section*.10}% 11
+\BOOKMARK [2][-]{section*.12}{UserData}{section*.10}% 12
+\BOOKMARK [2][-]{section*.13}{BoardElement}{section*.10}% 13
+\BOOKMARK [2][-]{section*.14}{Truck}{section*.10}% 14
+\BOOKMARK [2][-]{section*.15}{Node}{section*.10}% 15
+\BOOKMARK [2][-]{section*.16}{Edge}{section*.10}% 16
+\BOOKMARK [2][-]{section*.17}{Parcel}{section*.10}% 17
+\BOOKMARK [2][-]{section*.18}{Board}{section*.10}% 18
+\BOOKMARK [2][-]{section*.19}{Score}{section*.10}% 19
+\BOOKMARK [2][-]{section*.20}{Vector}{section*.10}% 20
+\BOOKMARK [2][-]{section*.21}{Main}{section*.10}% 21
+\BOOKMARK [2][-]{section*.22}{Manager}{section*.10}% 22
+\BOOKMARK [2][-]{section*.23}{Game}{section*.10}% 23
+\BOOKMARK [2][-]{section*.24}{Game Runner}{section*.10}% 24
+\BOOKMARK [2][-]{section*.25}{Your Manager}{section*.10}% 25
+\BOOKMARK [1][-]{section*.26}{6. Your Tasks}{}% 26
+\BOOKMARK [1][-]{section*.27}{7. Concurrency}{}% 27
+\BOOKMARK [2][-]{section*.28}{Approaches to Concurrency}{section*.27}% 28
+\BOOKMARK [1][-]{section*.29}{8. Project Schedule}{}% 29
