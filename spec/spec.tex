@@ -25,16 +25,20 @@
 \lstset{language=Java}
 \begin{center}
 \begin{HUGE}{\bf A6 - Shipping Game}\\ \end{HUGE}
-\vspace{10mm}
+\vspace{3mm}
+\begin{LARGE} By Michael Patashnik and the CS2110 Course Staff\\ \end{LARGE}
+\vspace{7mm}
 \begin{LARGE} Contents\\ \end{LARGE}
 \noindent\rule{8cm}{0.4pt}
 \begin{enumerate} \begin{large}
 \item Heap
 \item Game Overview
 \item Installation
+\item Using the GUI
 \item Class Explanation
 \item Your Tasks
 \item Concurrency
+\item Project Schedule
 \end{large}\end{enumerate}
 \end{center}
 \newpage
@@ -106,7 +110,11 @@ MyManager -h -r 10
 
 
 \newpage
-\section{4. Class Explanation}
+\section{4. Using the GUI}
+TODO!
+
+\newpage
+\section{5. Class Explanation}
 Assuming your installation worked correctly, you should be able to see the javadoc specifications for all of the public methods available to classes in the game package. If not, consult section 2 of this guide or ask on Piazza/at office hours.\\
 The game structure follows the below diagram.
 \begin{figure}[h]
@@ -145,7 +153,7 @@ An instance of the Game Runner class allows the automatic running of many games.
 An instance of Your Manager fills in the missing behavior of the Manager class to determine how the game runs. See the next section for more on what you have to do in your extension of the Manager class.
 
 \newpage
-\section{5. Your Tasks}
+\section{6. Your Tasks}
 In order to complete the assignment, your primary task is write a class extending the abstract Manager class explained in the previous section. In order to do this, you will have to override and implement the two abstract methods declared in the Manager class: \textbf{run()} and \textbf{truckNotification(Truck t, Notification message)}. These two methods determine the behavior of the trucks in the game. On their own, trucks don't do anything; it's up to you to instruct them.\\
 
 \begin{figure}[h]
@@ -158,7 +166,7 @@ run() is called by the game as soon as the game begins, and allows you to do ini
 truckNotification(Truck t, Notification message) is called by trucks whenever they do something of note. For a full list of the reasons why a truck would call this method, see Manager.Notification in the previous section and in the javadoc. This method is called by the truck in its own thread in order to ask for more instructions. For example, upon arrival at a new node in the graph, the truck may send a notification that there is at least one parcel at the current node. Perhaps you want that truck to pick up that parcel before continuing on its route.
 
 \newpage
-\section{6. Concurrency}
+\section{7. Concurrency}
 Because every Truck you are interacting with exists in its own thread, Shipping Game is inherently multithread. Your manager has to be able to handle multiple trucks calling truckNotification concurrently, without crashing or giving incorrect instructions. That said, depending on the complexity of your solution, you may not need to worry about concurrency at all. For example, consider the following pseudo-code approach to the shipping game problem.
 \begin{algorithm}
 \caption{Basic Preprocessing} \label{alg:ls}
@@ -219,9 +227,28 @@ processA() and processB() could not possibly be executed concurrently, because a
 The simplest way to use synchronized blocks on Synchronized collections to allow iteration \href{http://docs.oracle.com/javase/7/docs/api/java/util/Collections.html\#synchronizedCollection(java.util.Collection)}{({\color{blue}\underline{See API}})}. That way only one complex (iterative) process can occur on the collection at a time, and nothing can go wrong. \textbf{This combination is probably the best solution for this project, and should be considered first}.
 \item \textbf{Locks and Locking} - Power: High. Possibility for Error: High\\
 Locks (and Semaphores and other equivalent classes) take the two pieces of a synchronized block - preventing other threads from accessing code, and letting other threads know that the going is clear - and separate them into two individual lines of code. Only one thread can "own" a mutex at a time (semaphores are generalized to allow N threads), so when a thread acquires a Lock l, all other threads that attempt to call l.lock() are forced to wait until the thread that owns the lock calls l.unlock(), at which point an arbitrarily chosen thread that is waiting will call l.lock() and proceed. This gives you the ultimate control over which threads execute what where and when, but is very prone to issues such as deadlock in which two threads are each waiting to acquire a lock owned by the other. These are overkill for all but the most complex solutions, and most likely not necessary for this project. 
-
-
-
 \end{itemize}
+
+\newpage
+\section{8. Project Schedule}
+In an effort to encourage gradual progression through the project (rather than back-ending the whole thing), the project is due in two parts. The Heap section of the project will be due midway through the project, and the full project due at the end. You can continue to work on and change your heap code after the heap portion is due to improve its use in the project as whole, but the submitted heap is the one that will be graded for heap points.
+
+Bold lines are required, submission dates. The date of prelim 2 is included to help in your planning. Try to at least start the heap section before you start studying for prelim 2.\\
+
+\begin{center}
+\begin{Large}
+\begin{tabular}{| c | c |}
+\hline
+Date & Project Milestone\\
+\hline
+Thursday 11/13 & Project Released\\
+Thursday 11/20 & Prelim 2\\
+\textbf{Sunday 11/23 @ 11:59PM} & \textbf{Heap Section Due}\\
+\textbf{Thursday 12/4 @ 11:59PM} & \textbf{Full Project Due}\\
+\hline
+\end{tabular}
+\end{Large}
+\end{center}
+
 
 \end{document}
