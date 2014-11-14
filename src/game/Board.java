@@ -894,11 +894,18 @@ public class Board implements JSONString {
 
     /** Scale the (x,y) coordinates of circles to fit the gui */
     private void scaleComponents() {
-        double heightRatio = (double)(GUI.DRAWING_BOARD_HEIGHT)/ 
+    	int guiHeight = GUI.DRAWING_BOARD_HEIGHT;
+    	if(game != null && game.getGUI() != null)
+    		guiHeight = game.getGUI().getDrawingPanel().getHeight();
+    	int guiWidth = GUI.DRAWING_BOARD_WIDTH;
+    	if(game != null && game.getGUI() != null)
+    		guiHeight = game.getGUI().getDrawingPanel().getWidth();
+    	
+        double heightRatio = (double)(guiHeight)/ 
                 (double)(BoardGeneration.HEIGHT + BoardGeneration.BUFFER * 2);
-        double widthRatio = (double)(GUI.DRAWING_BOARD_WIDTH)/ 
+        double widthRatio = (double)(guiWidth)/ 
                 (double)(BoardGeneration.WIDTH + BoardGeneration.BUFFER * 2);
- 
+                
         for (Node n : getNodes()) {
             Circle c = n.getCircle();
             c.setX1((int) (c.getX1() * widthRatio));

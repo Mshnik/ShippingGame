@@ -279,6 +279,8 @@ public class GUI extends JFrame{
         pack();
         validate();
         repaint();
+        drawingBoardHeight = drawingPanel.getHeight();
+        drawingBoardWidth = drawingPanel.getWidth();
         setGame(g);
         initialized = true;
         setLocation(X_OFFSET, Y_OFFSET);
@@ -294,7 +296,7 @@ public class GUI extends JFrame{
         Dimension newSize = drawingPanel.getSize();
         double heightRatio = (double)newSize.height / (double)drawingBoardHeight;
         double widthRatio = (double)newSize.width / (double)drawingBoardWidth;
-        
+                
         for (Node n : game.getBoard().getNodes()) {
             Circle c = n.getCircle();
             n.updateGUILocation((int)Math.round((c.getX1() * widthRatio)), 
@@ -399,9 +401,18 @@ public class GUI extends JFrame{
         game.setGUI(this);
         game.getBoard().updateMinMaxLength();
         drawMap();
-        drawingPanelResized();
+        
+        Dimension newSize = drawingPanel.getSize();
+        double heightRatio = (double)newSize.height / (double)DRAWING_BOARD_HEIGHT;
+        double widthRatio = (double)newSize.width / (double)DRAWING_BOARD_WIDTH;
+                
+        for (Node n : game.getBoard().getNodes()) {
+            Circle c = n.getCircle();
+            n.updateGUILocation((int)Math.round((c.getX1() * widthRatio)), 
+                    (int)Math.round((c.getY1() * heightRatio)));
+        }
+        
         updateSidePanel();
-        pack();
         validate();
         repaint();
     }
