@@ -497,8 +497,10 @@ public class Board implements JSONString {
         private static final int MIN_EDGE_LENGTH = 5;
         private static final int MAX_EDGE_LENGTH = 60;
 
-        private static final int WIDTH = 1600 - Circle.DEFAULT_DIAMETER * 3;
-        private static final int HEIGHT = 1200 - Circle.DEFAULT_DIAMETER * 3;
+        private static final int WIDTH = 1600;
+        private static final int HEIGHT = 1200;
+        
+        private static final int BUFFER = (int)(Circle.DEFAULT_DIAMETER * 2.5);
 
         private static final int MIN_TRUCKS = 5;
         private static final int MAX_TRUCKS = 50;
@@ -553,8 +555,8 @@ public class Board implements JSONString {
                 while (c.getX1() == -Circle.DEFAULT_DIAMETER || 
                         c.getY1() == -Circle.DEFAULT_DIAMETER) {
                     //Try setting to a new location
-                    c.setX1(r.nextInt(WIDTH + 1) + Circle.DEFAULT_DIAMETER * 2);
-                    c.setY1(r.nextInt(HEIGHT + 1) + Circle.DEFAULT_DIAMETER * 2);
+                    c.setX1(r.nextInt(WIDTH + 1) + BUFFER);
+                    c.setY1(r.nextInt(HEIGHT + 1) + BUFFER);
                     //Check other existing nodes. If too close, re-randomize this node's location
                     for (Node n2 : b.getNodes()) {
                         if (n2.getCircle().getDistance(c) < Circle.BUFFER_RADUIS) {
@@ -892,15 +894,15 @@ public class Board implements JSONString {
 
     /** Scale the (x,y) coordinates of circles to fit the gui */
     private void scaleComponents() {
-        double heightRatio = (double)(GUI.DRAWING_BOARD_HEIGHT - 2*Circle.DEFAULT_DIAMETER)/ 
-                (double)BoardGeneration.HEIGHT;
-        double widthRatio = (double)(GUI.DRAWING_BOARD_WIDTH - 2*Circle.DEFAULT_DIAMETER)/ 
-                (double)BoardGeneration.WIDTH;
-
+        double heightRatio = (double)(GUI.DRAWING_BOARD_HEIGHT)/ 
+                (double)(BoardGeneration.HEIGHT + BoardGeneration.BUFFER * 2);
+        double widthRatio = (double)(GUI.DRAWING_BOARD_WIDTH)/ 
+                (double)(BoardGeneration.WIDTH + BoardGeneration.BUFFER * 2);
+ 
         for (Node n : getNodes()) {
             Circle c = n.getCircle();
-            c.setX1((int) (c.getX1() * widthRatio) + Circle.DEFAULT_DIAMETER/2);
-            c.setY1((int) (c.getY1() * heightRatio) + Circle.DEFAULT_DIAMETER/2);
+            c.setX1((int) (c.getX1() * widthRatio));
+            c.setY1((int) (c.getY1() * heightRatio));
         }
     }
 

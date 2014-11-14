@@ -25,7 +25,7 @@ public class GUI extends JFrame{
     private static final long serialVersionUID = 2941318999657277463L;
 
     public static final int X_OFFSET = 100;
-    public static final int Y_OFFSET = 100;
+    public static final int Y_OFFSET = 50;
 
     public static final int DRAWING_BOARD_WIDTH_MIN = 400;
     public static final int DRAWING_BOARD_HEIGHT_MIN = 400;
@@ -38,8 +38,8 @@ public class GUI extends JFrame{
 
     static {
         Dimension s = Toolkit.getDefaultToolkit().getScreenSize();
-        DRAWING_BOARD_WIDTH = s.width - SIDE_PANEL_WIDTH - X_OFFSET * 2;
-        DRAWING_BOARD_HEIGHT = s.height - UPDATE_PANEL_HEIGHT - Y_OFFSET * 3;
+        DRAWING_BOARD_WIDTH = (int)(s.width) - SIDE_PANEL_WIDTH - 2 * X_OFFSET;
+        DRAWING_BOARD_HEIGHT = (int)(s.height * 0.8) - UPDATE_PANEL_HEIGHT - 2 * Y_OFFSET;
     }
 
     private int drawingBoardWidth;	//Most recent value of width
@@ -281,8 +281,8 @@ public class GUI extends JFrame{
         repaint();
         setGame(g);
         initialized = true;
+        setLocation(X_OFFSET, Y_OFFSET);
         drawingPanelResized();
-        setLocation(X_OFFSET, Y_OFFSET/2);
         setVisible(true);
     }
 
@@ -294,7 +294,7 @@ public class GUI extends JFrame{
         Dimension newSize = drawingPanel.getSize();
         double heightRatio = (double)newSize.height / (double)drawingBoardHeight;
         double widthRatio = (double)newSize.width / (double)drawingBoardWidth;
-
+        
         for (Node n : game.getBoard().getNodes()) {
             Circle c = n.getCircle();
             n.updateGUILocation((int)Math.round((c.getX1() * widthRatio)), 
