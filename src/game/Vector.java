@@ -5,7 +5,6 @@ import java.util.Objects;
 
 /** A simple geometric vector class (a la Point), which allows doubles for its fields */
 public class Vector {
-
 	private double x;
 	private double y;
 	

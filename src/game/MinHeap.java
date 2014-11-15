@@ -1,14 +1,14 @@
 package game;
 
-/** Specify a class that is able to act as a dynamically sized Min Heap.
- * Below, N is used as the number of elements currently in the heap.
+/** An implementation implements a dynamically sized min Heap of elements
+ * of type T. Below, N is used as the number of elements currently in the heap.
  * @author MPatashnik
  * @param <T> - type of elements in the implementing class.
  */
 public interface MinHeap<T> {
 
 	/** Return a string that represents this heap, in the format:
-	 * [item1:priority1, item2:priority2, ... itemN:priorityN]
+	 * [item1:priority1, item2:priority2, ..., itemN:priorityN]
 	 * Use the toString() function of the items. 
 	 */
 	public String toString();

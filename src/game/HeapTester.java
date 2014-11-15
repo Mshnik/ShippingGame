@@ -5,6 +5,25 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.Comparator;
 
+/** This class provides method main to test an implementation of game.Min_Heap.
+ * It prints its results on the console.
+ * The implementation must be in package student.<br><br>
+ * 
+ * Element args[0] of the parameter to main must be the name of the class.
+ * So, Run -> Run Configurations, click pane "Arguments", and type into
+ * the Program Aruments field the name or your class that implements
+ * game.Min_Heap.  <br><br>
+ * 
+ * Additional arguments are possible.<br>
+     *      -d Print additional debugging information<br>
+     *      -p [n] Set the max heap size for polling to n<br>
+     *      -s [n] Set the max heap size for update to n<br>
+     *      -u [n] Set the number of priorities to update to n<br>
+     * Print results of tests on console
+ * 
+ * 
+ *@author davidgries
+ */
 public class HeapTester{
 
     public static boolean giveDebugOutput= false;

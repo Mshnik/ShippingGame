@@ -620,7 +620,7 @@ public class Board implements JSONString {
         private static void spiderwebEdges(Board b, Random r) {
             HashSet<Node> nodes = new HashSet<Node>();
             nodes.addAll(b.getNodes());
-            ArrayList<HashSet<Node>> hulls = new ArrayList<>();
+            ArrayList<HashSet<Node>> hulls = new ArrayList<HashSet<Node>>();
 
             //Create hulls, add edges
             while (! nodes.isEmpty()) {
@@ -646,7 +646,7 @@ public class Board implements JSONString {
             }
 
             //Create a hashmap of node -> hull the node is in within hulls.
-            HashMap<Node, Integer> hullMap = new HashMap<>();
+            HashMap<Node, Integer> hullMap = new HashMap<Node, Integer>();
             for (int i = 0; i < hulls.size(); i++) {
                 for (Node n : hulls.get(i)) {
                     hullMap.put(n,i);
@@ -779,7 +779,7 @@ public class Board implements JSONString {
             final double FLIP_CONDITION = Math.PI; 
 
             //Edge that should be removed, mapped to its new exits
-            HashMap<Edge, Node[]> needsFlip = new HashMap<>(); 
+            HashMap<Edge, Node[]> needsFlip = new HashMap<Edge, Node[]>(); 
 
             for (Node n1 : b.getNodes()) {
                 for (Edge e2 : n1.getTrueExits()) {

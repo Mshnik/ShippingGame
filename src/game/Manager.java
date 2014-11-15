@@ -79,9 +79,9 @@ public abstract class Manager implements Runnable{
 		DROPPED_OFF_PARCEL
 	}
 
-	/** Allows Trucks to notify the manager that something has occurred. 
-	 * Method should provide the calling truck with additional information
-	 * pertaining to the message sent.
+	/** Called by Truck t to notify the manager that something has occurred. 
+	 * Method should provide t with additional information pertaining
+	 * to the message sent.
 	 * 
 	 * @see Manager.Notification The notification enum for types of messages
 	 */
