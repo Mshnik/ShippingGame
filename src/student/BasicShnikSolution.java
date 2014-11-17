@@ -1,7 +1,8 @@
 package student;
 
-import java.util.*;
 import game.*;
+import java.util.*;
+
 
 /** A simple solution to the shipping game problem.
  * Greedy solution: assign each parcel to a truck, that truck gets it, 
@@ -43,7 +44,7 @@ public class BasicShnikSolution extends AbstractSolution {
 
 	@Override
 	public void truckNotification(Truck t, Notification message) {
-		if (! preprocessingDone) return;
+		if (!preprocessingDone) return;
 		
 		//Base case - at new node. Check if has parcel and should drop off.
 		if (message.equals(Notification.LOCATION_CHANGED)) {
@@ -55,7 +56,7 @@ public class BasicShnikSolution extends AbstractSolution {
 				//If so, assign this truck to a random one.
 				if (unassignedParcels.isEmpty()) {
 					parcelsAssigned.remove(t);
-					t.setTravelPath(dijkstra(t.getLocation(), getBoard().getTruckHome()));
+					t.setTravelPath(dijkstra(t.getLocation(), getBoard().getTruckDepot()));
 				} else {
 					Parcel p = Main.randomElement(unassignedParcels);
 					unassignedParcels.remove(p);

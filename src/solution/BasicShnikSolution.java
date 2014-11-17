@@ -56,7 +56,7 @@ public class BasicShnikSolution extends AbstractSolution {
 				//If so, assign this truck to a random one.
 				if (unassignedParcels.isEmpty()) {
 					parcelsAssigned.remove(t);
-					t.setTravelPath(dijkstra(t.getLocation(), getBoard().getTruckHome()));
+					t.setTravelPath(dijkstra(t.getLocation(), getBoard().getTruckDepot()));
 				} else {
 					Parcel p = Main.randomElement(unassignedParcels);
 					unassignedParcels.remove(p);

@@ -1,4 +1,4 @@
-package solution;
+package student;
 
 import java.util.*;
 import game.*;

@@ -145,7 +145,7 @@ public class Truck implements BoardElement, Runnable {
             alive = true;
             while (alive) {
                 locLock.acquire();
-                if (getBoard().getParcels().isEmpty() && location.equals(getBoard().getTruckHome())) {
+                if (getBoard().getParcels().isEmpty() && location.equals(getBoard().getTruckDepot())) {
                     locLock.release();
                     getBoard().addTruckToFinished(this);
                     //Deduct final waiting points

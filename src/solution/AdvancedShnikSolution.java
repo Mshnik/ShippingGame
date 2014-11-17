@@ -90,7 +90,7 @@ public class AdvancedShnikSolution extends AbstractSolution {
                 //If so, pick one at random and assign this truck to that.
                 if (unassignedParcels.isEmpty()) {
                     parcelsAssigned.remove(t);
-                    t.setTravelPath(dijkstra(t.getLocation(), getBoard().getTruckHome()));
+                    t.setTravelPath(dijkstra(t.getLocation(), getBoard().getTruckDepot()));
                 } else {
                     assignParcelTo(t);
                 }
@@ -102,7 +102,7 @@ public class AdvancedShnikSolution extends AbstractSolution {
             } else if (parcelsAssigned.containsKey(t) && getParcels().contains(parcelsAssigned.get(t))) {
                 t.setTravelPath(dijkstra(t.getLocation(), parcelsAssigned.get(t).getLocation()));
             } else if (! parcelsAssigned.containsKey(t) || getParcels().isEmpty()) {
-                t.setTravelPath(dijkstra(t.getLocation(), getBoard().getTruckHome()));
+                t.setTravelPath(dijkstra(t.getLocation(), getBoard().getTruckDepot()));
             } else if (parcelsAssigned.containsKey(t) && ! getParcels().contains(parcelsAssigned.get(t))) {
                 assignParcelTo(t);
             }
