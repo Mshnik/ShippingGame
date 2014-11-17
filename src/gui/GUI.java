@@ -657,6 +657,7 @@ public class GUI extends JFrame{
         }
         else {
             mntmReset.setEnabled(game.isFinished());
+            updateParcelAndTruckStats();
             updateThread.interrupt();
         }
     }
