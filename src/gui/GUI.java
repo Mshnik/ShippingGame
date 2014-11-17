@@ -3,6 +3,7 @@ package gui;
 import game.*;
 
 import javax.swing.*;
+
 import java.awt.*;
 
 import java.awt.event.*;
@@ -10,6 +11,9 @@ import javax.swing.border.LineBorder;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 import javax.swing.table.DefaultTableModel;
+
+import org.json.JSONException;
+
 import java.io.File;
 
 
@@ -62,6 +66,7 @@ public class GUI extends JFrame{
     private JMenuItem mntmReset; //The button that resets the game
 
     private JLabel frameLabel;   //Label that shows the current frame rate. Red if it's been altered
+    private JSlider frameSlider; //Slider for the frame rate.
     
     private long updateTime;	//How quickly the parcel/truck stats should update (ms)
     private static final long DEFAULT_UPDATE_TIME = 200;
@@ -166,7 +171,11 @@ public class GUI extends JFrame{
                     f.showOpenDialog(null);
                     File fil = f.getSelectedFile();
                     if (fil != null && fil.exists()) {
-                        setGame(new Game(game.getManagerClassname(), fil));
+                    	try{
+                          setGame(new Game(game.getManagerClassname(), fil));
+                    	} catch(JSONException j){
+                          showJSONParseError(j, fil);
+                    	}
                     }
                 }
             }
@@ -192,11 +201,19 @@ public class GUI extends JFrame{
             public void actionPerformed(ActionEvent arg0) {
                 if (game != null && game.isFinished()) {
                     messageClearer.interrupt();
-                    if (game.getFile() != null)
-                        setGame(new Game(game.getManagerClassname(), game.getFile()));
-                    else{
+                    int frame = game.getFrame();
+                    if (game.getFile() != null){
+                    	File fil = game.getFile();
+                    	try{
+                            setGame(new Game(game.getManagerClassname(), fil));
+                      	} catch(JSONException j){
+                            showJSONParseError(j, fil);
+                      	}
+                    }else{
                         setGame(new Game(game.getManagerClassname(), game.getBoard().seed));
                     }
+                    game.setFrame(frame);
+                    frameSlider.setValue(frame);
                     game.start();
                     setUpdateMessage("Game Started");
                 }
@@ -213,9 +230,15 @@ public class GUI extends JFrame{
             public void actionPerformed(ActionEvent arg0) {
                 int returnVal = JOptionPane.showConfirmDialog(null, "Are You Sure You Want to Reset?");
                 if (returnVal == JOptionPane.YES_OPTION) {
-                    messageClearer.interrupt();
-                    if (game.getFile() != null)
-                        setGame(new Game(game.getManagerClassname(), game.getFile()));
+                	if(messageClearer != null) messageClearer.interrupt();
+                    if (game.getFile() != null){
+                    	File fil = game.getFile();
+                    	try{
+                            setGame(new Game(game.getManagerClassname(), fil));
+                      	} catch(JSONException j){
+                            showJSONParseError(j, fil);
+                      	}
+                    }
                     else{
                         setGame(new Game(game.getManagerClassname(), game.getBoard().seed));
                     }
@@ -288,6 +311,16 @@ public class GUI extends JFrame{
         setVisible(true);
     }
 
+    /** Call to show the message for a json parsing error */
+    private void showJSONParseError(JSONException j, File fil){
+    	String msg = "Err with reading board " + fil.getName() + " : " 
+                  + j.getMessage() + "\n" +
+                  "Try pasting the contents of " + fil.getName() + 
+                  " into a JSON validator online.\n"
+                  + "Ex: jsonlint.com";
+    	 JOptionPane.showMessageDialog(self, msg);
+    }
+    
     /** Resize the drawing panel.
      *  Called internally when the drawing panel is resized */
     private void drawingPanelResized() {
@@ -495,7 +528,7 @@ public class GUI extends JFrame{
         frameLabel = new JLabel("Frame: " + fixNumber(game.getFrame(), 4, "") + "ms  ");
         frameLabel.setFont(Font.decode("asdf-14")); //System default font with size 14
         innerPanel3.add(frameLabel);
-        JSlider frameSlider = new JSlider();
+        frameSlider = new JSlider();
         frameSlider.setMajorTickSpacing(1);
         frameSlider.setMaximum(2000);
         frameSlider.setMinimum(1);
@@ -591,8 +624,10 @@ public class GUI extends JFrame{
 					getDrawingPanel().remove(p.getCircle());
 				}
 			});
-		} catch (Exception e) {
-			e.printStackTrace();
+		} catch (InterruptedException e) {
+			//Do nothing - interrupted because the game was reset, thus no handling necessary
+		} catch(Exception e){
+			e.printStackTrace(); //Other exception - print trace
 		}
     }
     
@@ -665,8 +700,7 @@ public class GUI extends JFrame{
                 try {
                     Thread.sleep(MESSAGE_DELETE_TIME);
                     setUpdateMessage("  ");
-                } catch (InterruptedException e) {
-                }
+                } catch (InterruptedException e) {}
             }
         };
         if (messageClearer != null && messageClearer.isAlive()) {

@@ -143,7 +143,7 @@ public class Truck implements BoardElement, Runnable {
         try {
             lastTravelTime = System.currentTimeMillis();
             alive = true;
-            while (true) {
+            while (alive) {
                 locLock.acquire();
                 if (getBoard().getParcels().isEmpty() && location.equals(getBoard().getTruckHome())) {
                     locLock.release();
