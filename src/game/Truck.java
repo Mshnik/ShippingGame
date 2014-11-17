@@ -134,7 +134,7 @@ public class Truck implements BoardElement, Runnable {
      * directions are not empty, pops off the next travel direction.<br><br>
      * 
      * Called and on loop until the game ends. Terminates itself when there are
-     * no more parcels and this truck is at the Tuck Depot. Once that occurs,
+     * no more parcels and this truck is at the Truck Depot. Once that occurs,
      * doesn't take any more instructions.
      * Students: don't call this procedure!
      */
@@ -143,10 +143,9 @@ public class Truck implements BoardElement, Runnable {
         try {
             lastTravelTime = System.currentTimeMillis();
             alive = true;
-            while (true) {
+            while (alive) {
                 locLock.acquire();
-                if (getBoard().getParcels().isEmpty() &&
-                        location.equals(getBoard().getTruckDepot())) {
+                if (getBoard().getParcels().isEmpty() && location.equals(getBoard().getTruckHome())) {
                     locLock.release();
                     getBoard().addTruckToFinished(this);
                     //Deduct final waiting points

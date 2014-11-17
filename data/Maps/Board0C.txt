@@ -1,0 +1,55 @@
+{
+"seed":151235,
+"scoreCoeff":[-2,-13,-106,1537,3],
+"node-0":{
+"name":"Truck Depot",
+"x":874,
+"y":833
+},
+"node-2":{
+"name":"Temecula",
+"x":153,
+"y":491
+},
+"node-3":{
+"name":"Stockton",
+"x":1355,
+"y":299
+},
+"edge-0":{
+"location":["Truck Depot","Temecula"],
+"length":15
+},
+"edge-1":{
+"location":["Temecula","Stockton"],
+"length":25
+},
+"edge-2":{
+"location":["Stockton","Truck Depot"],
+"length":5
+},
+"truck-0":{
+"name":"TRUCK-1",
+"color":-3750912
+},
+"parcel-0":{
+"location":"Temecula",
+"destination":"Truck Depot",
+"color":-16726421
+},
+"parcel-1":{
+"location":"Temecula",
+"destination":"Stockton",
+"color":-9622644
+},
+"parcel-2":{
+"location":"Stockton",
+"destination":"Temecula",
+"color":-16748090
+},
+"parcel-3":{
+"location":"Temecula",
+"destination":"Truck Depot",
+"color":-3800944
+}
+}
