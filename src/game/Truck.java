@@ -133,9 +133,9 @@ public class Truck implements BoardElement, Runnable {
      * Waits for more instructions in WAIT_TIME intervals. While the travel
      * directions are not empty, pops off the next travel direction.<br><br>
      * 
-     * Called and on loop until the game ends. Terminates itself when the parcels
-     * are empty and this truck is home. Once that occurs, doesn't take any more
-     * instructions.
+     * Called and on loop until the game ends. Terminates itself when there are
+     * no more parcels and this truck is at the Tuck Depot. Once that occurs,
+     * doesn't take any more instructions.
      * Students: don't call this procedure!
      */
     @Override
@@ -145,7 +145,8 @@ public class Truck implements BoardElement, Runnable {
             alive = true;
             while (true) {
                 locLock.acquire();
-                if (getBoard().getParcels().isEmpty() && location.equals(getBoard().getTruckHome())) {
+                if (getBoard().getParcels().isEmpty() &&
+                        location.equals(getBoard().getTruckDepot())) {
                     locLock.release();
                     getBoard().addTruckToFinished(this);
                     //Deduct final waiting points
@@ -612,7 +613,7 @@ public class Truck implements BoardElement, Runnable {
         travel.clear();
     }
 
-    /** Tell the Truck to travel along edge r.
+    /** Make the Truck travel along edge r.
      * The Truck will begin to travel only if its status is WAITING.
      * If status is TRAVELING, the Truck will ignore this call. 
      * @param r - the Edge for this Truck to travel along.

@@ -27,8 +27,10 @@ public class Board implements JSONString {
      * -1 if loaded from a non-random file. */
     public final long seed;
 
-    private Node truckHome;			//The node at which all trucks start
-    protected static final String TRUCK_HOME_NAME = "Truck Depot"; //Name of truckhome
+    private Node truckDepot;			//The node at which all trucks start
+    
+    /** Name of city where truck start --the truckDepot.*/
+    protected static final String TRUCK_DEPOT_NAME = "Truck Depot";
 
     private HashSet<Edge> edges;    //All edges in this board
 
@@ -39,7 +41,7 @@ public class Board implements JSONString {
 
     private ArrayList<Truck> trucks; //The trucks in this board
     private List<Truck> finishedTrucks; //The trucks that have terminated themselves 
-    //because they are home and there are no more parcels
+    //because they are at the Depot and there are no more parcels
     protected final int initialParcelCount;	//Starting number of parcels
     private Set<Parcel> parcels; //The parcels in this board - ones that have not been delivered yet
 
@@ -87,8 +89,8 @@ public class Board implements JSONString {
                 n.x = c.getX1();
                 n.y = c.getY1();
                 getNodes().add(n);
-                if (n.name.equals(Board.TRUCK_HOME_NAME))
-                    setTruckHome(n);
+                if (n.name.equals(Board.TRUCK_DEPOT_NAME))
+                    setTruckDepot(n);
             }
         }
 
@@ -119,7 +121,7 @@ public class Board implements JSONString {
                 JSONObject truck = obj.getJSONObject(key);
                 Color c = new Color(truck.getInt(BoardElement.COLOR_TOKEN));
                 String name = truck.getString(BoardElement.NAME_TOKEN);
-                Truck t = new Truck(game, name, c, getTruckHome());
+                Truck t = new Truck(game, name, c, getTruckDepot());
                 trucks.add(t);
             } else if ( key.startsWith(PARCEL_TOKEN)) {
                 JSONObject parcel = obj.getJSONObject(key);
@@ -178,21 +180,21 @@ public class Board implements JSONString {
         return null;
     }
 
-    /** Return the unique TruckHome Node in this board that 
-     * Trucks must return to before the game can be ended. */
-    public Node getTruckHome() {
-        return truckHome;
+    /** Return the unique Truck Depot Node in this board, to which 
+     * Trucks must return before the game can be ended. */
+    public Node getTruckDepot() {
+        return truckDepot;
     }
 
-    /** Set the TruckHome node that Trucks must return to before the game can be
+    /** Set the TruckDepot node that Trucks must return to before the game can be
      * ended to Node n.
      * @throws IllegalArgumentException -- if n is not in this board
      */
-    protected void setTruckHome(Node n) throws IllegalArgumentException {
+    protected void setTruckDepot(Node n) throws IllegalArgumentException {
         if (nodes.contains(n))
-            truckHome = n;
+            truckDepot = n;
         else
-            throw new IllegalArgumentException("Can't set Truck Home to " + n + 
+            throw new IllegalArgumentException("Can't set Truck Depot to " + n + 
                     ", it isn't contained in this board.");
     }
 
@@ -201,33 +203,33 @@ public class Board implements JSONString {
         return trucks;
     }
 
-    /** Return the alive trucks on this board that are currently on the Truck Home node
+    /** Return the alive trucks on this board that are currently on Truck Depot node
      * (an empty arrayList if there are no such trucks). */
-    public ArrayList<Truck> getTrucksHome() {
-        ArrayList<Truck> homeTrucks = new ArrayList<Truck>();
+    public ArrayList<Truck> getTrucksOnDepot() {
+        ArrayList<Truck> depotTrucks = new ArrayList<Truck>();
         for (Truck t : trucks)
-            if (t.isAlive() && t.getLocation() != null && t.getLocation().equals(getTruckHome()))
-                homeTrucks.add(t);
+            if (t.isAlive() && t.getLocation() != null && t.getLocation().equals(getTruckDepot()))
+                depotTrucks.add(t);
 
-        return homeTrucks;
+        return depotTrucks;
     }
 
-    /** Return true iff an alive Truck in this board is currently on the TruckHome node. 
+    /** Return true iff an alive Truck in this board is currently on the Truck Depot node. 
      */
-    public boolean isTruckHome() {
+    public boolean isTruckDepot() {
         for (Truck t : getTrucks())
-            if (t.isAlive() && t.getLocation() != null && t.getLocation().equals(getTruckHome()))
+            if (t.isAlive() && t.getLocation() != null && t.getLocation().equals(getTruckDepot()))
                 return true;
 
         return false;
     }
 
-    /** Return true iff all alive Trucks in this board are currently on the TruckHome node. 
+    /** Return true iff all alive Trucks in this board are currently on the Truck Depot node. 
      */
-    public boolean isAllTrucksHome() {
+    public boolean allTrucksAreAtDepot() {
         for (Truck t : getTrucks()) {
             if (t.isAlive() && (t.getStatus().equals(Truck.Status.TRAVELING) 
-                    || ! t.getLocation().equals(getTruckHome())))
+                    || ! t.getLocation().equals(getTruckDepot())))
                 return false;
         }
 
@@ -544,7 +546,7 @@ public class Board implements JSONString {
             for (int i = 0; i < numCities; i++) {
                 String name;
                 if (i == 0) {
-                    name = Board.TRUCK_HOME_NAME;
+                    name = Board.TRUCK_DEPOT_NAME;
                 } else{
                     name = cities.remove(r.nextInt(cities.size()));
                 }
@@ -569,8 +571,8 @@ public class Board implements JSONString {
                 n.x = n.getCircle().getX1();
                 n.y = n.getCircle().getY1();
                 b.getNodes().add(n);
-                if (n.name.equals(Board.TRUCK_HOME_NAME)) {
-                    b.setTruckHome(n);
+                if (n.name.equals(Board.TRUCK_DEPOT_NAME)) {
+                    b.setTruckDepot(n);
                 }
             }
 
@@ -578,7 +580,7 @@ public class Board implements JSONString {
             final int numb_trucks = r.nextInt(MAX_TRUCKS - MIN_TRUCKS + 1) + MIN_TRUCKS;
             for (int i = 0; i < numb_trucks; i++) {
                 Truck t = new Truck(b.game, "TRUCK-" + (i+1), 
-                        Score.COLOR[r.nextInt(Score.COLOR.length)], b.getTruckHome());
+                        Score.COLOR[r.nextInt(Score.COLOR.length)], b.getTruckDepot());
                 b.trucks.add(t);
             }
 

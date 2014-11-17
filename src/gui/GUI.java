@@ -13,7 +13,7 @@ import javax.swing.table.DefaultTableModel;
 import java.io.File;
 
 
-/** Class GUI creates the JFrame that shows the game.
+/** An instance is the JFrame that shows the game.
  * Class Game and other classes in package game send updates to the gui
  * to keep it up to date on the board state.
  * The user and the manager have no interaction with the GUI class.
@@ -596,7 +596,7 @@ public class GUI extends JFrame{
 		}
     }
     
-    /** Toggle the  interactability. When this isn't uninteractable,
+    /** Toggle the interactability. When this isn't uninteractable,
      * doesn't allow user to provide any input
      */
     public void toggleInteractable() {

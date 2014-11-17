@@ -192,8 +192,8 @@ public class Game {
 	/** Start the game by the manager run; then have each truck begin running.
 	 * Additional calls to this method after the first call do nothing. */
 	public void start() {
-		if (! running && !finished) {
-			if(frame != DEFAULT_FRAME) frameAltered = true;
+		if (!running && !finished) {
+			if (frame != DEFAULT_FRAME) frameAltered = true;
 
 			setRunning(true);			
 
