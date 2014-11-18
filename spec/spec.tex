@@ -167,7 +167,7 @@ The next two blocks of non-static data are changed as the game proceeds.
 You control how often non-static data is refreshed using bottom slider Update Time. Dragging the slider to the left updates the data more often at the cost of using a tiny bit more processing 
 power. For debugging purposes, it is useful to have the data update as quickly as possible, whereas once your code works correctly, you can have the data rarely updated to get the best possible score.
 
-Finally, slider  Frame controls how quickly the game progresses.\ A higher value (drag right) causes the trucks to travel more slowly and favors more computationally complex solutions, and a lower value causes the trucks to travel more quickly and favors more computationally simple solutions. It can be useful in debugging to drag the slider far to the right to watch the trucks move in slow motion. However, note that altering the slider causes the score to change and change the color of the Frame label to red. \textbf{Grading will be done at a Frame rate of 40ms, so when checking your scores make sure that you have not moved this slider}.
+Finally, slider  Frame controls how quickly the game progresses.\ A higher value (drag right) causes the trucks to travel more slowly and favors more computationally complex solutions, and a lower value causes the trucks to travel more quickly and favors more computationally simple solutions. It can be useful in debugging to drag the slider far to the right to watch the trucks move in slow motion. However, note that altering the slider causes the score to change and change the color of the Frame label to red. \textbf{Grading will be done at a Frame rate of 40ms, so when checking your scores make sure that you have not moved this slider} (The label will stay black when the frame rate is unaltered).
 
 \section{5. Brief introduction to the classes}
 Assuming your installation worked correctly, you should be able to see the javadoc specifications of all public classes and methods in package game.
@@ -258,7 +258,6 @@ If, however, you're shooting for a perfect grade, you may have to do some amount
 \centerline{\includegraphics[scale=0.45]{collision.png}} 
 \caption{\em{Don't rely on Spongebob to keep your code thread safe.}}
 \end{figure}
-\\
 
 In this vein, you have a few different options to keep code thread-safe. The more powerful the tool, however, the greater the possibility of creating new and more difficult problems. Ideally, come up with a strategy, than pick the least-comprehensive tool that gives you just enough capability to prevent potential thread safety problems.
 \subsection{Approaches to Concurrency}
@@ -274,7 +273,7 @@ synchronized(obj){
 //...Do things that only one thread should be doing.
 }
 \end{lstlisting}
-And, only one thread can access any synchronized block that is associated with that block at a time. This means that two synchronized blocks with the same object:
+And, only one thread can access any synchronized block that is associated with that object at a time. This means that two synchronized blocks with the same object:\\
 \begin{lstlisting}[frame=single]
 synchronized(obj){
 processA();
