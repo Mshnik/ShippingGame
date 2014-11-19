@@ -9,7 +9,7 @@ import java.util.*;
  * @author MPatashnik
  *
  */
-public class AdvancedShnikSolution extends AbstractSolution {
+public class MyManager extends AbstractSolution {
 
     /** A HashMap of parcel -> truck that is assigned to deliver it */
     private Map<Truck, Parcel> parcelsAssigned;
