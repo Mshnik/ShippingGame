@@ -40,8 +40,6 @@
 \item What to hand in when
 \end{large}\end{enumerate}
 \end{center}
-<<<<<<< HEAD
-
 
 \section{1. Introduction}
 You can work on A6b in groups of two. Form the group well before the assignment due date. Both must do something to form the group:
@@ -67,47 +65,10 @@ Also, at various events, such as a truck reaching its destination, it will let y
 Trucks begin the game on the Truck Depot city (there will be exactly one Truck Depot) and must return there after delivering all parcels for the game to end.
 
 \section{3. Installation and running}
-=======
-
-
-\section{1. Introduction}
-You can work on A6b in groups of two. Form the group well before the assignment due date. Both must do something to form the group:
-one proposes, the other accepts.
-People in a group must work together. It is against the rules for one person to do programming on this assignment
-without the other person sitting nearby and helping. Take turns "driving" ---using the keyboard and mouse.
-
-With the exception of your CMS-registered group partner, you may not look at anyone else's code, in any form,
-or show your code to anyone else (except the course staff), in any form. You may not show or give your code to another
-student in the class.
-
-We will pin a note on the Piazza, as we did for A4 and A5, to discuss important points. Check it often, especially before you post a question.
-
-
-
-\section{3. Game overview}
-In Shipping Game, you play the part of a shipping company engineer who ensures that parcels get where they're going in a timely fashion.\ In a run of Shipping Game, you are presented with an undirected, weighted graph (see next page) that represents the world.\ The nodes in the graph are cities (labeled with their names), and the edges are highways between cities (labeled with their length). At each city, there may be some parcels, to be delivered to another city. Thus, a parcel has a start city and a (different) destination city.
-The smaller filled-in circles that appear in some cities are the parcels that need to be picked up and delivered.\\
-\centerline{\includegraphics[scale=0.8]{map1.png}}\\
-
-You control a fleet of trucks, which can pick up and deliver parcels. You can give trucks instructions at the beginning of the game.
-Also, at various events, such as a truck reaching its destination, it will let you know so you can give it additional instructions.
-Trucks begin the game on the Truck Depot city (there will be exactly one Truck Depot) and must return there after delivering all parcels for the game to end.
-
-\section{4. Installation and running}
->>>>>>> 90121c5f214fe9c999de8db7f156ee1e9164922e
 \subsection{Installation}
 The code for this project is provided as a .jar file, without source files. Various data files are provided as text files in folders.
 \begin{enumerate}
 \item Create a new Java project in Eclipse, named A6.
-<<<<<<< HEAD
-\item Download ShippingGame.jar and all of the data folders and drag them into your A6 folder. Don't change the names of any of the folders within data or the code won't be able to find the data.
-\item Right click A6 --> Build Path --> Add External Archives --> Select ShippingGame.jar and click Open.
-\item Right click A6 -> Build Path --> Configure Build Path... --> Expand ShippingGame.jar by clicking on the triangle to the left of it --> Select Javadoc Location --> Click Edit... --> Select "Javadoc URL" --> Click Browse... --> Select the "doc" folder located within the data folder (don't expand it) and click Open, Click Ok, Click Ok.
-\item Create a package called \textbf{student} in folder src (right click src --> new... -> package) . All code you write goes in package student \textbf{student}.
-\item Place into package student your class MyHeap from assignment A6a. You will have to put a package statement at the top of it.
-If you are not sure your MyHeap is correct, you can use one that we wrote, which will be made available 2 days after A6a is due.
-\item Create a class in package student  (called whatever you like, but NOT Manager) that extends \textbf{game.Manager}. This is your manager class, and it is your main submission.
-=======
 \item Download ShippingGame.jar and all of the data folders and drag them into your A6 folder. Don't change the names of any of the folders or the code won't be able to find the data.
 \item Right click A6 --> Build Path --> Add External Archives --> Select ShippingGame.jar and click Open.
 \item Right click A6 -> Build Path --> Configure Build Path... --> Expand ShippingGame.jar by clicking on the triangle to the left of it --> Select Javadoc Location --> Click Edit... --> Select "Javadoc URL" --> Click Browse... --> Select the "doc" folder (don't expand it) and click Open, Click Ok, Click Ok.
@@ -115,7 +76,6 @@ If you are not sure your MyHeap is correct, you can use one that we wrote, which
 \item Place into package student your class MyHeap from assignment A6a. You will have to put a package statement at the top of it.
 If you are not sure your MyHeap is correct, you can use one that we wrote, which will be made available 2 days after A6a is due.
 \item Create a class \textbf{MyManager} in package student extends \textbf{game.Manager}. This is your manager class, and it is your main submission. You must use the name \textbf{MyManager}.
->>>>>>> 90121c5f214fe9c999de8db7f156ee1e9164922e
 \end{enumerate}
 
 \subsection{Running}
@@ -150,11 +110,7 @@ MyManager -h -r 10
 \caption{\em{Running MyManager in headless mode on 9001 random seeds.}}
 \end{figure}
 
-<<<<<<< HEAD
 \section{4. Using the GUI}
-=======
-\section{5. Using the GUI}
->>>>>>> 90121c5f214fe9c999de8db7f156ee1e9164922e
 \begin{figure}[h]
 \centerline{\includegraphics[scale=0.45]{gui.png}} 
 \caption{\em{The Shipping Game GUI. Now with 50\% less (visual) sugar!}}
@@ -162,7 +118,6 @@ MyManager -h -r 10
 
 Assuming the installation process went correctly and you have created a class that extends manager, you should be able to run the main class and see the gui. {\em(Note: the generated map may be different than pictured above)}. It is fully resizable. All cities (nodes) can be dragged to allow you to make the graph look cleaner, but  this purely visual change has no impact on the board state. Here are some other features.. 
 
-<<<<<<< HEAD
 \subsection{4a. Menu bar}
 \begin{itemize}
 \item File -> Open...: Open a JFileChooser rooted at the data/maps directory.\ You can choose a map (in JSON format) to load into the gui.
@@ -170,15 +125,6 @@ Assuming the installation process went correctly and you have created a class th
 \item Game -> Start: Begin the game.\ Clicking this again after the game has begun does nothing, but clicking it after the game has ended will restart it.
 \item Game -> Reset : Reset the displayed game to its initial state..
 \item Game -> New Random Map...: Generate a new random map with the seed (long int) given in the popup window. Exit this option by clicking cancel on the popup window.
-=======
-\subsection{5a. Menu bar}
-\begin{itemize}
-\item File -> Open...: Open a JFileChooser rooted at the data/maps directory.\ You can choose a map (in JSON format) to load into the gui.
-\item File -> Quit:  Close the gui and terminate the program.
-\item Game -> Start: Begin the game.\ Clicking this again after the game has begun does nothing.
-\item Game -> Reset : Reset the displayed game to its initial state..
-\item Game -> New Random Map...: Generate a new random map with the seed given in the popup window. Exit this option by clicking cancel on the popup window.
->>>>>>> 90121c5f214fe9c999de8db7f156ee1e9164922e
 \item Game -> Print Game JSON: Print a JSON string represention of this game to the eclipse console. Useful to save an interesting board by resetting it, printing the game JSON, and creating a new text file in the data/maps directory with the game JSON as its contents.
 \item GUI -> Repaint: Repaint the gui. Try clicking this if the gui looks strange before trying other solutions.
 \item GUI -> Edge Coloring: Control how edges are colored on the gui.
@@ -189,11 +135,7 @@ Assuming the installation process went correctly and you have created a class th
 \end{itemize}
 \end{itemize}
 
-<<<<<<< HEAD
 \subsection{4b. Info panel}
-=======
-\subsection{5b. Info panel}
->>>>>>> 90121c5f214fe9c999de8db7f156ee1e9164922e
 The panel on the right is the info panel ---it displays useful information about the currently displayed game.
 The top block of data is static and will not change as the game runs.
 \begin{itemize}
@@ -210,10 +152,7 @@ The top block of data is static and will not change as the game runs.
 \end{itemize}
 
 The next two blocks of non-static data are changed as the game proceeds.
-<<<<<<< HEAD
 
-=======
->>>>>>> 90121c5f214fe9c999de8db7f156ee1e9164922e
 \begin{itemize}
 \item Parcels in Cities: Number of undelivered parcels that are not on trucks
 \item Parcels on Trucks: Number of undelivered parcels that are on trucks
@@ -223,22 +162,12 @@ The next two blocks of non-static data are changed as the game proceeds.
 \item Trucks com w/ Manager: Number of trucks that are currently communicating with the Manager —i.e. have called truckNotification(...) and are awaiting a response.
 \end{itemize}
 
-<<<<<<< HEAD
 You control how often non-static data is refreshed using bottom slider Update Time. Dragging the slider to the left updates the data more often at the cost of using a tiny bit more processing 
 power. For debugging purposes, it is useful to have the data update as quickly as possible, whereas once your code works correctly, you can have the data rarely updated to get the best possible score.
 
-Finally, slider  Frame controls how quickly the game progresses.\ A higher value (drag right) causes the trucks to travel more slowly and favors more computationally complex solutions, and a lower value causes the trucks to travel more quickly and favors more computationally simple solutions. It can be useful in debugging to drag the slider far to the right to watch the trucks move in slow motion. However, note that altering the slider causes the score to change and change the color of the Frame label to red. \textbf{Grading will be done at a Frame rate of 40ms, so when checking your scores make sure that you have not moved this slider} (The label will stay black when the frame rate is unaltered).
+Finally, slider Frame controls how quickly the game progresses.\ A higher value (drag right) causes the trucks to travel more slowly and favors more computationally complex solutions, and a lower value causes the trucks to travel more quickly and favors more computationally simple solutions. It can be useful in debugging to drag the slider far to the right to watch the trucks move in slow motion. However, note that altering the slider causes the score to change and change the color of the Frame label to red. \textbf{Grading will be done at a Frame rate of 40ms, so when checking your scores make sure that you have not moved this slider} (The label will stay black when the frame rate is unaltered).
 
 \section{5. Brief introduction to the classes}
-=======
-You control how often non-static data is refreshed using bottom slider Update Time.\ Dragging the slider to the left updates the data more often at the cost of using a tiny bit more processing 
-power.\ For debugging purposes, it is useful to have the data update as quickly as possible, whereas once your code works correctly, you can have the data rarely updated to get the best possible score.
-
-Finally, slider  Frame controls how quickly the game progresses.\ A higher value (drag right) causes the trucks to travel more slowly and favors more computationally complex solutions, and a lower value causes the trucks to travel more quickly and favors more computationally simple solutions. It can be useful in debugging to drag the slider far to the right to watch the trucks move in slow motion. However, note that altering the slider causes the score to change and change the color of the Frame label to red. \textbf{Grading will be done at a Frame rate of 40ms, so when checking your scores make sure that you have not moved this slider}.
-
-
-\section{6. Brief introduction to the classes}
->>>>>>> 90121c5f214fe9c999de8db7f156ee1e9164922e
 Assuming your installation worked correctly, you should be able to see the javadoc specifications of all public classes and methods in package game.
 If not, consult section 2 of this guide or ask on Piazza/at office hours.\\
 
@@ -278,21 +207,12 @@ An instance of GameRunner provides for the automatic running of many games. This
 \subsection{Your Manager}
 An instance of your manager fills in the missing behavior of class Manager to determine how the game runs. See the next section for more on what you have to do in your extension of class Manager.
 
-<<<<<<< HEAD
 \section{6. Your tasks}
-=======
-\newpage
-\section{7. Your tasks}
->>>>>>> 90121c5f214fe9c999de8db7f156ee1e9164922e
 Your primary task is write a subclass of abstract class Manager.\ You must override the two abstract methods of class Manager: \textbf{run()} and \textbf{truckNotification(...)}, which determine the behavior of the trucks in the game. On their own, trucks don't do anything; it's up to you to write code to instruct them.\ The
 design of these two method is up to you. We give a few details below.\\
 
 \begin{figure}[h]
-<<<<<<< HEAD
 \centerline{\includegraphics[scale=0.35]{fry.jpg}} 
-=======
-\centerline{\includegraphics[scale=0.2]{fry.jpg}} 
->>>>>>> 90121c5f214fe9c999de8db7f156ee1e9164922e
 \caption{\em{The average intelligence of your shipping boys}}
 \end{figure}
 
@@ -300,12 +220,7 @@ Procedure run() is called as soon as the game begins. In run(), you can do initi
 
 Truck t calls truckNotification(Truck t, Notification message) when it does something of note, to ask for more instructions. For example, upon arrival at a new city, t may send a notification that there is a parcel at the city. Perhaps you want t to pick up that parcel before continuing on its route. For a full list of the reasons a truck would call this method, see Manager.Notification in the previous section and in the javadoc. This method is called by truck t in t's thread. 
 
-<<<<<<< HEAD
 \section{7. Concurrency}
-=======
-
-\section{8. Concurrency}
->>>>>>> 90121c5f214fe9c999de8db7f156ee1e9164922e
 Because every Truck the manager interacts with exists in its own thread, Shipping Game is inherently multithread. Your manager has to be able to handle several trucks calling truckNotification concurrently, without crashing or giving incorrect instructions. That said, depending on the complexity of your solution, you may not need to worry about concurrency at all. For example, consider the following pseudo-code approach to the shipping game problem.
 \begin{algorithm}
 \caption{Basic Preprocessing} \label{alg:ls}
@@ -333,7 +248,6 @@ Because every Truck the manager interacts with exists in its own thread, Shippin
 \end{algorithmic}
 \end{algorithm}
 \\
-<<<<<<< HEAD
 
 This algorithm makes use of every truck, but because no data structure is accessed by several trucks and all internal data structures are guaranteed to be thread-safe, there is no need for worry about concurrency. Assuming no errors, a correctly implemented version of this algorithm  would probably get at minimum a good grade, likely higher.\\
 
@@ -342,17 +256,6 @@ If, however, you're shooting for a perfect grade, you may have to do some amount
 \centerline{\includegraphics[scale=0.45]{collision.png}} 
 \caption{\em{Don't rely on Spongebob to keep your code thread safe.}}
 \end{figure}
-=======
-
-This algorithm makes use of every truck, but because no data structure is accessed by several trucks and all internal data structures are guaranteed to be thread-safe, there is no need for worry about concurrency. Assuming no errors, a correctly implemented version of this algorithm  would probably get at minimum a good grade, likely higher.\\
-
-If, however, you're shooting for a perfect grade, you may have to do some amount of work to ensure that your complex network of information sharing between trucks remains thread safe. Concurrent modifications of most data structures cause incorrect states, usually leading to null pointers or array-index-out-of-bound errors. Failure to write thread safe code might lead to unpredictable and catastrophic errors.\\
-\begin{figure}[h]
-\centerline{\includegraphics[scale=0.2]{collision.png}} 
-\caption{\em{Don't rely on Spongebob to keep your code thread safe.}}
-\end{figure}
-\\
->>>>>>> 90121c5f214fe9c999de8db7f156ee1e9164922e
 
 In this vein, you have a few different options to keep code thread-safe. The more powerful the tool, however, the greater the possibility of creating new and more difficult problems. Ideally, come up with a strategy, than pick the least-comprehensive tool that gives you just enough capability to prevent potential thread safety problems.
 \subsection{Approaches to Concurrency}
@@ -368,11 +271,7 @@ synchronized(obj){
 //...Do things that only one thread should be doing.
 }
 \end{lstlisting}
-<<<<<<< HEAD
 And, only one thread can access any synchronized block that is associated with that object at a time. This means that two synchronized blocks with the same object:\\
-=======
-And, only one thread can access any synchronized block that is associated with that block at a time. This means that two synchronized blocks with the same object:
->>>>>>> 90121c5f214fe9c999de8db7f156ee1e9164922e
 \begin{lstlisting}[frame=single]
 synchronized(obj){
 processA();
@@ -388,13 +287,8 @@ The simplest way to use synchronized blocks on Synchronized collections to allow
 Locks (and Semaphores and other equivalent classes) take the two pieces of a synchronized block ---preventing other threads from accessing code and letting other threads know that the going is clear--- and separate them into two individual lines of code. Only one thread can "own" a mutex (mutual exclusion object) at a time (semaphores are generalized to allow N threads), so when a thread acquires a Lock l, all other threads that attempt to call l.lock() are forced to wait until the thread that owns the lock calls l.unlock(), at which point an arbitrarily chosen thread that is waiting will call l.lock() and proceed. This gives you ultimate control over which threads execute what where and when, but it is  prone to issues such as deadlock in which two threads are each waiting to acquire a lock owned by the other. Locks and Semaphores are overkill for all but the most complex solutions and are most likely not necessary for this project. 
 \end{itemize}
 
-<<<<<<< HEAD
 \section{8. What to hand in when}
 This project is due on the last day of class, \textbf{Thursday, 4 December, at 11:59PM}.
-=======
-\section{9. What to hand in when}
-This project is due on the last day of class, Thursday, 4 December, at 11:59PM.
->>>>>>> 90121c5f214fe9c999de8db7f156ee1e9164922e
 Submit on the CMS a zip file that contains all the java file in package student ---these are the ones you wrote.
 This includes you class MyHeap.
 \\
