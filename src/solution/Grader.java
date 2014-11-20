@@ -34,7 +34,7 @@ public class Grader {
     private static final HashMap<String, Integer> JSON_BOARD_MAP = new HashMap<String, Integer>();
 
     /** Number of random seeds to run each student's code on, in addition to the above maps */
-    private static final int NUMBER_RANDOM_MAPS = 10;
+    private static final int NUMBER_RANDOM_MAPS = 1;
 
     /** Use to do printing */
     private static PrintStream stdout;
@@ -99,7 +99,7 @@ public class Grader {
                 "<=|===================================================================================================|=>";
 
 
-        Feedback feedback = runOn(Main.studentDirectory + "." + ""); //TODO!fill in with how to get the manager classname, and where it is located
+        Feedback feedback = runOn(Main.studentDirectory + "." + "MyManager"); //TODO!fill in with how to get the manager classname, and where it is located
         String finishedFeedback = header + "\n" + feedback.f;
 
         //Do grade printing to console where it will be picked up by graph
@@ -111,7 +111,7 @@ public class Grader {
         //Will write based on netID, thus old runs with the same student netIdS
         //Will be overwritten.
         try {
-            TextIO.write(GRADING_OUTPUT_DIRECTORY + "/" + args[2] + "_feedback.txt",finishedFeedback);
+            TextIO.write(GRADING_OUTPUT_DIRECTORY + "/" + args[2] + "/" + args[2] + "_feedback.txt",finishedFeedback);
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -126,7 +126,7 @@ public class Grader {
     /** Run managerClassname on the set maps and the number of given maps.
      * Return the feedback. */
     private static Feedback runOn(String managerClassname) {
-        GameRunner gr = new GameRunner(managerClassname, SHOW_GUI, true);
+        GameRunner gr = new GameRunner(managerClassname, SHOW_GUI, false);
         String[] boards = JSON_BOARD_MAP.keySet().toArray(new String[0]);
         GameScore[] fileScores = gr.runFiles(boards);
 

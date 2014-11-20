@@ -1,29 +1,29 @@
-\BOOKMARK [1][-]{section*.1}{1. Heaps}{}% 1
-\BOOKMARK [1][-]{section*.2}{2. Game Overview}{}% 2
-\BOOKMARK [1][-]{section*.3}{3. Installation and Running}{}% 3
+\BOOKMARK [1][-]{section*.1}{1. Introduction}{}% 1
+\BOOKMARK [1][-]{section*.2}{3. Game overview}{}% 2
+\BOOKMARK [1][-]{section*.3}{4. Installation and running}{}% 3
 \BOOKMARK [2][-]{section*.4}{Installation}{section*.3}% 4
 \BOOKMARK [2][-]{section*.5}{Running}{section*.3}% 5
 \BOOKMARK [2][-]{section*.6}{Arguments}{section*.3}% 6
-\BOOKMARK [1][-]{section*.7}{4. Using the GUI}{}% 7
-\BOOKMARK [2][-]{section*.8}{4a. Menu Bar}{section*.7}% 8
-\BOOKMARK [2][-]{section*.9}{4b. Info Panel}{section*.7}% 9
-\BOOKMARK [1][-]{section*.10}{5. Class Explanation}{}% 10
-\BOOKMARK [2][-]{section*.11}{Colorable}{section*.10}% 11
-\BOOKMARK [2][-]{section*.12}{UserData}{section*.10}% 12
-\BOOKMARK [2][-]{section*.13}{BoardElement}{section*.10}% 13
-\BOOKMARK [2][-]{section*.14}{Truck}{section*.10}% 14
-\BOOKMARK [2][-]{section*.15}{Node}{section*.10}% 15
-\BOOKMARK [2][-]{section*.16}{Edge}{section*.10}% 16
-\BOOKMARK [2][-]{section*.17}{Parcel}{section*.10}% 17
-\BOOKMARK [2][-]{section*.18}{Board}{section*.10}% 18
-\BOOKMARK [2][-]{section*.19}{Score}{section*.10}% 19
-\BOOKMARK [2][-]{section*.20}{Vector}{section*.10}% 20
-\BOOKMARK [2][-]{section*.21}{Main}{section*.10}% 21
-\BOOKMARK [2][-]{section*.22}{Manager}{section*.10}% 22
-\BOOKMARK [2][-]{section*.23}{Game}{section*.10}% 23
-\BOOKMARK [2][-]{section*.24}{Game Runner}{section*.10}% 24
+\BOOKMARK [1][-]{section*.7}{5. Using the GUI}{}% 7
+\BOOKMARK [2][-]{section*.8}{5a. Menu bar}{section*.7}% 8
+\BOOKMARK [2][-]{section*.9}{5b. Info panel}{section*.7}% 9
+\BOOKMARK [1][-]{section*.10}{6. Brief introduction to the classes}{}% 10
+\BOOKMARK [2][-]{section*.11}{Interface Colorable}{section*.10}% 11
+\BOOKMARK [2][-]{section*.12}{Interface UserData}{section*.10}% 12
+\BOOKMARK [2][-]{section*.13}{Interface BoardElement}{section*.10}% 13
+\BOOKMARK [2][-]{section*.14}{Class Truck}{section*.10}% 14
+\BOOKMARK [2][-]{section*.15}{Class Node}{section*.10}% 15
+\BOOKMARK [2][-]{section*.16}{Class Edge}{section*.10}% 16
+\BOOKMARK [2][-]{section*.17}{Class Parcel}{section*.10}% 17
+\BOOKMARK [2][-]{section*.18}{Class Board}{section*.10}% 18
+\BOOKMARK [2][-]{section*.19}{Class Score}{section*.10}% 19
+\BOOKMARK [2][-]{section*.20}{Class Vector}{section*.10}% 20
+\BOOKMARK [2][-]{section*.21}{Class Main}{section*.10}% 21
+\BOOKMARK [2][-]{section*.22}{Abstract class Manager}{section*.10}% 22
+\BOOKMARK [2][-]{section*.23}{Class Game}{section*.10}% 23
+\BOOKMARK [2][-]{section*.24}{Class GameRunner}{section*.10}% 24
 \BOOKMARK [2][-]{section*.25}{Your Manager}{section*.10}% 25
-\BOOKMARK [1][-]{section*.26}{6. Your Tasks}{}% 26
-\BOOKMARK [1][-]{section*.27}{7. Concurrency}{}% 27
+\BOOKMARK [1][-]{section*.26}{7. Your tasks}{}% 26
+\BOOKMARK [1][-]{section*.27}{8. Concurrency}{}% 27
 \BOOKMARK [2][-]{section*.28}{Approaches to Concurrency}{section*.27}% 28
-\BOOKMARK [1][-]{section*.29}{8. Project Schedule}{}% 29
+\BOOKMARK [1][-]{section*.29}{9. What to hand in when}{}% 29
