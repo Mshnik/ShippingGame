@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.1415926-2.5-1.40.14 (TeX Live 2013) (format=pdflatex 2013.5.30)  20 NOV 2014 11:20
+This is pdfTeX, Version 3.1415926-2.5-1.40.14 (TeX Live 2013) (format=pdflatex 2013.5.30)  20 NOV 2014 11:36
 entering extended mode
  restricted \write18 enabled.
  file:line:error style messages enabled.
@@ -976,182 +976,186 @@ ABD: EveryShipout initializing macros
 (/usr/local/texlive/2013/texmf-dist/tex/latex/listings/lstlang1.sty
 File: lstlang1.sty 2004/09/05 1.3 listings language file
 )
-<map1.png, id=123, 465.74pt x 375.4025pt>
+<map1.png, id=127, 465.74pt x 375.4025pt>
 File: map1.png Graphic file (type png)
  <use map1.png>
-Package pdftex.def Info: map1.png used on input line 62.
-(pdftex.def)             Requested size: 372.5925pt x 300.3224pt.
+Package pdftex.def Info: map1.png used on input line 60.
+(pdftex.def)             Requested size: 349.30414pt x 281.55118pt.
+ [1
 
-Underfull \hbox (badness 10000) in paragraph at lines 60--63
+{/usr/local/texlive/2013/texmf-var/fonts/map/pdftex/updmap/pdftex.map}] [2 <./m
+ap1.png>]
+LaTeX Font Info:    Try loading font information for OT1+lmr on input line 92.
 
- []
-
-[1
-
-{/usr/local/texlive/2013/texmf-var/fonts/map/pdftex/updmap/pdftex.map}]
-[2 <./map1.png>]
-LaTeX Font Info:    Try loading font information for OT1+lmr on input line 93.
- (/usr/local/texlive/2013/texmf-dist/tex/latex/lm/ot1lmr.fd
+(/usr/local/texlive/2013/texmf-dist/tex/latex/lm/ot1lmr.fd
 File: ot1lmr.fd 2009/10/30 v1.6 Font defs for Latin Modern
 )
-LaTeX Font Info:    Try loading font information for OML+lmm on input line 93.
+LaTeX Font Info:    Try loading font information for OML+lmm on input line 92.
 
 (/usr/local/texlive/2013/texmf-dist/tex/latex/lm/omllmm.fd
 File: omllmm.fd 2009/10/30 v1.6 Font defs for Latin Modern
 )
-LaTeX Font Info:    Try loading font information for OMS+lmsy on input line 93.
+LaTeX Font Info:    Try loading font information for OMS+lmsy on input line 92.
 
 
 (/usr/local/texlive/2013/texmf-dist/tex/latex/lm/omslmsy.fd
 File: omslmsy.fd 2009/10/30 v1.6 Font defs for Latin Modern
 )
-LaTeX Font Info:    Try loading font information for OMX+lmex on input line 93.
+LaTeX Font Info:    Try loading font information for OMX+lmex on input line 92.
 
 
 (/usr/local/texlive/2013/texmf-dist/tex/latex/lm/omxlmex.fd
 File: omxlmex.fd 2009/10/30 v1.6 Font defs for Latin Modern
 )
 LaTeX Font Info:    External font `lmex10' loaded for size
-(Font)              <10.95> on input line 93.
+(Font)              <10.95> on input line 92.
 LaTeX Font Info:    External font `lmex10' loaded for size
-(Font)              <8> on input line 93.
+(Font)              <8> on input line 92.
 LaTeX Font Info:    External font `lmex10' loaded for size
-(Font)              <6> on input line 93.
-LaTeX Font Info:    Try loading font information for U+msa on input line 93.
+(Font)              <6> on input line 92.
+LaTeX Font Info:    Try loading font information for U+msa on input line 92.
 
 (/usr/local/texlive/2013/texmf-dist/tex/latex/amsfonts/umsa.fd
 File: umsa.fd 2013/01/14 v3.01 AMS symbols A
 )
-LaTeX Font Info:    Try loading font information for U+msb on input line 93.
+LaTeX Font Info:    Try loading font information for U+msb on input line 92.
 
 (/usr/local/texlive/2013/texmf-dist/tex/latex/amsfonts/umsb.fd
 File: umsb.fd 2013/01/14 v3.01 AMS symbols B
 ) [3]
-<args.png, id=166, 699.61375pt x 178.6675pt>
+<args.png, id=172, 699.61375pt x 178.6675pt>
 File: args.png Graphic file (type png)
  <use args.png>
-Package pdftex.def Info: args.png used on input line 110.
+Package pdftex.def Info: args.png used on input line 109.
 (pdftex.def)             Requested size: 454.74355pt x 116.13249pt.
 
-<gui.png, id=167, 1241.63875pt x 747.79375pt>
+<gui.png, id=173, 1241.63875pt x 747.79375pt>
 File: gui.png Graphic file (type png)
  <use gui.png>
-Package pdftex.def Info: gui.png used on input line 116.
+Package pdftex.def Info: gui.png used on input line 115.
 (pdftex.def)             Requested size: 558.73228pt x 336.50407pt.
 
 
 LaTeX Warning: `h' float specifier changed to `ht'.
 
-LaTeX Font Info:    Try loading font information for OMS+lmr on input line 124.
+LaTeX Font Info:    Try loading font information for OMS+lmr on input line 123.
 
 (/usr/local/texlive/2013/texmf-dist/tex/latex/lm/omslmr.fd
 File: omslmr.fd 2009/10/30 v1.6 Font defs for Latin Modern
 )
 LaTeX Font Info:    Font shape `OMS/lmr/m/n' in size <10.95> not available
-(Font)              Font shape `OMS/lmsy/m/n' tried instead on input line 124.
+(Font)              Font shape `OMS/lmsy/m/n' tried instead on input line 123.
  [4 <./args.png>]
 [5 <./gui.png>] [6]
 Underfull \hbox (badness 10000) in paragraph at lines 172--174
 
  []
 
-<hirearchy.png, id=184, 778.91pt x 338.26375pt>
+<hirearchy.png, id=189, 778.91pt x 338.26375pt>
 File: hirearchy.png Graphic file (type png)
  <use hirearchy.png>
 Package pdftex.def Info: hirearchy.png used on input line 177.
 (pdftex.def)             Requested size: 545.23329pt x 236.78299pt.
- [7 <./hirearchy.png>] [8] [9]
-Underfull \hbox (badness 10000) in paragraph at lines 213--215
+ [7 <./hirearchy.png>] [8]
+Underfull \hbox (badness 10000) in paragraph at lines 212--214
 
  []
 
-<fry.jpg, id=199, 803.0pt x 602.25pt>
+[9] <fry.jpg, id=204, 803.0pt x 602.25pt>
 File: fry.jpg Graphic file (type jpg)
  <use fry.jpg>
-Package pdftex.def Info: fry.jpg used on input line 217.
-(pdftex.def)             Requested size: 160.59715pt x 120.44786pt.
+Package pdftex.def Info: fry.jpg used on input line 216.
+(pdftex.def)             Requested size: 281.05421pt x 210.79065pt.
 
-Underfull \hbox (badness 10000) in paragraph at lines 221--222
+Underfull \hbox (badness 10000) in paragraph at lines 220--221
 
  []
 
 Package hyperref Info: bookmark level for unknown algorithm defaults to 0 on in
-put line 229.
+put line 227.
 
-Underfull \hbox (badness 10000) in paragraph at lines 227--254
-
- []
-
-
-Underfull \hbox (badness 10000) in paragraph at lines 255--256
+Underfull \hbox (badness 10000) in paragraph at lines 225--252
 
  []
 
-[10 <./fry.jpg>] <collision.png, id=205, 644.4075pt x 470.75874pt>
+
+Underfull \hbox (badness 10000) in paragraph at lines 253--254
+
+ []
+
+[10 <./fry.jpg>] <collision.png, id=210, 644.4075pt x 470.75874pt>
 File: collision.png Graphic file (type png)
 
 <use collision.png>
-Package pdftex.def Info: collision.png used on input line 259.
-(pdftex.def)             Requested size: 128.87921pt x 94.15007pt.
+Package pdftex.def Info: collision.png used on input line 257.
+(pdftex.def)             Requested size: 289.9807pt x 211.83948pt.
 
-Underfull \hbox (badness 10000) in paragraph at lines 257--263
+
+LaTeX Warning: `h' float specifier changed to `ht'.
+
+[11]
+Underfull \hbox (badness 10000) in paragraph at lines 275--276
 
  []
 
-[11 <./collision.png>]
-Overfull \hbox (5.69582pt too wide) in paragraph at lines 287--288
+[12 <./collision.png>]
+Overfull \hbox (5.69582pt too wide) in paragraph at lines 284--285
 \T1/lmr/m/n/10.95 could not ex-e-cute pro-cessA() and pro-cessB() con-cur-rentl
 y, be-cause a thread's
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 287--288
+Underfull \hbox (badness 10000) in paragraph at lines 284--285
 
  []
 
-[12]
-Underfull \hbox (badness 10000) in paragraph at lines 295--299
-
- []
-
-Package atveryend Info: Empty hook `BeforeClearDocument' on input line 302.
+Package atveryend Info: Empty hook `BeforeClearDocument' on input line 297.
 [13]
-Package atveryend Info: Empty hook `AfterLastShipout' on input line 302.
+Package atveryend Info: Empty hook `AfterLastShipout' on input line 297.
  (./spec.aux)
-Package atveryend Info: Executing hook `AtVeryEndDocument' on input line 302.
-Package atveryend Info: Executing hook `AtEndAfterFileList' on input line 302.
-Package rerunfilecheck Info: File `spec.out' has not changed.
-(rerunfilecheck)             Checksum: 51D972E76C32458891A9DC8741B14C78;1755.
+Package atveryend Info: Executing hook `AtVeryEndDocument' on input line 297.
+Package atveryend Info: Executing hook `AtEndAfterFileList' on input line 297.
 
+
+Package rerunfilecheck Warning: File `spec.out' has changed.
+(rerunfilecheck)                Rerun to get outlines right
+(rerunfilecheck)                or use package `bookmark'.
+
+Package rerunfilecheck Info: Checksums for `spec.out':
+(rerunfilecheck)             Before: A22341907F9CD50B1555C8FE284A0B9B;1809
+(rerunfilecheck)             After:  95296DC8CA85D751D420F0C130B890E9;1755.
 
 LaTeX Warning: There were multiply-defined labels.
 
-Package atveryend Info: Empty hook `AtVeryVeryEnd' on input line 302.
+Package atveryend Info: Empty hook `AtVeryVeryEnd' on input line 297.
  ) 
 Here is how much of TeX's memory you used:
- 17445 strings out of 493315
- 294543 string characters out of 6137904
- 387439 words of memory out of 5000000
- 20456 multiletter control sequences out of 15000+600000
+ 17448 strings out of 493315
+ 294575 string characters out of 6137904
+ 383439 words of memory out of 5000000
+ 20457 multiletter control sequences out of 15000+600000
  51232 words of font info for 43 fonts, out of 8000000 for 9000
  957 hyphenation exceptions out of 8191
- 56i,8n,55p,959b,1201s stack positions out of 5000i,500n,10000p,200000b,80000s
-{/usr/local/texlive/2013/texmf-dist/fonts/enc/dvips/lm/lm-ec.enc}{/usr/local/
-texlive/2013/texmf-dist/fonts/enc/dvips/lm/lm-mathsy.enc}{/usr/local/texlive/20
-13/texmf-dist/fonts/enc/dvips/lm/lm-mathit.enc}{/usr/local/texlive/2013/texmf-d
-ist/fonts/enc/dvips/lm/lm-rm.enc}</usr/local/texlive/2013/texmf-dist/fonts/type
-1/public/lm/lmbx10.pfb></usr/local/texlive/2013/texmf-dist/fonts/type1/public/l
-m/lmbx12.pfb></usr/local/texlive/2013/texmf-dist/fonts/type1/public/lm/lmmi10.p
-fb></usr/local/texlive/2013/texmf-dist/fonts/type1/public/lm/lmr10.pfb></usr/lo
-cal/texlive/2013/texmf-dist/fonts/type1/public/lm/lmr12.pfb></usr/local/texlive
-/2013/texmf-dist/fonts/type1/public/lm/lmr17.pfb></usr/local/texlive/2013/texmf
--dist/fonts/type1/public/lm/lmr9.pfb></usr/local/texlive/2013/texmf-dist/fonts/
-type1/public/lm/lmri10.pfb></usr/local/texlive/2013/texmf-dist/fonts/type1/publ
-ic/lm/lmsy10.pfb>
-Output written on spec.pdf (13 pages, 1347569 bytes).
+ 56i,8n,55p,959b,1883s stack positions out of 5000i,500n,10000p,200000b,80000s
+pdfTeX warning (dest): name{section*.30} has been referenced but does not exi
+st, replaced by a fixed one
+
+{/usr/local/texlive/2013/texmf-dist/fonts/enc/dvips/lm/lm-ec.enc}{/usr/local/te
+xlive/2013/texmf-dist/fonts/enc/dvips/lm/lm-mathsy.enc}{/usr/local/texlive/2013
+/texmf-dist/fonts/enc/dvips/lm/lm-mathit.enc}{/usr/local/texlive/2013/texmf-dis
+t/fonts/enc/dvips/lm/lm-rm.enc}</usr/local/texlive/2013/texmf-dist/fonts/type1/
+public/lm/lmbx10.pfb></usr/local/texlive/2013/texmf-dist/fonts/type1/public/lm/
+lmbx12.pfb></usr/local/texlive/2013/texmf-dist/fonts/type1/public/lm/lmmi10.pfb
+></usr/local/texlive/2013/texmf-dist/fonts/type1/public/lm/lmr10.pfb></usr/loca
+l/texlive/2013/texmf-dist/fonts/type1/public/lm/lmr12.pfb></usr/local/texlive/2
+013/texmf-dist/fonts/type1/public/lm/lmr17.pfb></usr/local/texlive/2013/texmf-d
+ist/fonts/type1/public/lm/lmr9.pfb></usr/local/texlive/2013/texmf-dist/fonts/ty
+pe1/public/lm/lmri10.pfb></usr/local/texlive/2013/texmf-dist/fonts/type1/public
+/lm/lmsy10.pfb>
+Output written on spec.pdf (13 pages, 1350084 bytes).
 PDF statistics:
- 309 PDF objects out of 1000 (max. 8388607)
- 275 compressed objects within 3 object streams
- 95 named destinations out of 1000 (max. 500000)
- 275 words of extra memory for PDF output out of 10000 (max. 10000000)
+ 315 PDF objects out of 1000 (max. 8388607)
+ 281 compressed objects within 3 object streams
+ 97 named destinations out of 1000 (max. 500000)
+ 283 words of extra memory for PDF output out of 10000 (max. 10000000)
 

@@ -1,13 +1,13 @@
 \BOOKMARK [1][-]{section*.1}{1. Introduction}{}% 1
-\BOOKMARK [1][-]{section*.2}{3. Game overview}{}% 2
-\BOOKMARK [1][-]{section*.3}{4. Installation and running}{}% 3
+\BOOKMARK [1][-]{section*.2}{2. Game overview}{}% 2
+\BOOKMARK [1][-]{section*.3}{3. Installation and running}{}% 3
 \BOOKMARK [2][-]{section*.4}{Installation}{section*.3}% 4
 \BOOKMARK [2][-]{section*.5}{Running}{section*.3}% 5
 \BOOKMARK [2][-]{section*.6}{Arguments}{section*.3}% 6
-\BOOKMARK [1][-]{section*.7}{5. Using the GUI}{}% 7
-\BOOKMARK [2][-]{section*.8}{5a. Menu bar}{section*.7}% 8
-\BOOKMARK [2][-]{section*.9}{5b. Info panel}{section*.7}% 9
-\BOOKMARK [1][-]{section*.10}{6. Brief introduction to the classes}{}% 10
+\BOOKMARK [1][-]{section*.7}{4. Using the GUI}{}% 7
+\BOOKMARK [2][-]{section*.8}{4a. Menu bar}{section*.7}% 8
+\BOOKMARK [2][-]{section*.9}{4b. Info panel}{section*.7}% 9
+\BOOKMARK [1][-]{section*.10}{5. Brief introduction to the classes}{}% 10
 \BOOKMARK [2][-]{section*.11}{Interface Colorable}{section*.10}% 11
 \BOOKMARK [2][-]{section*.12}{Interface UserData}{section*.10}% 12
 \BOOKMARK [2][-]{section*.13}{Interface BoardElement}{section*.10}% 13
@@ -23,7 +23,7 @@
 \BOOKMARK [2][-]{section*.23}{Class Game}{section*.10}% 23
 \BOOKMARK [2][-]{section*.24}{Class GameRunner}{section*.10}% 24
 \BOOKMARK [2][-]{section*.25}{Your Manager}{section*.10}% 25
-\BOOKMARK [1][-]{section*.26}{7. Your tasks}{}% 26
-\BOOKMARK [1][-]{section*.27}{8. Concurrency}{}% 27
+\BOOKMARK [1][-]{section*.26}{6. Your tasks}{}% 26
+\BOOKMARK [1][-]{section*.27}{7. Concurrency}{}% 27
 \BOOKMARK [2][-]{section*.28}{Approaches to Concurrency}{section*.27}% 28
-\BOOKMARK [1][-]{section*.29}{9. What to hand in when}{}% 29
+\BOOKMARK [1][-]{section*.29}{8. What to hand in when}{}% 29
