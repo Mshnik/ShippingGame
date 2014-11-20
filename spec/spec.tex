@@ -68,14 +68,28 @@ Trucks begin the game on the Truck Depot city (there will be exactly one Truck D
 \subsection{Installation}
 The code for this project is provided as a .jar file, without source files. Various data files are provided as text files in folders.
 \begin{enumerate}
-\item Create a new Java project in Eclipse, named A6.
-\item Download ShippingGame.jar and all of the data folders and drag them into your A6 folder. Don't change the names of any of the folders or the code won't be able to find the data.
-\item Right click A6 --> Build Path --> Add External Archives --> Select ShippingGame.jar and click Open.
-\item Right click A6 -> Build Path --> Configure Build Path... --> Expand ShippingGame.jar by clicking on the triangle to the left of it --> Select Javadoc Location --> Click Edit... --> Select "Javadoc URL" --> Click Browse... --> Select the "doc" folder (don't expand it) and click Open, Click Ok, Click Ok.
-\item Create a package called \textbf{student} in folder src (right click src --> new... -> package) . All code you write goes in package student \textbf{student}.
-\item Place into package student your class MyHeap from assignment A6a. You will have to put a package statement at the top of it.
-If you are not sure your MyHeap is correct, you can use one that we wrote, which will be made available 2 days after A6a is due.
-\item Create a class \textbf{MyManager} in package student extends \textbf{game.Manager}. This is your manager class, and it is your main submission. You must use the name \textbf{MyManager}.
+\item Download the A6 files from the CMS.
+\item Create a new Java project in Eclipse, named A6. 
+\item Drag ShippingGame.jar and compressed folder data into your A6 folder, expand (unzip) the data folder. Don't change
+the names of any of the folders within data or the code won?' be able to
+find the data.
+\item Select ShippingGame.jar and right click on it. In the contextual menu that
+pops up, select Build Path -> Add to Build Path. This makes available all
+the .class files in the jar file.
+\item Select ShippingGame.jar (now in Referenced Libraries) and right click it. In the contextual menu, select Build Path --> configure build path... In the menu that pops up, select Javadoc location and click the edit button on right... Select "Javadoc URL", then click Browse... --> Navigate to the "doc" folder (don't go into it) and click Open. Click ok on all the menus.
+\item Create a package called student in folder src (right click src -> new... ->
+package) . All code you write goes in package student student. Drag into
+package student your file MyHeap.java. You may have to put a statement
+"package student;" as the first line of the file. And you may have to put in
+a statement "import game.MinHeap;". After doing this, there should be no
+syntax errors.
+\item Create a class MyManager in package student extends game.Manager.
+This is your manager class, and it is your main submission. You must use
+the name MyManager.
+Note: In the window that pops open, in which you type the name of the
+class and other things, in the Superclass field, type "game.Manager" and
+make sure the boxes "Constructor from superclass" and "Inherited abstract
+methods" are checked. This makes everything easier for you.
 \end{enumerate}
 
 \subsection{Running}
