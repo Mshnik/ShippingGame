@@ -7,9 +7,6 @@ import java.util.concurrent.Semaphore;
 
 /** Game starting methods. Also serves as a util holder */
 public class Main {
-	
-	/** False if this code is for personal use and testing, true if for academic use in CS2110 */
-	private static final boolean IS_CLASS_RELEASE = false;
 
 	/** Student directory */
 	public static final String studentDirectory = "student";
@@ -18,6 +15,7 @@ public class Main {
 	 * an instance of that manager class, create the game and the threads, and start the game.
 	 * @param args - a 1x... array containing the name of the class of the user wants as the Manager
 	 * 				first argument is manager name, other args are flags.
+	 *              If null or empty, uses {"MyManager"} as a 1x1 array of args.
 	 * @throws IllegalArgumentException if args is null or has length 0.
 	 */
 	public static void main(String[] args) throws IllegalArgumentException {
@@ -26,13 +24,11 @@ public class Main {
 		fibCalc.add(1);
 		
 		if (args == null || args.length < 1)
-			throw new IllegalArgumentException("Illegal String Array Passed into Args:\n" +
-					"expecting length at least 1 array with name of manager class as first element.\n" +
-					"recieved " + args + " of length " + (args == null ? "null" : args.length));
+			args = new String[]{"MyManager"};
 
 		String userManagerClass = studentDirectory + "." +args[0];
 		
-		if (args[0].startsWith("<s>") && ! IS_CLASS_RELEASE) {
+		if (args[0].startsWith("<s>")) {
 			userManagerClass = "solution."+args[0].substring(args[0].indexOf('>') + 1);
 		}
 		
@@ -171,12 +167,13 @@ public class Main {
 		return "\"" + s + "\"";
 	}
 
-	/** Return a random element of elms (null if elms is empty). */
+	/** Return a random element of elms (null if elms is empty).
+	 * Synchronizes on {@code elms} to prevent concurrent modification. */
 	public static <T> T randomElement(Collection<T> elms) {
-		if (elms.isEmpty())
-			return null;
 		T val = null;
 		synchronized(elms) {
+			if (elms.isEmpty())
+				return null;
 			Iterator<T> it = elms.iterator();
 			for (int i = 0; i < (int)(Math.random() * elms.size()) + 1; i++) {
 				val = it.next();
