@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.1415926-2.5-1.40.14 (TeX Live 2013) (format=pdflatex 2013.5.30)  20 NOV 2014 11:36
+This is pdfTeX, Version 3.1415926-2.5-1.40.14 (TeX Live 2013) (format=pdflatex 2013.5.30)  20 NOV 2014 11:50
 entering extended mode
  restricted \write18 enabled.
  file:line:error style messages enabled.
@@ -976,7 +976,7 @@ ABD: EveryShipout initializing macros
 (/usr/local/texlive/2013/texmf-dist/tex/latex/listings/lstlang1.sty
 File: lstlang1.sty 2004/09/05 1.3 listings language file
 )
-<map1.png, id=127, 465.74pt x 375.4025pt>
+<map1.png, id=123, 465.74pt x 375.4025pt>
 File: map1.png Graphic file (type png)
  <use map1.png>
 Package pdftex.def Info: map1.png used on input line 60.
@@ -1023,13 +1023,13 @@ LaTeX Font Info:    Try loading font information for U+msb on input line 92.
 (/usr/local/texlive/2013/texmf-dist/tex/latex/amsfonts/umsb.fd
 File: umsb.fd 2013/01/14 v3.01 AMS symbols B
 ) [3]
-<args.png, id=172, 699.61375pt x 178.6675pt>
+<args.png, id=168, 699.61375pt x 178.6675pt>
 File: args.png Graphic file (type png)
  <use args.png>
 Package pdftex.def Info: args.png used on input line 109.
 (pdftex.def)             Requested size: 454.74355pt x 116.13249pt.
 
-<gui.png, id=173, 1241.63875pt x 747.79375pt>
+<gui.png, id=169, 1241.63875pt x 747.79375pt>
 File: gui.png Graphic file (type png)
  <use gui.png>
 Package pdftex.def Info: gui.png used on input line 115.
@@ -1046,116 +1046,106 @@ File: omslmr.fd 2009/10/30 v1.6 Font defs for Latin Modern
 LaTeX Font Info:    Font shape `OMS/lmr/m/n' in size <10.95> not available
 (Font)              Font shape `OMS/lmsy/m/n' tried instead on input line 123.
  [4 <./args.png>]
-[5 <./gui.png>] [6]
-Underfull \hbox (badness 10000) in paragraph at lines 172--174
+[5 <./gui.png>]
+Underfull \hbox (badness 10000) in paragraph at lines 165--167
 
  []
 
-<hirearchy.png, id=189, 778.91pt x 338.26375pt>
+[6]
+Underfull \hbox (badness 10000) in paragraph at lines 171--172
+
+ []
+
+<hirearchy.png, id=185, 778.91pt x 338.26375pt>
 File: hirearchy.png Graphic file (type png)
  <use hirearchy.png>
-Package pdftex.def Info: hirearchy.png used on input line 177.
+Package pdftex.def Info: hirearchy.png used on input line 175.
 (pdftex.def)             Requested size: 545.23329pt x 236.78299pt.
  [7 <./hirearchy.png>] [8]
-Underfull \hbox (badness 10000) in paragraph at lines 212--214
+Underfull \hbox (badness 10000) in paragraph at lines 210--212
 
  []
 
-[9] <fry.jpg, id=204, 803.0pt x 602.25pt>
+[9] <fry.jpg, id=200, 803.0pt x 602.25pt>
 File: fry.jpg Graphic file (type jpg)
  <use fry.jpg>
-Package pdftex.def Info: fry.jpg used on input line 216.
+Package pdftex.def Info: fry.jpg used on input line 214.
 (pdftex.def)             Requested size: 281.05421pt x 210.79065pt.
 
-Underfull \hbox (badness 10000) in paragraph at lines 220--221
+Underfull \hbox (badness 10000) in paragraph at lines 218--219
 
  []
 
 Package hyperref Info: bookmark level for unknown algorithm defaults to 0 on in
-put line 227.
-
-Underfull \hbox (badness 10000) in paragraph at lines 225--252
-
- []
-
-
-Underfull \hbox (badness 10000) in paragraph at lines 253--254
+put line 225.
+[10 <./fry.jpg>]
+Underfull \hbox (badness 10000) in paragraph at lines 250--251
 
  []
 
-[10 <./fry.jpg>] <collision.png, id=210, 644.4075pt x 470.75874pt>
+<collision.png, id=206, 644.4075pt x 470.75874pt>
 File: collision.png Graphic file (type png)
-
-<use collision.png>
-Package pdftex.def Info: collision.png used on input line 257.
+ <use collision.png>
+Package pdftex.def Info: collision.png used on input line 254.
 (pdftex.def)             Requested size: 289.9807pt x 211.83948pt.
 
 
 LaTeX Warning: `h' float specifier changed to `ht'.
 
-[11]
-Underfull \hbox (badness 10000) in paragraph at lines 275--276
+[11] [12 <./collision.png>]
+Underfull \hbox (badness 10000) in paragraph at lines 272--273
 
  []
 
-[12 <./collision.png>]
-Overfull \hbox (5.69582pt too wide) in paragraph at lines 284--285
+
+Overfull \hbox (5.69582pt too wide) in paragraph at lines 281--282
 \T1/lmr/m/n/10.95 could not ex-e-cute pro-cessA() and pro-cessB() con-cur-rentl
 y, be-cause a thread's
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 284--285
+Underfull \hbox (badness 10000) in paragraph at lines 281--282
 
  []
 
-Package atveryend Info: Empty hook `BeforeClearDocument' on input line 297.
+Package atveryend Info: Empty hook `BeforeClearDocument' on input line 294.
 [13]
-Package atveryend Info: Empty hook `AfterLastShipout' on input line 297.
+Package atveryend Info: Empty hook `AfterLastShipout' on input line 294.
  (./spec.aux)
-Package atveryend Info: Executing hook `AtVeryEndDocument' on input line 297.
-Package atveryend Info: Executing hook `AtEndAfterFileList' on input line 297.
+Package atveryend Info: Executing hook `AtVeryEndDocument' on input line 294.
+Package atveryend Info: Executing hook `AtEndAfterFileList' on input line 294.
+Package rerunfilecheck Info: File `spec.out' has not changed.
+(rerunfilecheck)             Checksum: 95296DC8CA85D751D420F0C130B890E9;1755.
 
-
-Package rerunfilecheck Warning: File `spec.out' has changed.
-(rerunfilecheck)                Rerun to get outlines right
-(rerunfilecheck)                or use package `bookmark'.
-
-Package rerunfilecheck Info: Checksums for `spec.out':
-(rerunfilecheck)             Before: A22341907F9CD50B1555C8FE284A0B9B;1809
-(rerunfilecheck)             After:  95296DC8CA85D751D420F0C130B890E9;1755.
 
 LaTeX Warning: There were multiply-defined labels.
 
-Package atveryend Info: Empty hook `AtVeryVeryEnd' on input line 297.
+Package atveryend Info: Empty hook `AtVeryVeryEnd' on input line 294.
  ) 
 Here is how much of TeX's memory you used:
- 17448 strings out of 493315
- 294575 string characters out of 6137904
- 383439 words of memory out of 5000000
- 20457 multiletter control sequences out of 15000+600000
+ 17446 strings out of 493315
+ 294551 string characters out of 6137904
+ 386439 words of memory out of 5000000
+ 20456 multiletter control sequences out of 15000+600000
  51232 words of font info for 43 fonts, out of 8000000 for 9000
  957 hyphenation exceptions out of 8191
- 56i,8n,55p,959b,1883s stack positions out of 5000i,500n,10000p,200000b,80000s
-pdfTeX warning (dest): name{section*.30} has been referenced but does not exi
-st, replaced by a fixed one
-
-{/usr/local/texlive/2013/texmf-dist/fonts/enc/dvips/lm/lm-ec.enc}{/usr/local/te
-xlive/2013/texmf-dist/fonts/enc/dvips/lm/lm-mathsy.enc}{/usr/local/texlive/2013
-/texmf-dist/fonts/enc/dvips/lm/lm-mathit.enc}{/usr/local/texlive/2013/texmf-dis
-t/fonts/enc/dvips/lm/lm-rm.enc}</usr/local/texlive/2013/texmf-dist/fonts/type1/
-public/lm/lmbx10.pfb></usr/local/texlive/2013/texmf-dist/fonts/type1/public/lm/
-lmbx12.pfb></usr/local/texlive/2013/texmf-dist/fonts/type1/public/lm/lmmi10.pfb
-></usr/local/texlive/2013/texmf-dist/fonts/type1/public/lm/lmr10.pfb></usr/loca
-l/texlive/2013/texmf-dist/fonts/type1/public/lm/lmr12.pfb></usr/local/texlive/2
-013/texmf-dist/fonts/type1/public/lm/lmr17.pfb></usr/local/texlive/2013/texmf-d
-ist/fonts/type1/public/lm/lmr9.pfb></usr/local/texlive/2013/texmf-dist/fonts/ty
-pe1/public/lm/lmri10.pfb></usr/local/texlive/2013/texmf-dist/fonts/type1/public
-/lm/lmsy10.pfb>
-Output written on spec.pdf (13 pages, 1350084 bytes).
+ 56i,8n,55p,959b,1909s stack positions out of 5000i,500n,10000p,200000b,80000s
+{/usr/local/texlive/2013/texmf-dist/fonts/enc/dvips/lm/lm-ec.enc}{/usr/local/
+texlive/2013/texmf-dist/fonts/enc/dvips/lm/lm-mathsy.enc}{/usr/local/texlive/20
+13/texmf-dist/fonts/enc/dvips/lm/lm-mathit.enc}{/usr/local/texlive/2013/texmf-d
+ist/fonts/enc/dvips/lm/lm-rm.enc}</usr/local/texlive/2013/texmf-dist/fonts/type
+1/public/lm/lmbx10.pfb></usr/local/texlive/2013/texmf-dist/fonts/type1/public/l
+m/lmbx12.pfb></usr/local/texlive/2013/texmf-dist/fonts/type1/public/lm/lmmi10.p
+fb></usr/local/texlive/2013/texmf-dist/fonts/type1/public/lm/lmr10.pfb></usr/lo
+cal/texlive/2013/texmf-dist/fonts/type1/public/lm/lmr12.pfb></usr/local/texlive
+/2013/texmf-dist/fonts/type1/public/lm/lmr17.pfb></usr/local/texlive/2013/texmf
+-dist/fonts/type1/public/lm/lmr9.pfb></usr/local/texlive/2013/texmf-dist/fonts/
+type1/public/lm/lmri10.pfb></usr/local/texlive/2013/texmf-dist/fonts/type1/publ
+ic/lm/lmsy10.pfb>
+Output written on spec.pdf (13 pages, 1350073 bytes).
 PDF statistics:
- 315 PDF objects out of 1000 (max. 8388607)
- 281 compressed objects within 3 object streams
- 97 named destinations out of 1000 (max. 500000)
- 283 words of extra memory for PDF output out of 10000 (max. 10000000)
+ 310 PDF objects out of 1000 (max. 8388607)
+ 276 compressed objects within 3 object streams
+ 96 named destinations out of 1000 (max. 500000)
+ 275 words of extra memory for PDF output out of 10000 (max. 10000000)
 

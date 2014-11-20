@@ -87,9 +87,9 @@ If you are not sure your MyHeap is correct, you can use one that we wrote, which
 \end{enumerate}
 
 \subsection{Arguments}
-You can provide arguments to the runner to have it do different things. All argument combinations have to start with the name of your manager. With just the manager classname provided, the game will launch in GUI mode. There are no other applicable arguments for this mode. Any other combination of arguments will launch the game in GameRunner mode instead, where the game will automatically run your manager on a sequence of maps. 
+You can provide arguments to the runner to have it do different things. All argument combinations have to start with the name of your manager (MyManager). With no arguments or just the manager classname provided, the game will launch in GUI mode. There are no other applicable arguments for this mode. Any other combination of arguments will launch the game in GameRunner mode instead, where the game will automatically run your manager on a sequence of maps. 
 
-To run GameRunner on a series of seeds <seed1> <seed2> <seed3> such as $15, 12345, 907230587$, use each seed as an argument, separated by a space. (replace MyManager with the name of your Manager):
+To run GameRunner on a series of seeds <seed1> <seed2> <seed3> such as $15, 12345, 907230587$, use each seed as an argument, separated by a space:
 \begin{center}
 MyManager 15 12345 907230587
 \end{center}
@@ -116,7 +116,7 @@ MyManager -h -r 10
 \caption{\em{The Shipping Game GUI. Now with 50\% less (visual) sugar!}}
 \end{figure}
 
-Assuming the installation process went correctly and you have created a class that extends manager, you should be able to run the main class and see the gui. {\em(Note: the generated map may be different than pictured above)}. It is fully resizable. All cities (nodes) can be dragged to allow you to make the graph look cleaner, but  this purely visual change has no impact on the board state. Here are some other features.. 
+Assuming the installation process went correctly and you have created a class that extends manager, you should be able to run the main class and see the gui. {\em(Note: the generated map may be different than pictured below)}. It is fully resizable. All cities (nodes) can be dragged to allow you to make the graph look cleaner, but  this purely visual change has no impact on the board state. Here are some other features.. 
 
 \subsection{4a. Menu bar}
 \begin{itemize}
@@ -125,7 +125,6 @@ Assuming the installation process went correctly and you have created a class th
 \item Game -> Start: Begin the game.\ Clicking this again after the game has begun does nothing, but clicking it after the game has ended will restart it.
 \item Game -> Reset : Reset the displayed game to its initial state..
 \item Game -> New Random Map...: Generate a new random map with the seed (long int) given in the popup window. Exit this option by clicking cancel on the popup window.
->>>>>>> master
 \item Game -> Print Game JSON: Print a JSON string represention of this game to the eclipse console. Useful to save an interesting board by resetting it, printing the game JSON, and creating a new text file in the data/maps directory with the game JSON as its contents.
 \item GUI -> Repaint: Repaint the gui. Try clicking this if the gui looks strange before trying other solutions.
 \item GUI -> Edge Coloring: Control how edges are colored on the gui.
@@ -164,13 +163,12 @@ The next two blocks of non-static data are changed as the game proceeds.
 \end{itemize}
 
 You control how often non-static data is refreshed using bottom slider Update Time. Dragging the slider to the left updates the data more often at the cost of using a tiny bit more processing 
-power. For debugging purposes, it is useful to have the data update as quickly as possible, whereas once your code works correctly, you can have the data rarely updated to get the best possible score.
+power. For debugging purposes, it is useful to have the data update as quickly as possible, whereas once your code works correctly, you can have the data rarely updated to get the best possible score.\\
 
 Finally, slider Frame controls how quickly the game progresses.\ A higher value (drag right) causes the trucks to travel more slowly and favors more computationally complex solutions, and a lower value causes the trucks to travel more quickly and favors more computationally simple solutions. It can be useful in debugging to drag the slider far to the right to watch the trucks move in slow motion. However, note that altering the slider causes the score to change and change the color of the Frame label to red. \textbf{Grading will be done at a Frame rate of 40ms, so when checking your scores make sure that you have not moved this slider} (The label will stay black when the frame rate is unaltered).
 
 \section{5. Brief introduction to the classes}
-Assuming your installation worked correctly, you should be able to see the javadoc specifications of all public classes and methods in package game.
-If not, consult section 2 of this guide or ask on Piazza/at office hours.\\
+Assuming your installation worked correctly, you should be able to see the javadoc specifications of all public classes and methods in package game. You can do this by right-clicking index.html (in data/doc/) and selecting open with... -> Web Browser. If this doesn't work, consult section 2 of this guide or ask on Piazza/at office hours.\\
 
 The following diagram shows the class structure.\ Each interface and class in the figure is explained briefly below.\ For a more thorough explanation, see the javadoc specs.
 \begin{figure}[h]
@@ -248,7 +246,6 @@ Because every Truck the manager interacts with exists in its own thread, Shippin
 \ENDIF
 \end{algorithmic}
 \end{algorithm}
-\\
 
 This algorithm makes use of every truck, but because no data structure is accessed by several trucks and all internal data structures are guaranteed to be thread-safe, there is no need for worry about concurrency. Assuming no errors, a correctly implemented version of this algorithm  would probably get at minimum a good grade, likely higher.\\
 
