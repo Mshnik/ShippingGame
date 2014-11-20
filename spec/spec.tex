@@ -106,7 +106,7 @@ or
 MyManager -h -r 10
 \end{center}
 \begin{figure}[h]
-\centerline{\includegraphics[scale=0.65]{args.png}} 
+\centerline{\includegraphics[scale=0.55]{args.png}} 
 \caption{\em{Running MyManager in headless mode on 9001 random seeds.}}
 \end{figure}
 
@@ -211,7 +211,7 @@ Your primary task is write a subclass of abstract class Manager.\ You must overr
 design of these two method is up to you. We give a few details below.\\
 
 \begin{figure}[h]
-\centerline{\includegraphics[scale=0.35]{fry.jpg}} 
+\centerline{\includegraphics[scale=0.32]{fry.jpg}} 
 \caption{\em{The average intelligence of your shipping boys}}
 \end{figure}
 
@@ -251,7 +251,7 @@ This algorithm makes use of every truck, but because no data structure is access
 
 If, however, you're shooting for a perfect grade, you may have to do some amount of work to ensure that your complex network of information sharing between trucks remains thread safe. Concurrent modifications of most data structures cause incorrect states, usually leading to null pointers or array-index-out-of-bound errors. Failure to write thread safe code might lead to unpredictable and catastrophic errors.\\
 \begin{figure}[h]
-\centerline{\includegraphics[scale=0.45]{collision.png}} 
+\centerline{\includegraphics[scale=0.4]{collision.png}} 
 \caption{\em{Don't rely on Spongebob to keep your code thread safe.}}
 \end{figure}
 
@@ -278,7 +278,7 @@ synchronized(obj){ //Note - synchronized on same obj
 processB();
 }
 \end{lstlisting}
-could not execute processA() and processB()  concurrently, because a thread's presence in one of the two blocks prevents other threads from being in either of the two blocks.\\
+could not execute processA() and processB()  concurrently, because a thread's presence in one of the two blocks prevents other threads from being in either of the two blocks.
 
 The simplest way to use synchronized blocks on Synchronized collections to allow iteration \href{http://docs.oracle.com/javase/7/docs/api/java/util/Collections.html\#synchronizedCollection(java.util.Collection)}{({\color{blue}\underline{See API}})}. That way only one complex (iterative) process can occur on the collection at a time, and nothing can go wrong. \textbf{This combination is probably the best solution for this project, and should be considered first}.
 \item \textbf{Locks and Locking} - Power: High. Possibility for Error: High\\
@@ -287,8 +287,6 @@ Locks (and Semaphores and other equivalent classes) take the two pieces of a syn
 
 \section{8. What to hand in when}
 This project is due on the last day of class, \textbf{Thursday, 4 December, at 11:59PM}.
-Submit on the CMS a zip file that contains all the java file in package student ---these are the ones you wrote.
-This includes you class MyHeap.
-
+Submit a single .zip file that contains the contents of package student only. All classes your code needs to run must be in package student.  For example, if your submission requires three files, package student contains should contain these three files and the zip file you submit should contain only those three files.  There should be NO DIRECTORIES in your submission.  Failure to adhere to this structure will lead to grading of your Submission being delayed and/or a penalty for failing to submit properly.
 
 \end{document}
