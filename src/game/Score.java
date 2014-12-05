@@ -9,7 +9,7 @@ import java.awt.Color;
  * for trucks and validates colors for parcels and trucks.
  * @author MPatashnik
  */
-public class Score {
+public final class Score {
 
 	/** The Colors in the game. Colors of Trucks and Parcels are chosen from this Array.
 	 * Other colors are not allowed in the game, so setColor(Color c) methods mus

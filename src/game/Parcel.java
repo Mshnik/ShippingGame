@@ -16,7 +16,7 @@ import java.util.concurrent.Semaphore;
  * @author MPatashnik
  *
  */
-public class Parcel implements BoardElement {
+public final class Parcel implements BoardElement {
 
 	/** The board to which this Parcel belongs. */
 	private final Board board;

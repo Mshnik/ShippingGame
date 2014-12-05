@@ -22,7 +22,7 @@ import java.util.concurrent.Semaphore;
 
  * @author MPatashnik
  */
-public class Truck implements BoardElement, Runnable {
+public final class Truck implements BoardElement, Runnable {
 
     /** The Two states that a Truck can be in at any time - either Waiting (staying
      * on its location and awaiting further travel instructions) or Traveling

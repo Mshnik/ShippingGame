@@ -25,7 +25,7 @@ import java.util.*;
  * @author MPatashnik
  *
  */
-public class Edge implements BoardElement{
+public final class Edge implements BoardElement{
     /**Max val an edge can have for length. */
     public static final int DEFAULT_MIN_LENGTH = Integer.MAX_VALUE;	
 

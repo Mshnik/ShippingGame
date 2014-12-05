@@ -16,7 +16,7 @@ import java.util.*;
  *  
  *  @author MPatashnik
  **/
-public class Node implements BoardElement {
+public final class Node implements BoardElement {
     /** The name of this node. Set during construction */
     public final String name;
 

@@ -21,7 +21,7 @@ import org.json.*;
  * 
  * @author MPatashnik
  */
-public class Board implements JSONString {
+public final class Board implements JSONString {
 
     /** The random seed from which this Board was generated: 
      * -1 if loaded from a non-random file. */
@@ -245,7 +245,10 @@ public class Board implements JSONString {
 
     /** Return the parcels in this board that have not yet been delivered. */
     public Set<Parcel> getParcels() {
-        return parcels;
+//    	synchronized(parcels){
+//        return new HashSet<Parcel>(parcels);
+//    	}
+    	return parcels;
     }
 
     /** Called by Trucks to drop off parcels at nodes. 

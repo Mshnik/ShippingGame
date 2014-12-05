@@ -18,7 +18,7 @@ public class GameRunner {
 	private static final long UPDATE_FRAME = 1000;
 	
 	/** Extra time alloted before timeout, for calculation and stuff */
-	private static final double TIME_ALLOWANCE = 5000;
+	private static final double TIME_ALLOWANCE = 10000;
 	
 	/** Number of components of stack trace to include in status message printed to console */
 	private final int STACK_TRACE_LENGTH = 3;
