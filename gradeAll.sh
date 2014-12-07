@@ -22,6 +22,9 @@ for D in *; do
 		for Z in *.zip; do
 			if [ -e "${Z}" ]; then
 				unzip -o "${Z}";
+				if [ -e "__MACOSX" ]; then
+					rm -rf __MACOSX;
+				fi
 				for dir in *; do
 					if [ -d "${dir}" ]; then
 						mv ./"${dir}"/* .
