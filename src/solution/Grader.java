@@ -95,6 +95,9 @@ public class Grader {
             netIDs = new String[1];
             netIDs[0] = args[2];
         }
+    	System.err.println("Grading " + 
+    			(netIDs.length > 1 ? "group_of" + netIDs[0] + netIDs[1] : netIDs[0]));
+
 
         //Make sure the solution directory exists
         File gradingRoot = new File(GRADING_OUTPUT_DIRECTORY);
