@@ -33,13 +33,6 @@ public class Grader {
     /** Directory (within the project scope) where output files are written */
     private static final String GRADING_OUTPUT_DIRECTORY = "Submissions";
 
-    /** Instructor solution of shippingGame, classname */
-    private static final String INSTRUCTOR_SOLUTION_CLASSNAME = "solution.BasicShnikSolution";
-
-    /** Game Runner for Instructor solution */
-    private static final GameRunner INSTRUCTOR_GAME_RUNNER = 
-            new GameRunner(INSTRUCTOR_SOLUTION_CLASSNAME, SHOW_GUI, false);
-
     /** HashMap of board JSON files to run each student's code on -> instructor's score */
     private static final HashMap<String, Integer> INSTRUCTOR_SCORE_FILE = new HashMap<String, Integer>();
     
@@ -57,17 +50,17 @@ public class Grader {
         INSTRUCTOR_SCORE_FILE.clear();
         INSTRUCTOR_SCORE_RANDOM.clear();
 
+        INSTRUCTOR_SCORE_FILE.put("TestBoard1", 1756);
+        INSTRUCTOR_SCORE_FILE.put("TestBoard2", 71508);
+        INSTRUCTOR_SCORE_FILE.put("TestBoard3", 1133);
         
-        INSTRUCTOR_SCORE_RANDOM.put(135612L, 0);
-        INSTRUCTOR_SCORE_RANDOM.put(89712L, 0);
-        INSTRUCTOR_SCORE_RANDOM.put(654375L, 0);
-        INSTRUCTOR_SCORE_RANDOM.put(907234534L, 0);
-        INSTRUCTOR_SCORE_RANDOM.put(765368L, 0);
-        INSTRUCTOR_SCORE_RANDOM.put(1345634L, 0);
-        INSTRUCTOR_SCORE_RANDOM.put(8465874L, 0);
-        INSTRUCTOR_SCORE_RANDOM.put(34852L, 0);
-        INSTRUCTOR_SCORE_RANDOM.put(65486457L, 0);
-        INSTRUCTOR_SCORE_RANDOM.put(456324L, 0);
+        INSTRUCTOR_SCORE_RANDOM.put(new Long(2345724), 346038);
+        INSTRUCTOR_SCORE_RANDOM.put(new Long(542675), 400324);
+        INSTRUCTOR_SCORE_RANDOM.put(new Long(653836), 372729);
+        INSTRUCTOR_SCORE_RANDOM.put(new Long(971235), 639364);
+        INSTRUCTOR_SCORE_RANDOM.put(new Long(345353413), 267453);
+        INSTRUCTOR_SCORE_RANDOM.put(new Long(6761234), 966813);
+        INSTRUCTOR_SCORE_RANDOM.put(new Long(1290734269), 351324);
     }
 
     /** Main grading program.
