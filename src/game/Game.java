@@ -17,7 +17,7 @@ import org.json.JSONObject;
 public class Game {
 
     /** The directory that contains the map. */
-	public static final String MAP_DIRECTORY = "data/Maps";
+	public static final String MAP_DIRECTORY = "data/Maps/";
 	
 	/** The extension of the maps' file name --usually .txt . */
 	public static final String MAP_EXTENSION = ".txt";

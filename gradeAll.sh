@@ -19,6 +19,11 @@ echo "NetID,Grade," > grades.csv;
 for D in *; do
 	if [ -d "${D}" ]; then
 		cd ${D};
+		for Z in *.zip; do
+			if [ -e "${Z}" ]; then
+				unzip -o "${Z}";
+			fi
+		done
 		if [ -e "MyManager.java" ]; then
 			echo "TESTING ${D}...";
 			cp *.java ../../src/student/;
