@@ -118,9 +118,11 @@ public class GameRunner {
 				return new GameScore(g, g.getManager().getScore(), GameStatus.TIMEOUT, "Game Timeout after " + maxTime + "ms");
 			}
 		} catch (InterruptedException e) {
-			String msg = g.throwable.toString();
-			for (int i = 0; i < Math.min(g.throwable.getStackTrace().length - 1, STACK_TRACE_LENGTH); i++) {
-				msg += " at " + g.throwable.getStackTrace()[i].toString();
+			String msg = "" + g.throwable;
+			if (g.throwable != null){
+				for (int i = 0; i < Math.min(g.throwable.getStackTrace().length - 1, STACK_TRACE_LENGTH); i++) {
+					msg += " at " + g.throwable.getStackTrace()[i];
+				}
 			}
 			return new GameScore(g,g.getManager().getScore(), GameStatus.ERROR, "Exception Thrown - " + msg);
 		}
