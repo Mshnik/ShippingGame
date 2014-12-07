@@ -24,7 +24,7 @@ for D in *; do
 				unzip -o "${Z}";
 				for dir in *; do
 					if [ -d "${dir}" ]; then
-						mv ./${dir}/* .
+						mv ./"${dir}"/* .
 					fi
 				done
 			fi
