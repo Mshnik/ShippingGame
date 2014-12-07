@@ -53,14 +53,14 @@ public class Grader {
         INSTRUCTOR_SCORE_FILE.put("TestBoard1", 1756);
         INSTRUCTOR_SCORE_FILE.put("TestBoard2", 71508);
         INSTRUCTOR_SCORE_FILE.put("TestBoard3", 1133);
-//        
+        
         INSTRUCTOR_SCORE_RANDOM.put(new Long(2345724), 346038);
-        INSTRUCTOR_SCORE_RANDOM.put(new Long(542675), 400324);
-        INSTRUCTOR_SCORE_RANDOM.put(new Long(653836), 372729);
-        INSTRUCTOR_SCORE_RANDOM.put(new Long(971235), 639364);
-        INSTRUCTOR_SCORE_RANDOM.put(new Long(345353413), 267453);
-        INSTRUCTOR_SCORE_RANDOM.put(new Long(6761234), 966813);
-        INSTRUCTOR_SCORE_RANDOM.put(new Long(1290734269), 351324);
+//        INSTRUCTOR_SCORE_RANDOM.put(new Long(542675), 400324);
+//        INSTRUCTOR_SCORE_RANDOM.put(new Long(653836), 372729);
+//        INSTRUCTOR_SCORE_RANDOM.put(new Long(971235), 639364);
+//        INSTRUCTOR_SCORE_RANDOM.put(new Long(345353413), 267453);
+//        INSTRUCTOR_SCORE_RANDOM.put(new Long(6761234), 966813);
+//        INSTRUCTOR_SCORE_RANDOM.put(new Long(1290734269), 351324);
     }
 
     /** Main grading program.
@@ -163,7 +163,7 @@ public class Grader {
         
         //From file maps
         s += "\nFrom File Games... (" + fileBoards.length + ")\n" +
-                "File.........................Completeness......Points...............InstructorPoints...Status";
+                "File.....................Completeness......Points...............InstructorPoints...Status";
         for (int i = 0; i < fileScores.length; i++) {
             double completenessScore = completenesScore(fileScores[i]);
             double instructorScore = INSTRUCTOR_SCORE_FILE.get(fileBoards[i]);
@@ -175,14 +175,14 @@ public class Grader {
         	totalInstructorPoints += instructorScore;
         	
             s += "\n" + String.format("%20s",fileScores[i].game.getFile().getName()) + "\t" 
-            		+ String.format("%9.0f",completenessScore) + "\t\t\t" 
-                    + String.format("%9.0f",pointScore) + "  (" + String.format("%3.2f", (pointScore/instructorScore) * 100) + "%)" 
+            		+ String.format("%6.3f",completenessScore) + "\t\t\t" 
+                    + String.format("%6.3f",pointScore) + "  (" + String.format("%3.2f", (pointScore/instructorScore) * 100) + "%)\t" 
                     + "\t" + String.format("%9.0f",instructorScore) + "\t\t" + fileScores[i].message;
         }
 
         //From seed maps
         s += "\n\nFrom Random Seed Games... (" + randomBoards.length + ")\n" +
-        		"Seed.........................Completeness......Points...............InstructorPoints...Status";
+        		"Seed.....................Completeness......Points...............InstructorPoints...Status";
         for (int i = 0; i < randomScores.length; i++) {
         	double completenessScore = completenesScore(randomScores[i]);
             double instructorScore = INSTRUCTOR_SCORE_RANDOM.get(randomBoards[i]);
@@ -193,8 +193,8 @@ public class Grader {
         	totalPointsScore += pointScore;
         	totalInstructorPoints += instructorScore;
         	
-            s += "\n" + String.format("%20s",randomBoards[i]) + "\t" + String.format("%9.0f",completenessScore) + "\t\t\t" 
-                    + String.format("%9.0f",pointScore) + "  (" + String.format("%3.2f", (pointScore/instructorScore) * 100) + "%)" 
+            s += "\n" + String.format("%20s",randomBoards[i]) + "\t" + String.format("%6.3f",completenessScore) + "\t\t\t" 
+                    + String.format("%6.3f",pointScore) + "  (" + String.format("%3.2f", (pointScore/instructorScore) * 100) + "%)\t" 
                     + "\t" + String.format("%9.0f",instructorScore) + "\t\t" + randomScores[i].message;
         }
 
@@ -220,18 +220,24 @@ public class Grader {
         	s += "\n3 point bonus! - Congratulations on beating the Instructor solution!";
         }
         s += "\n\n" +
-        		"Total Correctness (" + (CORRECTNESS * 100) + "%) :" + String.format("%5.0f", weightedCompletenessScore / CORRECTNESS) +
-                "\nTotal Points (" + (SCORE * 100) + "%) :\t   " + String.format("%5.0f", weightedPointsScore / SCORE)+
-                "\nGrade: " + String.format("%3.1f",f.grade);
+        		"Total Correctness (" + (CORRECTNESS * 100) + "%) :" + String.format("%4.2f", (totalCompletenesScore * 100.0 / totalTests)) +
+                "\nTotal Points (" + (SCORE * 100) + "%) :\t   " + String.format("%4.2f", weightedPointsScore / SCORE);
+        if(printingFlag){
+        	s +="\n - 3 point printing pentalty";
+        }
+        if(totalPointsScore > totalInstructorPoints){
+        	s += "\n + 3 point super solution bonus";
+        }
+        s += "\nGrade: " + String.format("%3.1f",f.grade);
         f.f = s;
         return f;
     }
 
     /** Portion of completenss score that is parcels */
-    private static final double COMPLETENESS_PARCELS = 0.9;
+    private static final double COMPLETENESS_PARCELS = 1;
     
     /** Portion of completeness score that is trucks getting home */
-    private static final double COMPLETENESS_TRUCKS = 1 - COMPLETENESS_PARCELS;
+    private static final double COMPLETENESS_TRUCKS = 0;
     
     /** Returns a completeness score for the given gameScore - out of 1 for full completeness */
     private static double completenesScore(GameScore gs){
