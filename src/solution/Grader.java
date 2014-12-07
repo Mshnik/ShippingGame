@@ -49,18 +49,18 @@ public class Grader {
     static {
         INSTRUCTOR_SCORE_FILE.clear();
         INSTRUCTOR_SCORE_RANDOM.clear();
-
-        INSTRUCTOR_SCORE_FILE.put("TestBoard1", 1756);
-        INSTRUCTOR_SCORE_FILE.put("TestBoard2", 71508);
-        INSTRUCTOR_SCORE_FILE.put("TestBoard3", 1133);
+//
+//        INSTRUCTOR_SCORE_FILE.put("TestBoard1", 1756);
+//        INSTRUCTOR_SCORE_FILE.put("TestBoard2", 71508);
+//        INSTRUCTOR_SCORE_FILE.put("TestBoard3", 1133);
         
         INSTRUCTOR_SCORE_RANDOM.put(new Long(2345724), 346038);
-        INSTRUCTOR_SCORE_RANDOM.put(new Long(542675), 400324);
-        INSTRUCTOR_SCORE_RANDOM.put(new Long(653836), 372729);
-        INSTRUCTOR_SCORE_RANDOM.put(new Long(971235), 639364);
-        INSTRUCTOR_SCORE_RANDOM.put(new Long(345353413), 267453);
-        INSTRUCTOR_SCORE_RANDOM.put(new Long(6761234), 966813);
-        INSTRUCTOR_SCORE_RANDOM.put(new Long(1290734269), 351324);
+//        INSTRUCTOR_SCORE_RANDOM.put(new Long(542675), 400324);
+//        INSTRUCTOR_SCORE_RANDOM.put(new Long(653836), 372729);
+//        INSTRUCTOR_SCORE_RANDOM.put(new Long(971235), 639364);
+//        INSTRUCTOR_SCORE_RANDOM.put(new Long(345353413), 267453);
+//        INSTRUCTOR_SCORE_RANDOM.put(new Long(6761234), 966813);
+//        INSTRUCTOR_SCORE_RANDOM.put(new Long(1290734269), 351324);
     }
 
     /** Main grading program.
@@ -95,6 +95,9 @@ public class Grader {
             netIDs = new String[1];
             netIDs[0] = args[2];
         }
+    	System.err.println("Grading " + 
+    			(netIDs.length > 1 ? "group_of" + netIDs[0] + netIDs[1] : netIDs[0]));
+
 
         //Make sure the solution directory exists
         File gradingRoot = new File(GRADING_OUTPUT_DIRECTORY);
@@ -181,7 +184,7 @@ public class Grader {
                 "Seed...........................Score...............InstructorScore...Status";
         for (int i = 0; i < randomScores.length; i++) {
         	double completenessScore = completenesScore(randomScores[i]);
-            double instructorScore = INSTRUCTOR_SCORE_RANDOM.get(randomScores[i]);
+            double instructorScore = INSTRUCTOR_SCORE_RANDOM.get(randomBoards[i]);
         	double pointScore = adjustedScore(fileScores[i]);
         	
         	totalCompletenesScore += completenessScore;
