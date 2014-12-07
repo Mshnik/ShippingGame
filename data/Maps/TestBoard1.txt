@@ -1,0 +1,36 @@
+{
+"seed":1235,
+"scoreCoeff":[-3,-15,-23,1928,3],
+"node-0":{
+"name":"City1",
+"x":1290,
+"y":714
+},
+"node-1":{
+"name":"Truck Depot",
+"x":1190,
+"y":714
+},
+"node-2":{
+"name":"City2",
+"x":1090,
+"y":714
+},
+"edge-0":{
+"location":["City1","Truck Depot"],
+"length":34
+},
+"edge-1":{
+"location":["City2","Truck Depot"],
+"length":12
+},
+"truck-0":{
+"name":"TRUCK-1",
+"color":-307201
+},
+"parcel-0":{
+"location":"City1",
+"destination":"City2",
+"color":-16726421
+}
+}
