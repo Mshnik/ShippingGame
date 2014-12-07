@@ -85,6 +85,7 @@ public class GameRunner {
 				System.out.println(String.format("%20d", gs[i].game.getSeed()) + "  " 
 						+ String.format("%7d",gs[i].score) + "  " + gs[i].message);
 			}
+            System.err.println("Finished board " + (i+1));
 		}
 		if (hasGUI && gui != null) gui.dispose();
 		return gs;
