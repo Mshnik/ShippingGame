@@ -14,21 +14,21 @@ public class BasicShnikSolution extends AbstractSolution {
 
 	/** A HashMap of parcel -> truck that is assigned to deliver it */
 	private Map<Truck, Parcel> parcelsAssigned;
-	
+
 	/** Unassigned parcels */
 	private Set<Parcel> unassignedParcels;
-	
+
 	/** True once the run step is done, false until then */
 	private boolean preprocessingDone;
-	
+
 	@Override
 	public void run() {
 		parcelsAssigned = Collections.synchronizedMap(new HashMap<Truck, Parcel>());
 		unassignedParcels = Collections.synchronizedSet(new HashSet<Parcel>());
-		
+
 		ArrayList<Truck> trucks = getTrucks();
 		int i = 0;
-		
+
 		//Assign every parcel to a truck as possible, or put it in the unassigned list
 		for (Parcel p : getParcels()) {
 			if (i >= trucks.size()) {
@@ -45,12 +45,12 @@ public class BasicShnikSolution extends AbstractSolution {
 	@Override
 	public void truckNotification(Truck t, Notification message) {
 		if (!preprocessingDone) return;
-		
+
 		//Base case - at new node. Check if has parcel and should drop off.
 		if (message.equals(Notification.LOCATION_CHANGED)) {
 			if (t.getLoad() != null && t.getLoad().destination.equals(t.getLocation())) {
 				t.dropoffLoad();
-				
+
 				//Check if there are more parcels to handle. If not, remove from
 				// assignment and go home.
 				//If so, assign this truck to a random one.
@@ -74,6 +74,6 @@ public class BasicShnikSolution extends AbstractSolution {
 				t.setTravelPath(dijkstra(t.getLocation(), parcelsAssigned.get(t).getLocation()));
 			}
 		}
-		
+
 	}
 }

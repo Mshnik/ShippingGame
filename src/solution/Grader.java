@@ -13,6 +13,16 @@ import gui.TextIO;
  */
 public class Grader {
 
+	/** Percentage of score going to correctness (Getting all the parcels )
+	 * 
+	 */
+	private static final double CORRECTNESS = 0.8;
+	
+	/** Percentage of score going to score (compared to instructor score)
+	 * 
+	 */
+	private static final double SCORE = 1 - CORRECTNESS;
+	
     /** Set this to true to show gui while grading.
      * May slow down grading slightly, but nice if a solution is providing erratic behavior
      * 
@@ -31,10 +41,10 @@ public class Grader {
             new GameRunner(INSTRUCTOR_SOLUTION_CLASSNAME, SHOW_GUI, false);
 
     /** HashMap of board JSON files to run each student's code on -> instructor's score */
-    private static final HashMap<String, Integer> JSON_BOARD_MAP = new HashMap<String, Integer>();
-
-    /** Number of random seeds to run each student's code on, in addition to the above maps */
-    private static final int NUMBER_RANDOM_MAPS = 1;
+    private static final HashMap<String, Integer> INSTRUCTOR_SCORE_FILE = new HashMap<String, Integer>();
+    
+    /** HashMap of random seed to run each student's code on -> instructor's score */
+    private static final HashMap<Long, Integer> INSTRUCTOR_SCORE_RANDOM = new HashMap<Long, Integer>();
 
     /** Use to do printing */
     private static PrintStream stdout;
@@ -42,11 +52,22 @@ public class Grader {
     /** Set to true if the student ever tries to print */
     private static boolean printingFlag = false;
 
-    /** Fill in the JSON_BOARD_MAP with the grading tuples - called at class compilation time */
+    /** Fill in the with the grading tuples - called at class compilation time */
     static {
-        JSON_BOARD_MAP.clear();
+        INSTRUCTOR_SCORE_FILE.clear();
+        INSTRUCTOR_SCORE_RANDOM.clear();
 
-        //TODO - add required map jsons
+        
+        INSTRUCTOR_SCORE_RANDOM.put(135612L, 0);
+        INSTRUCTOR_SCORE_RANDOM.put(89712L, 0);
+        INSTRUCTOR_SCORE_RANDOM.put(654375L, 0);
+        INSTRUCTOR_SCORE_RANDOM.put(907234534L, 0);
+        INSTRUCTOR_SCORE_RANDOM.put(765368L, 0);
+        INSTRUCTOR_SCORE_RANDOM.put(1345634L, 0);
+        INSTRUCTOR_SCORE_RANDOM.put(8465874L, 0);
+        INSTRUCTOR_SCORE_RANDOM.put(34852L, 0);
+        INSTRUCTOR_SCORE_RANDOM.put(65486457L, 0);
+        INSTRUCTOR_SCORE_RANDOM.put(456324L, 0);
     }
 
     /** Main grading program.
@@ -90,16 +111,16 @@ public class Grader {
                 "First, we run your manager on a set of pre-determined maps, to test the corner cases of\n" +
                 "your code. Then we run it on a set of randomly generated maps, to test the regular behavior\n" +
                 "of your code.\n" +
-                "For a given map, you receive full credit so long as your score is at least equal to the instructor's\n" +
-                "simple solution, at a handicap. If your code causes an uncaught error or a timeout (runs for much too long on a\n" +
-                "given map) you may receive some amount partial credit on that map, depending on the severity of\n" +
-                "the error or timeout.\n" +
-                "After the grading program runs, I will look back through your code to see if any simple mistakes caused\n" +
-                "you to loose to many points. Now let's get shipping!\n" +
+                "For a given map, " + (CORRECTNESS * 100) + "% of the points are for correctness - was your solution\n" +
+                "able to pick up and deliver every parcel? The rest of the points are for your score - full credit for" +
+                "achieving a score at least equal to the instructor's. If your code causes an uncaught error or a timeout\n" +
+                "(runs for much too long on a given map) you may receive some amount partial credit on that map, \n" +
+                "depending on the severity of the error or timeout.\n" +
+                "Now let's get shipping!\n" +
                 "<=|===================================================================================================|=>";
 
 
-        Feedback feedback = runOn(Main.studentDirectory + "." + "MyManager"); //TODO!fill in with how to get the manager classname, and where it is located
+        Feedback feedback = runOn(Main.studentDirectory + "." + "MyManager");
         String finishedFeedback = header + "\n" + feedback.f;
 
         //Do grade printing to console where it will be picked up by graph
@@ -127,17 +148,15 @@ public class Grader {
      * Return the feedback. */
     private static Feedback runOn(String managerClassname) {
         GameRunner gr = new GameRunner(managerClassname, SHOW_GUI, false);
-        String[] boards = JSON_BOARD_MAP.keySet().toArray(new String[0]);
-        GameScore[] fileScores = gr.runFiles(boards);
-
-        GameScore[] instructorRandomScores = INSTRUCTOR_GAME_RUNNER.runRandom(NUMBER_RANDOM_MAPS);
-
-        long[] randomSeeds = new long[NUMBER_RANDOM_MAPS];
-        for (int i = 0; i < NUMBER_RANDOM_MAPS; i++) {
-            randomSeeds[i] = instructorRandomScores[i].game.getSeed();
+        String[] fileBoards = INSTRUCTOR_SCORE_FILE.keySet().toArray(new String[0]);
+        Long[] rndBoards = INSTRUCTOR_SCORE_RANDOM.keySet().toArray(new Long[0]);
+        long[] randomBoards = new long[rndBoards.length];
+        for(int i = 0; i < rndBoards.length; i++){
+        	randomBoards[i] = rndBoards[i];
         }
-
-        GameScore[] randomScores = gr.runSeeds(randomSeeds);
+        
+        GameScore[] fileScores = gr.runFiles(fileBoards);
+        GameScore[] randomScores = gr.runSeeds(randomBoards);
 
         //Start compiling feedback (without header - that will be added later)
         double earnedPoints = 0;
@@ -145,27 +164,27 @@ public class Grader {
         String s = "";
 
         //From file maps
-        s += "\nFrom File Games... (" + boards.length + ")\n" +
+        s += "\nFrom File Games... (" + fileBoards.length + ")\n" +
                 "Seed...........................Score...............InstructorScore...Status";
         for (int i = 0; i < fileScores.length; i++) {
             double score = adjustedScore(fileScores[i]);
-            double instructorScore = JSON_BOARD_MAP.get(boards[i]) * INSTRUCTOR_HANDICAP;
+            double instructorScore = INSTRUCTOR_SCORE_FILE.get(fileBoards[i]);
             earnedPoints += score;
             instructorPoints += instructorScore;
-            s += "\n\t" + String.format("%20s",boards[i]) + "\t" 
+            s += "\n\t" + String.format("%20s",fileBoards[i]) + "\t" 
                     + String.format("%9.0f",score) + "  (" + String.format("%3.2f", (score/instructorScore) * 100) + "%)" 
                     + "\t" + String.format("%9.0f",instructorScore) + "\t\t" + fileScores[i].message;
         }
 
         //From seed maps
-        s += "\n\nFrom Random Seed Games... (" + randomSeeds.length + ")\n" +
+        s += "\n\nFrom Random Seed Games... (" + randomBoards.length + ")\n" +
                 "Seed...........................Score...............InstructorScore...Status";
         for (int i = 0; i < randomScores.length; i++) {
             double score = adjustedScore(randomScores[i]);
-            double instructorScore = adjustedScore(instructorRandomScores[i]) * INSTRUCTOR_HANDICAP;
+            double instructorScore = INSTRUCTOR_SCORE_RANDOM.get(randomBoards[i]);
             earnedPoints += score;
             instructorPoints += instructorScore;
-            s += "\n\t" + String.format("%20s",randomSeeds[i]) + "\t" 
+            s += "\n\t" + String.format("%20s",randomBoards[i]) + "\t" 
                     + String.format("%9.0f",score) + "  (" + String.format("%3.2f", (score/instructorScore) * 100) + "%)" 
                     + "\t" + String.format("%9.0f",instructorScore) + "\t\t" + randomScores[i].message;
         }
@@ -187,9 +206,6 @@ public class Grader {
         f.f = s;
         return f;
     }
-
-    /** Instructor handicap */
-    private static final double INSTRUCTOR_HANDICAP = 0.9;
 
     /** Penalty for a heavy error */
     private static final double HEAVY_PENALTY = 0.65;

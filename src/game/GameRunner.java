@@ -150,6 +150,18 @@ public class GameRunner {
 		/** the score. */
 		public final int score;
 		
+		/** The initial number of parcels */
+		public final double initialParcels;
+		
+		/** The number of delivered parcels remaining */
+		public final double deliveredParcels;
+		
+		/** The total number of trucks */
+		public final double trucks;
+		
+		/** The number of trucks who made it home */
+		public final double homeTrucks;
+		
 		/** the status. */
 		public final GameStatus status;
 		
@@ -165,6 +177,10 @@ public class GameRunner {
 		 */
 		public GameScore(Game g, int s, GameStatus status, String m) {
 			game = g;
+			initialParcels = g.getBoard().initialParcelCount;
+			deliveredParcels = initialParcels - g.getBoard().getParcels().size();
+			trucks = g.getBoard().getTrucks().size();
+			homeTrucks = g.getBoard().getTruckDepot().trucksHere();
 			score = s;
 			this.status = status;
 			message = m;
