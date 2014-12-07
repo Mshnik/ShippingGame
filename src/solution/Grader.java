@@ -55,12 +55,12 @@ public class Grader {
         INSTRUCTOR_SCORE_FILE.put("TestBoard3", 1133);
         
         INSTRUCTOR_SCORE_RANDOM.put(new Long(2345724), 346038);
-//        INSTRUCTOR_SCORE_RANDOM.put(new Long(542675), 400324);
-//        INSTRUCTOR_SCORE_RANDOM.put(new Long(653836), 372729);
-//        INSTRUCTOR_SCORE_RANDOM.put(new Long(971235), 639364);
-//        INSTRUCTOR_SCORE_RANDOM.put(new Long(345353413), 267453);
-//        INSTRUCTOR_SCORE_RANDOM.put(new Long(6761234), 966813);
-//        INSTRUCTOR_SCORE_RANDOM.put(new Long(1290734269), 351324);
+        INSTRUCTOR_SCORE_RANDOM.put(new Long(542675), 400324);
+        INSTRUCTOR_SCORE_RANDOM.put(new Long(653836), 372729);
+        INSTRUCTOR_SCORE_RANDOM.put(new Long(971235), 639364);
+        INSTRUCTOR_SCORE_RANDOM.put(new Long(345353413), 267453);
+        INSTRUCTOR_SCORE_RANDOM.put(new Long(6761234), 966813);
+        INSTRUCTOR_SCORE_RANDOM.put(new Long(1290734269), 351324);
     }
 
     /** Main grading program.
