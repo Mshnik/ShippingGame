@@ -22,6 +22,11 @@ for D in *; do
 		for Z in *.zip; do
 			if [ -e "${Z}" ]; then
 				unzip -o "${Z}";
+				for dir in *; do
+					if [ -d "${dir}" ]; then
+						mv ./"${dir}"/* .
+					fi
+				done
 			fi
 		done
 		if [ -e "MyManager.java" ]; then
