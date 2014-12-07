@@ -102,7 +102,7 @@ public class Grader {
 		String[] netIDs = null;
 		if (args[2].startsWith("group_of_")) {
 			netIDs = new String[2];
-			String p = args[2].substring(10); // length of group_of_
+			String p = args[2].substring(9); // length of group_of_
 			netIDs[0] = p.substring(0, p.indexOf('_'));
 			netIDs[1] = p.substring(p.indexOf('_') + 1);
 		} else {
