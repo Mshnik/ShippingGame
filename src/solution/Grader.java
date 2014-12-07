@@ -159,20 +159,27 @@ public class Grader {
         GameScore[] randomScores = gr.runSeeds(randomBoards);
 
         //Start compiling feedback (without header - that will be added later)
-        double earnedPoints = 0;
-        double instructorPoints = 0;
         String s = "";
-
+        double totalCompletenesScore = 0;
+        double totalTests = 0;
+        double totalPointsScore = 0;
+        double totalInstructorPoints = 0;
+        
         //From file maps
         s += "\nFrom File Games... (" + fileBoards.length + ")\n" +
-                "Seed...........................Score...............InstructorScore...Status";
+                "Seed.........................Completeness......Points...............InstructorPoints...Status";
         for (int i = 0; i < fileScores.length; i++) {
-            double score = adjustedScore(fileScores[i]);
+            double completenessScore = completenesScore(fileScores[i]);
             double instructorScore = INSTRUCTOR_SCORE_FILE.get(fileBoards[i]);
-            earnedPoints += score;
-            instructorPoints += instructorScore;
-            s += "\n\t" + String.format("%20s",fileBoards[i]) + "\t" 
-                    + String.format("%9.0f",score) + "  (" + String.format("%3.2f", (score/instructorScore) * 100) + "%)" 
+        	double pointScore = adjustedScore(fileScores[i]);
+        	
+        	totalCompletenesScore += completenessScore;
+        	totalTests ++;
+        	totalPointsScore += pointScore;
+        	totalInstructorPoints += instructorScore;
+        	
+            s += "\n\t" + String.format("%20s",fileBoards[i]) + "\t" + String.format("%9.0f",completenessScore) + "\t" 
+                    + String.format("%9.0f",pointScore) + "  (" + String.format("%3.2f", (pointScore/instructorScore) * 100) + "%)" 
                     + "\t" + String.format("%9.0f",instructorScore) + "\t\t" + fileScores[i].message;
         }
 
@@ -180,33 +187,56 @@ public class Grader {
         s += "\n\nFrom Random Seed Games... (" + randomBoards.length + ")\n" +
                 "Seed...........................Score...............InstructorScore...Status";
         for (int i = 0; i < randomScores.length; i++) {
-            double score = adjustedScore(randomScores[i]);
-            double instructorScore = INSTRUCTOR_SCORE_RANDOM.get(randomBoards[i]);
-            earnedPoints += score;
-            instructorPoints += instructorScore;
-            s += "\n\t" + String.format("%20s",randomBoards[i]) + "\t" 
-                    + String.format("%9.0f",score) + "  (" + String.format("%3.2f", (score/instructorScore) * 100) + "%)" 
+        	double completenessScore = completenesScore(randomScores[i]);
+            double instructorScore = INSTRUCTOR_SCORE_RANDOM.get(randomScores[i]);
+        	double pointScore = adjustedScore(fileScores[i]);
+        	
+        	totalCompletenesScore += completenessScore;
+        	totalTests ++;
+        	totalPointsScore += pointScore;
+        	totalInstructorPoints += instructorScore;
+        	
+            s += "\n\t" + String.format("%20s",randomScores[i]) + "\t" + String.format("%9.0f",completenessScore) + "\t" 
+                    + String.format("%9.0f",pointScore) + "  (" + String.format("%3.2f", (pointScore/instructorScore) * 100) + "%)" 
                     + "\t" + String.format("%9.0f",instructorScore) + "\t\t" + randomScores[i].message;
         }
 
         //Add finishing stats.
         Feedback f = new Feedback();
-        f.grade = Math.max(0, Math.min(1, earnedPoints / instructorPoints)) * 100;
+        
+        double weightedCompletenessScore = (totalCompletenesScore / totalTests) * 100 * CORRECTNESS;
+        double weightedPointsScore = Math.max(0, Math.min(1, 
+        		totalPointsScore / totalInstructorPoints)) * 100 * SCORE;
+        
+        f.grade = weightedCompletenessScore + weightedPointsScore;
 
         if (printingFlag) {
-            f.grade -= 5;
-            s += "\n 5 point penalty - your code contained print statements. This is not good" +
+            f.grade -= 3;
+            s += "\n 3 point penalty - your code contained print statements. This is not good" +
                     "for code you are submitting.";
         }
 
         s += "\n\n" +
-                "Earned Points: " + String.format("%11.0f", earnedPoints)+
-                "\t\tPossible Points: " + String.format("%11.0f", instructorPoints) + 
+        		"Total Correctness (" + CORRECTNESS + "%) :" + String.format("%11.0f", totalCompletenesScore) +
+                "Earned Points (" + SCORE + "%) :" + String.format("%11.0f", totalPointsScore)+
+                "\t\tPossible Points: " + String.format("%11.0f", totalInstructorPoints) + 
                 "\nGrade: " + String.format("%3.1f",f.grade);
         f.f = s;
         return f;
     }
 
+    /** Portion of completenss score that is parcels */
+    private static final double COMPLETENESS_PARCELS = 0.9;
+    
+    /** Portion of completeness score that is trucks getting home */
+    private static final double COMPLETENESS_TRUCKS = 1 - COMPLETENESS_PARCELS;
+    
+    /** Returns a completeness score for the given gameScore - out of 1 for full completeness */
+    private static double completenesScore(GameScore gs){
+    	return COMPLETENESS_PARCELS * (gs.deliveredParcels / gs.initialParcels) +
+    		   COMPLETENESS_TRUCKS * (gs.homeTrucks / gs.trucks);
+    }
+    
     /** Penalty for a heavy error */
     private static final double HEAVY_PENALTY = 0.65;
 
