@@ -21,7 +21,7 @@ public class Grader {
 	/** Percentage of score going to score (compared to instructor score)
 	 * 
 	 */
-	private static final double SCORE = 1 - CORRECTNESS;
+	private static final double SCORE = 0.2;
 	
     /** Set this to true to show gui while grading.
      * May slow down grading slightly, but nice if a solution is providing erratic behavior
@@ -49,18 +49,18 @@ public class Grader {
     static {
         INSTRUCTOR_SCORE_FILE.clear();
         INSTRUCTOR_SCORE_RANDOM.clear();
-//
-//        INSTRUCTOR_SCORE_FILE.put("TestBoard1", 1756);
-//        INSTRUCTOR_SCORE_FILE.put("TestBoard2", 71508);
-//        INSTRUCTOR_SCORE_FILE.put("TestBoard3", 1133);
-        
+
+        INSTRUCTOR_SCORE_FILE.put("TestBoard1", 1756);
+        INSTRUCTOR_SCORE_FILE.put("TestBoard2", 71508);
+        INSTRUCTOR_SCORE_FILE.put("TestBoard3", 1133);
+//        
         INSTRUCTOR_SCORE_RANDOM.put(new Long(2345724), 346038);
-//        INSTRUCTOR_SCORE_RANDOM.put(new Long(542675), 400324);
-//        INSTRUCTOR_SCORE_RANDOM.put(new Long(653836), 372729);
-//        INSTRUCTOR_SCORE_RANDOM.put(new Long(971235), 639364);
-//        INSTRUCTOR_SCORE_RANDOM.put(new Long(345353413), 267453);
-//        INSTRUCTOR_SCORE_RANDOM.put(new Long(6761234), 966813);
-//        INSTRUCTOR_SCORE_RANDOM.put(new Long(1290734269), 351324);
+        INSTRUCTOR_SCORE_RANDOM.put(new Long(542675), 400324);
+        INSTRUCTOR_SCORE_RANDOM.put(new Long(653836), 372729);
+        INSTRUCTOR_SCORE_RANDOM.put(new Long(971235), 639364);
+        INSTRUCTOR_SCORE_RANDOM.put(new Long(345353413), 267453);
+        INSTRUCTOR_SCORE_RANDOM.put(new Long(6761234), 966813);
+        INSTRUCTOR_SCORE_RANDOM.put(new Long(1290734269), 351324);
     }
 
     /** Main grading program.
@@ -108,7 +108,7 @@ public class Grader {
                 "your code. Then we run it on a set of randomly generated maps, to test the regular behavior\n" +
                 "of your code.\n" +
                 "For a given map, " + (CORRECTNESS * 100) + "% of the points are for correctness - was your solution\n" +
-                "able to pick up and deliver every parcel? The rest of the points are for your score - full credit for" +
+                "able to pick up and deliver every parcel? The rest of the points are for your score - full credit for\n" +
                 "achieving a score at least equal to the instructor's. If your code causes an uncaught error or a timeout\n" +
                 "(runs for much too long on a given map) you may receive some amount partial credit on that map, \n" +
                 "depending on the severity of the error or timeout.\n" +
@@ -163,7 +163,7 @@ public class Grader {
         
         //From file maps
         s += "\nFrom File Games... (" + fileBoards.length + ")\n" +
-                "Seed.........................Completeness......Points...............InstructorPoints...Status";
+                "File.........................Completeness......Points...............InstructorPoints...Status";
         for (int i = 0; i < fileScores.length; i++) {
             double completenessScore = completenesScore(fileScores[i]);
             double instructorScore = INSTRUCTOR_SCORE_FILE.get(fileBoards[i]);
@@ -174,25 +174,26 @@ public class Grader {
         	totalPointsScore += pointScore;
         	totalInstructorPoints += instructorScore;
         	
-            s += "\n\t" + String.format("%20s",fileBoards[i]) + "\t" + String.format("%9.0f",completenessScore) + "\t" 
+            s += "\n" + String.format("%20s",fileScores[i].game.getFile().getName()) + "\t" 
+            		+ String.format("%9.0f",completenessScore) + "\t\t\t" 
                     + String.format("%9.0f",pointScore) + "  (" + String.format("%3.2f", (pointScore/instructorScore) * 100) + "%)" 
                     + "\t" + String.format("%9.0f",instructorScore) + "\t\t" + fileScores[i].message;
         }
 
         //From seed maps
         s += "\n\nFrom Random Seed Games... (" + randomBoards.length + ")\n" +
-                "Seed...........................Score...............InstructorScore...Status";
+        		"Seed.........................Completeness......Points...............InstructorPoints...Status";
         for (int i = 0; i < randomScores.length; i++) {
         	double completenessScore = completenesScore(randomScores[i]);
             double instructorScore = INSTRUCTOR_SCORE_RANDOM.get(randomBoards[i]);
-        	double pointScore = adjustedScore(fileScores[i]);
+        	double pointScore = adjustedScore(randomScores[i]);
         	
         	totalCompletenesScore += completenessScore;
         	totalTests ++;
         	totalPointsScore += pointScore;
         	totalInstructorPoints += instructorScore;
         	
-            s += "\n\t" + String.format("%20s",randomScores[i]) + "\t" + String.format("%9.0f",completenessScore) + "\t" 
+            s += "\n" + String.format("%20s",randomBoards[i]) + "\t" + String.format("%9.0f",completenessScore) + "\t\t\t" 
                     + String.format("%9.0f",pointScore) + "  (" + String.format("%3.2f", (pointScore/instructorScore) * 100) + "%)" 
                     + "\t" + String.format("%9.0f",instructorScore) + "\t\t" + randomScores[i].message;
         }
@@ -212,10 +213,15 @@ public class Grader {
                     "for code you are submitting.";
         }
 
+        s += "\n\n\n" + "In-Game Score: " + String.format("%11s", (int)totalPointsScore + " of " + (int)totalInstructorPoints) +
+        		" (" + String.format("%3.1f", totalPointsScore / totalInstructorPoints * 100) + "%)";
+        if(totalPointsScore > totalInstructorPoints){
+        	f.grade += 3;
+        	s += "\n3 point bonus! - Congratulations on beating the Instructor solution!";
+        }
         s += "\n\n" +
-        		"Total Correctness (" + CORRECTNESS + "%) :" + String.format("%11.0f", totalCompletenesScore) +
-                "Earned Points (" + SCORE + "%) :" + String.format("%11.0f", totalPointsScore)+
-                "\t\tPossible Points: " + String.format("%11.0f", totalInstructorPoints) + 
+        		"Total Correctness (" + (CORRECTNESS * 100) + "%) :" + String.format("%5.0f", weightedCompletenessScore / CORRECTNESS) +
+                "\nTotal Points (" + (SCORE * 100) + "%) :\t   " + String.format("%5.0f", weightedPointsScore / SCORE)+
                 "\nGrade: " + String.format("%3.1f",f.grade);
         f.f = s;
         return f;
