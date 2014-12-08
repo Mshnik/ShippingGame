@@ -87,7 +87,7 @@ public class GameRunner {
 			}
             System.err.println("Finished board " + (i+1));
 		}
-		if (hasGUI && gui != null) gui.dispose();
+//		if (hasGUI && gui != null) gui.dispose();
 		return gs;
 	}
 	

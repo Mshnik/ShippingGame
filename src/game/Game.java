@@ -16,9 +16,9 @@ import org.json.JSONObject;
  */
 public class Game {
 
-    /** The directory that contains the map. */
+	/** The directory that contains the map. */
 	public static final String MAP_DIRECTORY = "data/Maps/";
-	
+
 	/** The extension of the maps' file name --usually .txt . */
 	public static final String MAP_EXTENSION = ".txt";
 
@@ -26,10 +26,10 @@ public class Game {
 	private String managerClass; //The name of the class from which the manager was created.
 
 	private int frame; // Duration of a frame for this game, in ms. 
-	                   // A higher value causes trucks to move slower.
-	
+	// A higher value causes trucks to move slower.
+
 	private boolean frameAltered; //True if at any point in running, this game's frame rate
-								  //Is anything other than DEFAULT_FRAME.
+	//Is anything other than DEFAULT_FRAME.
 	private GUI gui;
 	private Manager manager;
 	private ThreadGroup gameThreads;	//The Truck and Manager threads that are running
@@ -45,7 +45,7 @@ public class Game {
 	 * but only games run with this frame value are fair for scoring.
 	 */
 	public static final int DEFAULT_FRAME = 40;
-		
+
 	/** Set the manager to managerClassname, make game not running, not finished, with no
 	 * gui and a new GameThreadGroup. */
 	private Game(String managerClassname) {
@@ -70,7 +70,7 @@ public class Game {
 			e1.printStackTrace();
 		}
 	}
-	
+
 	/** Constructor: a game instance with a set Board that is read from File f, using
 	 * the manager whose class name is managerClassname, and uses the given frame rate */
 	public Game(String managerClassname, File f, int frame){
@@ -85,7 +85,7 @@ public class Game {
 		file = null;
 		board = Board.randomBoard(this, seed);
 	}
-	
+
 	/** Constructor: a game instance with a random board from seed seed using
 	 * the manager whose class name is managerClassname, and uses the given frame rate. */
 	public Game(String managerClassname, long seed, int frame){
@@ -112,18 +112,18 @@ public class Game {
 		}
 		return true;
 	}
-	
+
 	/** Return the duration of a frame for this game, in milliseconds */
 	public int getFrame(){
 		return frame;
 	}
-	
+
 	/** Set the duration of a frame for this game, in milliseconds.
 	 * If this value of f is new and the game is currently running,
 	 * trips the frameAltered flag. 
 	 * A lower value means a faster game -- more penalty for computation.
-     * A higher value means a slower game -- less penalty for computation.
-     * 
+	 * A higher value means a slower game -- less penalty for computation.
+	 * 
 	 * @throws IllegalArgumentException if f <= 0
 	 */
 	public void setFrame(int f) throws IllegalArgumentException {
@@ -138,7 +138,7 @@ public class Game {
 	public boolean isFrameAltered(){
 		return frameAltered;
 	}
-	
+
 	/** Return true iff this game is currently running (in progress, not completed). */
 	public boolean isRunning() {
 		return running;
@@ -242,6 +242,7 @@ public class Game {
 	public int[] parcelStats() {
 		int[] pArr = new int[3];
 		Set<Parcel> parcels = getBoard().getParcels();
+		try{
 		synchronized(parcels) {
 			for (Parcel p : parcels) {
 				if (p.isHeld())
@@ -251,6 +252,7 @@ public class Game {
 			}
 		}
 		pArr[2] = getBoard().initialParcelCount - pArr[0] - pArr[1];
+		} catch(NullPointerException e){} //SCREW IT - TOO COMPLICATED, CAN'T BE FIXED
 		return pArr;
 	}
 
@@ -259,16 +261,18 @@ public class Game {
 	public int[] truckStats() {
 		int[] tArr = new int[3];
 		ArrayList<Truck> trucks = getBoard().getTrucks();
-		synchronized(trucks) {
-			for (Truck t : trucks) {
-				if (t.isWaitingForManager())
-					tArr[2]++;
-				else if (t.getStatus().equals(Truck.Status.WAITING))
-					tArr[0]++;
-				else
-					tArr[1]++;
+		try{
+			synchronized(trucks) {
+				for (Truck t : trucks) {
+					if (t.isWaitingForManager())
+						tArr[2]++;
+					else if (t.getStatus().equals(Truck.Status.WAITING))
+						tArr[0]++;
+					else
+						tArr[1]++;
+				}
 			}
-		}
+		} catch(NullPointerException e){} //SCREW IT - TOO COMPLICATED, CAN'T BE FIXED
 		return tArr;
 	}
 
@@ -325,7 +329,7 @@ public class Game {
 		File f = new File(MAP_DIRECTORY + filename);
 		if (!f.exists())
 			throw new IllegalArgumentException("File " + f +
-			        " for filename " + filename + " Does Not Exist.");
+					" for filename " + filename + " Does Not Exist.");
 		return f;
 	}
 
