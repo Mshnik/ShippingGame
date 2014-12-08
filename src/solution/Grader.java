@@ -33,7 +33,7 @@ public class Grader {
 	 * 
 	 * TODO Graders - feel free to change this value.
 	 */
-	private static final boolean SHOW_GUI = true;
+	private static final boolean SHOW_GUI = false;
 
 	/** Directory (within the project scope) where output files are written */
 	private static final String GRADING_OUTPUT_DIRECTORY = "Submissions";
