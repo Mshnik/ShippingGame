@@ -44,7 +44,12 @@ public class Game {
 	/** The default frame value. Other frame values can be used for testing,
 	 * but only games run with this frame value are fair for scoring.
 	 */
-	public static final int DEFAULT_FRAME = 40;
+	private static final int SCORE_FRAME_RATE = 0;
+	
+	/** Default frame value for GUI games. Good speed for testing and watching
+	 * progression
+	 */
+	private static final int GUI_FRAME_RATE = 40;
 
 	/** Set the manager to managerClassname, make game not running, not finished, with no
 	 * gui and a new GameThreadGroup. */
@@ -55,7 +60,7 @@ public class Game {
 		finished = false;
 		gui = null;
 		gameThreads = new GameThreadGroup();
-		frame = DEFAULT_FRAME;
+		frame = SCORE_FRAME_RATE;
 	}
 
 	/** Constructor: a game instance with a set Board that is read from File f, using
@@ -121,14 +126,17 @@ public class Game {
 	/** Set the duration of a frame for this game, in milliseconds.
 	 * If this value of f is new and the game is currently running,
 	 * trips the frameAltered flag. 
+	 * Can only be called in a game with a GUI
 	 * A lower value means a faster game -- more penalty for computation.
 	 * A higher value means a slower game -- less penalty for computation.
 	 * 
-	 * @throws IllegalArgumentException if f <= 0
+	 * @throws IllegalArgumentException if f < 0
 	 */
 	public void setFrame(int f) throws IllegalArgumentException {
-		if(f <= 0) throw new IllegalArgumentException("Can't set frame rate for " + this + " to " + f);
-		if(isRunning() && (f != DEFAULT_FRAME)) frameAltered = true;
+		if(f < 0) throw new IllegalArgumentException("Can't set frame rate for " + this + " to " + f);
+		if(gui == null && f != 0) 
+			throw new IllegalArgumentException("Can't change frame rate for non-gui game");
+		if(isRunning() && (f != frame)) frameAltered = true;
 		frame = f;
 	}
 
@@ -193,7 +201,7 @@ public class Game {
 	 * Additional calls to this method after the first call do nothing. */
 	public void start() {
 		if (!running && !finished) {
-			if (frame != DEFAULT_FRAME) frameAltered = true;
+			if (frame != GUI_FRAME_RATE) frameAltered = true;
 
 			setRunning(true);			
 
@@ -225,6 +233,8 @@ public class Game {
 	 * Students: don't call this */
 	public void setGUI(GUI g) {
 		gui = g;
+		if(gui != null) setFrame(GUI_FRAME_RATE);
+		else setFrame(SCORE_FRAME_RATE);
 	}
 
 	/** Return the current update message shown on the GUI. */
