@@ -3,7 +3,6 @@ package game;
 import gui.GUI;
 
 import java.io.File;
-import java.util.ConcurrentModificationException;
 import java.util.Random;
 
 /**
@@ -37,6 +36,9 @@ public class GameRunner {
 	 * otherwise
 	 */
 	private final boolean printOutput;
+	
+	/** True if gameRunners should print extra debugging output (time allotted) */
+	private static final boolean PRINT_DEBUG = false;
 
 	/**
 	 * Create a new GameRunner to run a set of games using userManagerClassname.
@@ -100,7 +102,7 @@ public class GameRunner {
 			}
 			try {
 				gs[i] = monitor(g);
-			} catch (ConcurrentModificationException e) {
+			} catch (Exception e) {
 				String msg = "" + e;
 				gs[i] = new GameScore(g, g.getManager().getScore(),
 						GameStatus.ERROR, "Exception Thrown - " + msg);
@@ -110,9 +112,8 @@ public class GameRunner {
 						+ "  " + String.format("%7d", gs[i].score) + "  "
 						+ gs[i].message);
 			}
-			System.err.println("Finished board " + (i + 1));
+			if(PRINT_DEBUG) System.err.println("Finished board " + (i + 1));
 		}
-		// if (hasGUI && gui != null) gui.dispose();
 		return gs;
 	}
 
@@ -130,7 +131,8 @@ public class GameRunner {
 		final double maxPathLength = g.getBoard().getMaxLength()
 				* g.getBoard().getEdgesSize();
 		final long maxTime = (long) (maxPathLength * parcelTruckRatio / 5 + TIME_ALLOWANCE);
-		System.err.println(">> Time Allowed : " + maxTime);
+		if(PRINT_DEBUG) 
+			System.err.println(">> Time Allowed : " + maxTime);
 
 		// Set the monitoring thread as this thread, start g
 		g.monitoringThread = Thread.currentThread();

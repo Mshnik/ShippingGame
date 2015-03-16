@@ -44,7 +44,7 @@ public class Game {
 	/** The default frame value. Other frame values can be used for testing,
 	 * but only games run with this frame value are fair for scoring.
 	 */
-	private static final int SCORE_FRAME_RATE = 0;
+	private static final int SCORE_FRAME_RATE = 1;
 	
 	/** Default frame value for GUI games. Good speed for testing and watching
 	 * progression
