@@ -292,9 +292,6 @@ public final class Truck implements BoardElement, Runnable {
             locLock.acquire();
             travelingTo = t;
             locLock.release();
-            preManagerNotification();
-            game.getManager().truckNotification(this, Manager.Notification.TRAVELING_TO_CHANGED);
-            postManagerNotification();
         }
     }
 
@@ -361,9 +358,6 @@ public final class Truck implements BoardElement, Runnable {
             }
             goingTo = g;
             locLock.release();
-            preManagerNotification();
-            game.getManager().truckNotification(this, Manager.Notification.GOING_TO_CHANGED);
-            postManagerNotification();
         }
     }
 
@@ -385,12 +379,9 @@ public final class Truck implements BoardElement, Runnable {
      * @throws InterruptedException */
     private void setStatus(Truck.Status s) throws InterruptedException {
         if (!status.equals(s)){
-            preManagerNotification();
             statusLock.acquire();
             status = s;
             statusLock.release();
-            game.getManager().truckNotification(this, Manager.Notification.STATUS_CHANGED);
-            postManagerNotification();
         }
     }
 
@@ -514,9 +505,6 @@ public final class Truck implements BoardElement, Runnable {
             parcelLock.release();
 
             getManager().getScoreObject().changeScore(getBoard().getPickupCost());
-            preManagerNotification();
-            game.getManager().truckNotification(this, Manager.Notification.PICKED_UP_PARCEL);
-            postManagerNotification();
         }
     }
 
@@ -545,9 +533,6 @@ public final class Truck implements BoardElement, Runnable {
         }
         load = null;
         getManager().getScoreObject().changeScore(getBoard().getDropoffCost());
-        preManagerNotification();
-        game.getManager().truckNotification(this, Manager.Notification.DROPPED_OFF_PARCEL);
-        postManagerNotification();
 
     }
 

@@ -33,13 +33,13 @@ public abstract class Manager implements Runnable{
 	/** Behavior for the Manager and all trucks. To be overridden in subclasses */
 	public abstract void run();
 
-	/** Message options from a truck to a manager include the following. Unless
-	 * otherwise noted, the truck's status will be WAITING whenever a notification
-	 * is fired. Exceptions are TRAVELING_TO_CHANGED (always) and STATUS_CHANGED
-	 * (sometimes).
+	/** Message options from a truck to a manager include the following. 
+	 * The truck's status will be WAITING whenever a notification
+	 * is fired. 
 	 */
 	public enum Notification{
-		/** Notification sent whenever a truck is waiting without any travel directions.
+		/** Notification sent whenever a truck is waiting (doing nothing) 
+		 *  without any travel directions. <br>
 		 *  Sent every time the truck checks that it still has no travel directions
 		 *  - Every Truck.WAIT_TIME ms. */
 		WAITING,
@@ -48,35 +48,10 @@ public abstract class Manager implements Runnable{
 		 *  currently on -- changes. This occurs whenever a truck reaches a new node */
 		LOCATION_CHANGED,
 		
-		/** Notification Sent whenever a truck's field travelingTo field - what Node the 
-		 *  truck is currently traveling toward changes. This occurs whenever a truck leaves 
-		 *  a node towards a new node. Thus this will be fired only while a Truck is traveling, 
-		 *  not waiting. */
-		TRAVELING_TO_CHANGED,
-		
-		/** Notification sent whenever a truck's goingTo field - what Node the
-		 *  truck will end up at when the current travel queue is exhausted - changes.
-		 *  This occurs whenever a new edge is added to a truck's travel directions. */
-		GOING_TO_CHANGED,
-		
-		/** Notification sent whenever a truck's traveling/waiting status changes.
-		 *  This occurs whenever a truck begins traveling or stops traveling. Status
-		 *  has successfully been changed when the notification is fired,
-		 *  so if the truck's status is TRAVELING and the STATUS_CHANGED notification
-		 *  is fired, the truck just had its status changed to TRAVELING and is
-		 *  now TRAVELING. */
-		STATUS_CHANGED,
-		
 		/** Notification sent whenever a truck arrives at a node that contains
 		 *  at least one parcel. A PARCEL_AT_NODE notification is fired after a
 		 *  LOCATION_CHANGED notification */
-		PARCEL_AT_NODE,
-		
-		/** Notification sent whenever a truck picks up a parcel */
-		PICKED_UP_PARCEL,
-		
-		/** Notification sent whenever a truck drops off up a parcel */
-		DROPPED_OFF_PARCEL
+		PARCEL_AT_NODE
 	}
 
 	/** Called by Truck t to notify the manager that something has occurred. 
