@@ -98,6 +98,28 @@ public class GUI extends JFrame{
 				UPDATE_PANEL_HEIGHT + DRAWING_BOARD_HEIGHT_MIN));
 		setDefaultCloseOperation(EXIT_ON_CLOSE);
 
+		createDrawingPanel();
+
+		createSidePanel();
+
+		createBottomPanel();
+
+		createMenuBar();
+
+		pack();
+		validate();
+		repaint();
+		drawingBoardHeight = drawingPanel.getHeight();
+		drawingBoardWidth = drawingPanel.getWidth();
+		setGame(g);
+		initialized = true;
+		setLocation(X_OFFSET, Y_OFFSET);
+		drawingPanelResized();
+		setVisible(true);
+	}
+
+	/** Creates and re-adds the drawingPanel to this gui. Used as part of construction */
+	private void createDrawingPanel(){
 		drawingPanel = new JPanel();
 		drawingPanel.setBorder(new LineBorder(new Color(131,155,255)));
 		drawingPanel.setBackground(Color.WHITE);
@@ -117,7 +139,10 @@ public class GUI extends JFrame{
 		});
 
 		getContentPane().add(drawingPanel, BorderLayout.CENTER);
+	}
 
+	/** Creates and adds the sidePanel to this gui. Used as part of construction */
+	private void createSidePanel(){
 		sidePanel = new JPanel();
 		sidePanel.setBorder(new LineBorder(new Color(131,155,255)));
 		sidePanel.setBackground(new Color(203, 255, 181));
@@ -126,7 +151,10 @@ public class GUI extends JFrame{
 		sidePanel.setLayout(new BorderLayout());
 
 		getContentPane().add(sidePanel, BorderLayout.EAST);
+	}
 
+	/** Creates and adds the bottomPanel to this gui. Used as part of construciton */
+	private void createBottomPanel(){
 		JPanel bottomPanel = new JPanel();
 		bottomPanel.setPreferredSize(new Dimension(DRAWING_BOARD_WIDTH, UPDATE_PANEL_HEIGHT));
 		bottomPanel.setBackground(new Color(181,255,252));
@@ -153,6 +181,10 @@ public class GUI extends JFrame{
 		JLabel lblSpace = new JLabel("\t\t");
 		bottomPanel.add(lblSpace);
 
+	}
+
+	/** Creates and adds the menuBar to this GUI. Used during construction */
+	private void createMenuBar(){
 		menuBar = new JMenuBar();
 		setJMenuBar(menuBar);
 
@@ -298,17 +330,6 @@ public class GUI extends JFrame{
 		d.setSelected(true);
 		addEdgeStyleCheckbox("Highlight Travel", Line.ColorPolicy.HIGHLIGHT_TRAVEL, mnGUI, edgeStyleGroup);
 		addEdgeStyleCheckbox("Gradient", Line.ColorPolicy.DISTANCE_GRADIENT, mnGUI, edgeStyleGroup);
-
-		pack();
-		validate();
-		repaint();
-		drawingBoardHeight = drawingPanel.getHeight();
-		drawingBoardWidth = drawingPanel.getWidth();
-		setGame(g);
-		initialized = true;
-		setLocation(X_OFFSET, Y_OFFSET);
-		drawingPanelResized();
-		setVisible(true);
 	}
 
 	/** Call to show the message for a json parsing error */
