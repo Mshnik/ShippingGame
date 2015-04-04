@@ -24,7 +24,7 @@
 \begin{document}
 \lstset{language=Java}
 \begin{center}
-\begin{HUGE}{\bf A6b - Shipping Game}\\ \end{HUGE}
+\begin{HUGE}{\bf A8 - Shipping Game}\\ \end{HUGE}
 \vspace{3mm}
 \begin{LARGE} By Michael Patashnik and the CS2110 Course Staff\\ \end{LARGE}
 \vspace{7mm}
@@ -37,12 +37,12 @@
 \item Brief introduction to the classes
 \item Your tasks
 \item Concurrency
-\item What to hand in when
+\item Grading
 \end{large}\end{enumerate}
 \end{center}
 
 \section{1. Introduction}
-You can work on A6b in groups of two. Form the group well before the assignment due date. Both must do something to form the group:
+You can work on A8 in groups of two. Form the group well before the assignment due date. Both must do something to form the group:
 one proposes, the other accepts.
 People in a group must work together. It is against the rules for one person to do programming on this assignment
 without the other person sitting nearby and helping. Take turns "driving" ---using the keyboard and mouse.
@@ -51,7 +51,7 @@ With the exception of your CMS-registered group partner, you may not look at any
 or show your code to anyone else (except the course staff), in any form. You may not show or give your code to another
 student in the class.
 
-We will pin a note on the Piazza, as we did for A4 and A5, to discuss important points. Check it often, especially before you post a question.
+We will pin a note on the Piazza, as we did for earlier projects, to discuss important points. Check it often, especially before you post a question.
 
 \section{2. Game overview}
 In Shipping Game, you play the part of a shipping company engineer who ensures that parcels get where they're going in a timely fashion.\ In a run of Shipping Game, you are presented with an undirected, weighted graph (see next page) that represents the world.\ The nodes in the graph are cities (labeled with their names), and the edges are highways between cities (labeled with their length). At each city, there may be some parcels, to be delivered to another city. Thus, a parcel has a start city and a (different) destination city.
@@ -68,11 +68,10 @@ Trucks begin the game on the Truck Depot city (there will be exactly one Truck D
 \subsection{Installation}
 The code for this project is provided as a .jar file, without source files. Various data files are provided as text files in folders.
 \begin{enumerate}
-\item Download the A6 files from the CMS.
-\item Create a new Java project in Eclipse, named A6. 
-\item Drag ShippingGame.jar and compressed folder data into your A6 folder, expand (unzip) the data folder. Don't change
-the names of any of the folders within data or the code won?' be able to
-find the data.
+\item Download the A8 files from the CMS.
+\item Create a new Java project in Eclipse, named A8. 
+\item Drag ShippingGame.jar and compressed folder data into your A8 folder, expand (unzip) the data folder. Don't change
+the names of any of the folders within data or the code won't be able to find the data. When this is done correctly, you should have a data folder with your project root, just as you did in A7.
 \item Select ShippingGame.jar and right click on it. In the contextual menu that
 pops up, select Build Path -> Add to Build Path. This makes available all
 the .class files in the jar file.
@@ -94,7 +93,7 @@ methods" are checked. This makes everything easier for you.
 
 \subsection{Running}
 \begin{enumerate}
-\item Select A6 -> Run As... --> Run Configurations... --> New Launch Configuration (blank page with star in top left)
+\item Select A7 -> Run As... --> Run Configurations... --> New Launch Configuration (blank page with star in top left)
 \item Click Search... next to Main class --> Select game.main
 \item Click run.
 \item From here on out, the settings are saved, so you can simply run the project by clicking the green run button as usual.
@@ -179,7 +178,7 @@ The next two blocks of non-static data are changed as the game proceeds.
 You control how often non-static data is refreshed using bottom slider Update Time. Dragging the slider to the left updates the data more often at the cost of using a tiny bit more processing 
 power. For debugging purposes, it is useful to have the data update as quickly as possible, whereas once your code works correctly, you can have the data rarely updated to get the best possible score.\\
 
-Finally, slider Frame controls how quickly the game progresses.\ A higher value (drag right) causes the trucks to travel more slowly and favors more computationally complex solutions, and a lower value causes the trucks to travel more quickly and favors more computationally simple solutions. It can be useful in debugging to drag the slider far to the right to watch the trucks move in slow motion. However, note that altering the slider causes the score to change and change the color of the Frame label to red. \textbf{Grading will be done at a Frame rate of 40ms, so when checking your scores make sure that you have not moved this slider} (The label will stay black when the frame rate is unaltered).
+Finally, slider Frame controls how quickly the game progresses.\ A higher value (drag right) causes the trucks to travel more slowly and favors more computationally complex solutions, and a lower value causes the trucks to travel more quickly and favors more computationally simple solutions. It can be useful in debugging to drag the slider far to the right to watch the trucks move in slow motion. However, note that altering the slider causes the score to change and change the color of the Frame label to red. (The label will stay black when the frame rate is unaltered).\\
 
 \section{5. Brief introduction to the classes}
 Assuming your installation worked correctly, you should be able to see the javadoc specifications of all public classes and methods in package game. You can do this by right-clicking index.html (in data/doc/) and selecting open with... -> Web Browser. If this doesn't work, consult section 2 of this guide or ask on Piazza/at office hours.\\
@@ -265,7 +264,7 @@ This algorithm makes use of every truck, but because no data structure is access
 
 If, however, you're shooting for a perfect grade, you may have to do some amount of work to ensure that your complex network of information sharing between trucks remains thread safe. Concurrent modifications of most data structures cause incorrect states, usually leading to null pointers or array-index-out-of-bound errors. Failure to write thread safe code might lead to unpredictable and catastrophic errors.\\
 \begin{figure}[h]
-\centerline{\includegraphics[scale=0.4]{collision.png}} 
+\centerline{\includegraphics[scale=0.5]{collision.png}} 
 \caption{\em{Don't rely on Spongebob to keep your code thread safe.}}
 \end{figure}
 
@@ -277,7 +276,8 @@ Java's built-in concurrency system. Threads can cause themselves to wait, using 
 \item \textbf{Synchronized Collections} - Power: low. Possibility for error: none. \\
 Class java.util.Collections \href{http://docs.oracle.com/javase/7/docs/api/java/util/Collections.html\#synchronizedCollection(java.util.Collection)}{({\color{blue}\underline{API}})} provides the ability to create a synchronized collection (a synchronized set, list, map, etc...). These collections are inherently thread-safe for basic operations, including adding elements, removing elements, getting elements, and checking the size of the collection. Notably, you can't iterate over a synchronized collection without a synchronized block (see next section), so complex operations that require iterating aren't safe. If you can get away with just using Synchronized Collections, you should do so and won't have any problems.
 \item \textbf{Synchronized Blocks} - Power: medium. Possibility for Error: low.\\
-A synchronized block limits one thread to executing its body at a time. Other threads wait on before the statement until the executing thread finishes the block. Moreover, each synchronized block is called on some object in the form:
+A synchronized block limits one thread to executing its body at a time. Other threads wait on before the statement until the executing thread finishes the block. Moreover, each synchronized block is called on some object in the form:\\
+
 \begin{lstlisting}[frame=single]
 synchronized(obj){
 //...Do things that only one thread should be doing.
@@ -299,8 +299,12 @@ The simplest way to use synchronized blocks on Synchronized collections to allow
 Locks (and Semaphores and other equivalent classes) take the two pieces of a synchronized block ---preventing other threads from accessing code and letting other threads know that the going is clear--- and separate them into two individual lines of code. Only one thread can "own" a mutex (mutual exclusion object) at a time (semaphores are generalized to allow N threads), so when a thread acquires a Lock l, all other threads that attempt to call l.lock() are forced to wait until the thread that owns the lock calls l.unlock(), at which point an arbitrarily chosen thread that is waiting will call l.lock() and proceed. This gives you ultimate control over which threads execute what where and when, but it is  prone to issues such as deadlock in which two threads are each waiting to acquire a lock owned by the other. Locks and Semaphores are overkill for all but the most complex solutions and are most likely not necessary for this project. 
 \end{itemize}
 
-\section{8. What to hand in when}
-This project is due on the last day of class, \textbf{Thursday, 4 December, at 11:59PM}.
-Submit a single .zip file that contains the contents of package student only. All classes your code needs to run must be in package student.  For example, if your submission requires three files, package student contains should contain these three files and the zip file you submit should contain only those three files.  There should be NO DIRECTORIES in your submission.  Failure to adhere to this structure will lead to grading of your Submission being delayed and/or a penalty for failing to submit properly.
+\section{8. Grading}
+This project is due on the last day of class, \textbf{//TODO}.
+Submit a single .zip file that contains the contents of package student only. All classes your code needs to run must be in package student.  For example, if your submission requires three files, package student contains should contain these three files and the zip file you submit should contain only those three files.  There should be NO DIRECTORIES in your submission.  Failure to adhere to this structure will lead to grading of your Submission being delayed and/or a penalty for failing to submit properly.\\
+
+\textbf{Grading will be done at a Frame rate of 1ms (very fast) in headless mode, so when checking your scores make sure that you are running in headless mode which defaults to 1ms.} Running the game  in GUI mode with a frame rate of 1ms may produce a close but slightly altered score.\\ 
+
+In order to grade your projects in a timely fashion, it is necessary to enforce a timeout on runnings - some maximum amount of time to allow before killing the process. The main purpose of this mechanism is to prevent broken solutions that have entered an infinite loop or recursion from causing the grading program to break. The exact amount of time allowed is variable based on the map size (maps with more parcels/longer edges have higher allotted time), but every map is given at least 10 seconds. This should be plenty of time for even more advanced solutions. If you're ever worried that your solution may be taking to long, run your solution on in headless mode on the seed that worries you and make sure that it never times out. The GameRunner used by the headless mode is the same one used for grading.
 
 \end{document}
