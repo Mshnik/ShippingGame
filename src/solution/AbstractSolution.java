@@ -40,7 +40,7 @@ public abstract class AbstractSolution extends Manager {
 	 * if no path exists. 
 	 */
 	protected static LinkedList<Node> dijkstra(Node start, Node end) {
-		MinHeap<Node> frontier = new HeapSolution<Node>();
+	    PQueue<Node> frontier = new HeapSolution<Node>();
 		HashMap<Node, NodeInfo> nodeInfo = new HashMap<Node, NodeInfo>();
 
 		frontier.add(start, 0);

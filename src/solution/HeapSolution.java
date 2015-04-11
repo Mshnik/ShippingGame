@@ -1,9 +1,9 @@
 package solution;
 
-import game.MinHeap;
+import game.PQueue;
 import java.util.*;
 
-public class HeapSolution<T> extends ArrayList<T> implements MinHeap<T> {
+public class HeapSolution<T> extends ArrayList<T> implements PQueue<T> {
 
 	private static final long serialVersionUID = 1L;
 	
@@ -37,6 +37,14 @@ public class HeapSolution<T> extends ArrayList<T> implements MinHeap<T> {
 		bubbleDown(0);
 		return rtnVal;
 	}
+	
+	@Override
+    /** Return the min value in this heap.
+     * Precondiiton: The heap is not empty. */
+    public T peek() {
+        T rtnVal= super.get(0);
+        return rtnVal;
+    }
 
 	@Override
 	/** Add item with priority p to this heap. */

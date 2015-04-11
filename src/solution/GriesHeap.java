@@ -1,11 +1,11 @@
 package solution;
 
-import game.MinHeap;
+import game.PQueue;
 import java.util.ArrayList;
 import java.util.HashMap;
 
 /** An instance is a heap of elements of type T. */
-public class GriesHeap<T> implements MinHeap<T> {
+public class GriesHeap<T> implements PQueue<T> {
     
     // The heap consists of the b.size() elements in b.
     // They satisfy the heap properties:
@@ -39,6 +39,13 @@ public class GriesHeap<T> implements MinHeap<T> {
         itemMap.remove(val);
         b.remove(b.size()-1);
         bubbleDown(0);
+        return val;
+    }
+    
+    /** Return the min value in this heap.
+     * Precondition: The heap is not empty. */
+    public @Override T peek() {
+        T val= b.get(0);
         return val;
     }
 

@@ -83,7 +83,7 @@ public class HeapTester{
     /** Create and return an instance of the user-defined manager class, 
      * named userHeapClass. */
     @SuppressWarnings("unchecked")
-    private static MinHeap<Thingy> createUserManager(String userHeapClass) {
+    private static PQueue<Thingy> createUserManager(String userHeapClass) {
         try {
             String heapClass = "";
             if (userHeapClass.startsWith("<s>"))
@@ -93,11 +93,11 @@ public class HeapTester{
 
             @SuppressWarnings("rawtypes")
             Class c= Class.forName(heapClass);
-            if (!MinHeap.class.isAssignableFrom(c))
+            if (!PQueue.class.isAssignableFrom(c))
                 throw new IllegalArgumentException("Class " + heapClass + 
                         " Does not Extend Heap Class");
 
-            return (MinHeap<Thingy>) c.newInstance();//OK because default constructor
+            return (PQueue<Thingy>) c.newInstance();//OK because default constructor
             // is only constructor that should be used.
         } catch (ClassNotFoundException | InstantiationException |
                 IllegalAccessException | IllegalArgumentException e){
@@ -156,7 +156,7 @@ public class HeapTester{
      * Also test functions isEmpty() and size(). */
     public static boolean testAdding()  {
         System.out.println("Start of adding test. adding integers 0..7, in order.");
-        MinHeap<Thingy> heap= createUserManager(userClassName);
+        PQueue<Thingy> heap= createUserManager(userClassName);
 
         if (!heap.isEmpty()) {
             System.out.println("Heap should be empty but isn't.");
@@ -201,7 +201,7 @@ public class HeapTester{
 
     /** Return true iff values removed from a heap are in increasing order. */
     public static boolean testPollingOrder() {
-        MinHeap<Thingy> heap= createUserManager(userClassName);
+        PQueue<Thingy> heap= createUserManager(userClassName);
         ArrayList<Thingy> arrayList= new ArrayList<Thingy>();
 
         // inv: heap and arrayList contain the same values, all random
@@ -246,7 +246,7 @@ public class HeapTester{
         };
 
         ArrayList<Thingy> arrayList= new ArrayList<Thingy>();
-        MinHeap<Thingy> heap= createUserManager(userClassName); 
+        PQueue<Thingy> heap= createUserManager(userClassName); 
 
         //Add a bunch of elements to both arrayList and heap.
         for (int i= 0; i < maxHeapSizeForUpdate; i++) {
