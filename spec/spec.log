@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.14159265-2.6-1.40.15 (TeX Live 2014) (preloaded format=pdflatex 2014.5.25)  4 APR 2015 16:44
+This is pdfTeX, Version 3.14159265-2.6-1.40.15 (TeX Live 2014) (preloaded format=pdflatex 2014.5.25)  12 APR 2015 12:57
 entering extended mode
  restricted \write18 enabled.
  %&-line parsing enabled.
@@ -879,11 +879,8 @@ Package: array 2008/09/09 v2.4c Tabular extension package (FMi)
 )
 \everycr=\toks42
 \minrowclearance=\skip55
-) (./spec.aux
-
-LaTeX Warning: Label `alg:ls' multiply defined.
-
 )
+No file spec.aux.
 \openout1 = `spec.aux'.
 
 LaTeX Font Info:    Checking defaults for OML/cmm/m/it on input line 24.
@@ -901,7 +898,7 @@ LaTeX Font Info:    ... okay on input line 24.
 LaTeX Font Info:    Checking defaults for PD1/pdf/m/n on input line 24.
 LaTeX Font Info:    ... okay on input line 24.
 LaTeX Font Info:    Try loading font information for T1+lmr on input line 24.
- (/usr/local/texlive/2014/texmf-dist/tex/latex/lm/t1lmr.fd
+(/usr/local/texlive/2014/texmf-dist/tex/latex/lm/t1lmr.fd
 File: t1lmr.fd 2009/10/30 v1.6 Font defs for Latin Modern
 )
 *geometry* driver: auto-detecting
@@ -951,8 +948,6 @@ Package: gettitlestring 2010/12/03 v1.4 Cleanup title references (HO)
 LaTeX Info: Redefining \ref on input line 24.
 LaTeX Info: Redefining \pageref on input line 24.
 LaTeX Info: Redefining \nameref on input line 24.
-
-(./spec.out) (./spec.out)
 \@outlinefile=\write4
 \openout4 = `spec.out'.
 
@@ -991,7 +986,7 @@ ABD: EveryShipout initializing macros
 (/usr/local/texlive/2014/texmf-dist/tex/latex/listings/lstlang1.sty
 File: lstlang1.sty 2014/03/04 1.5c listings language file
 )
-<map1.png, id=123, 465.74pt x 375.4025pt>
+<map1.png, id=7, 465.74pt x 375.4025pt>
 File: map1.png Graphic file (type png)
  <use map1.png>
 Package pdftex.def Info: map1.png used on input line 60.
@@ -1000,172 +995,172 @@ Package pdftex.def Info: map1.png used on input line 60.
 
 {/usr/local/texlive/2014/texmf-var/fonts/map/pdftex/updmap/pdftex.map}] [2 <./m
 ap1.png>] [3]
-LaTeX Font Info:    Try loading font information for OT1+lmr on input line 105.
+LaTeX Font Info:    Try loading font information for OT1+lmr on input line 107.
 
 
 (/usr/local/texlive/2014/texmf-dist/tex/latex/lm/ot1lmr.fd
 File: ot1lmr.fd 2009/10/30 v1.6 Font defs for Latin Modern
 )
-LaTeX Font Info:    Try loading font information for OML+lmm on input line 105.
+LaTeX Font Info:    Try loading font information for OML+lmm on input line 107.
 
 
 (/usr/local/texlive/2014/texmf-dist/tex/latex/lm/omllmm.fd
 File: omllmm.fd 2009/10/30 v1.6 Font defs for Latin Modern
 )
-LaTeX Font Info:    Try loading font information for OMS+lmsy on input line 105
+LaTeX Font Info:    Try loading font information for OMS+lmsy on input line 107
 .
 
 (/usr/local/texlive/2014/texmf-dist/tex/latex/lm/omslmsy.fd
 File: omslmsy.fd 2009/10/30 v1.6 Font defs for Latin Modern
 )
-LaTeX Font Info:    Try loading font information for OMX+lmex on input line 105
+LaTeX Font Info:    Try loading font information for OMX+lmex on input line 107
 .
 
 (/usr/local/texlive/2014/texmf-dist/tex/latex/lm/omxlmex.fd
 File: omxlmex.fd 2009/10/30 v1.6 Font defs for Latin Modern
 )
 LaTeX Font Info:    External font `lmex10' loaded for size
-(Font)              <10.95> on input line 105.
+(Font)              <10.95> on input line 107.
 LaTeX Font Info:    External font `lmex10' loaded for size
-(Font)              <8> on input line 105.
+(Font)              <8> on input line 107.
 LaTeX Font Info:    External font `lmex10' loaded for size
-(Font)              <6> on input line 105.
-LaTeX Font Info:    Try loading font information for U+msa on input line 105.
+(Font)              <6> on input line 107.
+LaTeX Font Info:    Try loading font information for U+msa on input line 107.
 
 (/usr/local/texlive/2014/texmf-dist/tex/latex/amsfonts/umsa.fd
 File: umsa.fd 2013/01/14 v3.01 AMS symbols A
 )
-LaTeX Font Info:    Try loading font information for U+msb on input line 105.
+LaTeX Font Info:    Try loading font information for U+msb on input line 107.
 
 (/usr/local/texlive/2014/texmf-dist/tex/latex/amsfonts/umsb.fd
 File: umsb.fd 2013/01/14 v3.01 AMS symbols B
 )
-<args.png, id=164, 699.61375pt x 178.6675pt>
+<args.png, id=53, 699.61375pt x 178.6675pt>
 File: args.png Graphic file (type png)
  <use args.png>
-Package pdftex.def Info: args.png used on input line 122.
+Package pdftex.def Info: args.png used on input line 124.
 (pdftex.def)             Requested size: 384.78876pt x 98.26741pt.
 
-<gui.png, id=165, 1241.63875pt x 747.79375pt>
+<gui.png, id=54, 1241.63875pt x 747.79375pt>
 File: gui.png Graphic file (type png)
  <use gui.png>
-Package pdftex.def Info: gui.png used on input line 128.
+Package pdftex.def Info: gui.png used on input line 130.
 (pdftex.def)             Requested size: 558.73228pt x 336.50407pt.
 
 
 LaTeX Warning: `h' float specifier changed to `ht'.
 
-LaTeX Font Info:    Try loading font information for OMS+lmr on input line 136.
+LaTeX Font Info:    Try loading font information for OMS+lmr on input line 138.
 
 (/usr/local/texlive/2014/texmf-dist/tex/latex/lm/omslmr.fd
 File: omslmr.fd 2009/10/30 v1.6 Font defs for Latin Modern
 )
 LaTeX Font Info:    Font shape `OMS/lmr/m/n' in size <10.95> not available
-(Font)              Font shape `OMS/lmsy/m/n' tried instead on input line 136.
+(Font)              Font shape `OMS/lmsy/m/n' tried instead on input line 138.
  [4 <./args.png>]
 [5 <./gui.png>]
-Underfull \hbox (badness 10000) in paragraph at lines 178--180
+Underfull \hbox (badness 10000) in paragraph at lines 180--182
 
  []
 
 [6]
-Underfull \hbox (badness 10000) in paragraph at lines 181--182
+Underfull \hbox (badness 10000) in paragraph at lines 183--184
 
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 184--185
+Underfull \hbox (badness 10000) in paragraph at lines 186--187
 
  []
 
-<hirearchy.png, id=185, 778.91pt x 338.26375pt>
+<hirearchy.png, id=76, 778.91pt x 338.26375pt>
 File: hirearchy.png Graphic file (type png)
  <use hirearchy.png>
-Package pdftex.def Info: hirearchy.png used on input line 188.
+Package pdftex.def Info: hirearchy.png used on input line 190.
 (pdftex.def)             Requested size: 545.23329pt x 236.78299pt.
 
 
 LaTeX Warning: `h' float specifier changed to `ht'.
 
 [7] [8 <./hirearchy.png>]
-Underfull \hbox (badness 10000) in paragraph at lines 223--225
+Underfull \hbox (badness 10000) in paragraph at lines 225--227
 
  []
 
-[9] <fry.jpg, id=200, 803.0pt x 602.25pt>
+[9] <fry.jpg, id=107, 803.0pt x 602.25pt>
 File: fry.jpg Graphic file (type jpg)
  <use fry.jpg>
-Package pdftex.def Info: fry.jpg used on input line 227.
+Package pdftex.def Info: fry.jpg used on input line 229.
 (pdftex.def)             Requested size: 256.96526pt x 192.72392pt.
 
-Underfull \hbox (badness 10000) in paragraph at lines 231--232
+Underfull \hbox (badness 10000) in paragraph at lines 233--234
 
  []
 
 Package hyperref Info: bookmark level for unknown algorithm defaults to 0 on in
-put line 238.
+put line 240.
 [10 <./fry.jpg>]
-Underfull \hbox (badness 10000) in paragraph at lines 263--264
+Underfull \hbox (badness 10000) in paragraph at lines 265--266
 
  []
 
-<collision.png, id=206, 644.4075pt x 470.75874pt>
+<collision.png, id=115, 644.4075pt x 470.75874pt>
 File: collision.png Graphic file (type png)
  <use collision.png>
-Package pdftex.def Info: collision.png used on input line 267.
+Package pdftex.def Info: collision.png used on input line 269.
 (pdftex.def)             Requested size: 322.20296pt x 235.3788pt.
 
 
 LaTeX Warning: `h' float specifier changed to `ht'.
 
 [11]
-Underfull \hbox (badness 10000) in paragraph at lines 278--280
+Underfull \hbox (badness 10000) in paragraph at lines 280--282
 
  []
 
 [12 <./collision.png>]
-Underfull \hbox (badness 10000) in paragraph at lines 286--287
+Underfull \hbox (badness 10000) in paragraph at lines 288--289
 
  []
 
 
-Overfull \hbox (5.69582pt too wide) in paragraph at lines 295--296
-\T1/lmr/m/n/10.95 could not ex-e-cute pro-cessA() and pro-cessB() con-cur-rentl
-y, be-cause a thread's
- []
-
-
-Underfull \hbox (badness 10000) in paragraph at lines 303--305
+Underfull \hbox (badness 10000) in paragraph at lines 305--307
 
  []
 
 [13]
-Underfull \hbox (badness 10000) in paragraph at lines 306--307
+Underfull \hbox (badness 10000) in paragraph at lines 308--309
 
  []
 
 [14]
-Package atveryend Info: Empty hook `BeforeClearDocument' on input line 310.
-Package atveryend Info: Empty hook `AfterLastShipout' on input line 310.
+Package atveryend Info: Empty hook `BeforeClearDocument' on input line 312.
+Package atveryend Info: Empty hook `AfterLastShipout' on input line 312.
  (./spec.aux)
-Package atveryend Info: Executing hook `AtVeryEndDocument' on input line 310.
-Package atveryend Info: Executing hook `AtEndAfterFileList' on input line 310.
-Package rerunfilecheck Info: File `spec.out' has not changed.
-(rerunfilecheck)             Checksum: B051EE21B677638FC9584D657516994A;1742.
+Package atveryend Info: Executing hook `AtVeryEndDocument' on input line 312.
+Package atveryend Info: Executing hook `AtEndAfterFileList' on input line 312.
 
 
-LaTeX Warning: There were multiply-defined labels.
+Package rerunfilecheck Warning: File `spec.out' has changed.
+(rerunfilecheck)                Rerun to get outlines right
+(rerunfilecheck)                or use package `bookmark'.
 
-Package atveryend Info: Empty hook `AtVeryVeryEnd' on input line 310.
+Package rerunfilecheck Info: Checksums for `spec.out':
+(rerunfilecheck)             Before: <no file>
+(rerunfilecheck)             After:  B051EE21B677638FC9584D657516994A;1742.
+
+LaTeX Warning: Label(s) may have changed. Rerun to get cross-references right.
+
+Package atveryend Info: Empty hook `AtVeryVeryEnd' on input line 312.
  ) 
 Here is how much of TeX's memory you used:
- 18960 strings out of 493117
- 336914 string characters out of 6135433
- 420882 words of memory out of 5000000
- 21966 multiletter control sequences out of 15000+600000
+ 18923 strings out of 493117
+ 336483 string characters out of 6135433
+ 420833 words of memory out of 5000000
+ 21936 multiletter control sequences out of 15000+600000
  51232 words of font info for 43 fonts, out of 8000000 for 9000
  1141 hyphenation exceptions out of 8191
- 55i,8n,54p,959b,1939s stack positions out of 5000i,500n,10000p,200000b,80000s
+ 55i,8n,54p,964b,1939s stack positions out of 5000i,500n,10000p,200000b,80000s
 {/usr/local/texlive/2014/texmf-dist/fonts/enc/dvips/lm/lm-ec.enc}{/usr/local/
 texlive/2014/texmf-dist/fonts/enc/dvips/lm/lm-mathsy.enc}{/usr/local/texlive/20
 14/texmf-dist/fonts/enc/dvips/lm/lm-mathit.enc}{/usr/local/texlive/2014/texmf-d
@@ -1178,10 +1173,10 @@ cal/texlive/2014/texmf-dist/fonts/type1/public/lm/lmr12.pfb></usr/local/texlive
 -dist/fonts/type1/public/lm/lmr9.pfb></usr/local/texlive/2014/texmf-dist/fonts/
 type1/public/lm/lmri10.pfb></usr/local/texlive/2014/texmf-dist/fonts/type1/publ
 ic/lm/lmsy10.pfb>
-Output written on spec.pdf (14 pages, 1350156 bytes).
+Output written on spec.pdf (14 pages, 1348086 bytes).
 PDF statistics:
- 315 PDF objects out of 1000 (max. 8388607)
- 280 compressed objects within 3 object streams
- 97 named destinations out of 1000 (max. 500000)
- 275 words of extra memory for PDF output out of 10000 (max. 10000000)
+ 224 PDF objects out of 1000 (max. 8388607)
+ 190 compressed objects within 2 object streams
+ 96 named destinations out of 1000 (max. 500000)
+ 43 words of extra memory for PDF output out of 10000 (max. 10000000)
 
