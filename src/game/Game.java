@@ -134,7 +134,7 @@ public class Game {
 	 */
 	public void setFrame(int f) throws IllegalArgumentException {
 		if(f < 0) throw new IllegalArgumentException("Can't set frame rate for " + this + " to " + f);
-		if(gui == null && f != 0) 
+		if(gui == null && f != SCORE_FRAME_RATE) 
 			throw new IllegalArgumentException("Can't change frame rate for non-gui game");
 		if(isRunning() && (f != frame)) frameAltered = true;
 		frame = f;

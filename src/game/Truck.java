@@ -44,10 +44,6 @@ public final class Truck implements BoardElement, Runnable {
     	 */
     	WAITING};
 
-    /** Milliseconds between wait updates - a truck calling
-     * Manager.truckNotification(this, Notification.WAITING) .*/
-    public static final int WAIT_TIME = 5;
-
     /** Maximum length/frame speed that a truck can travel. */
     public static final int MAX_SPEED = 10;
 
@@ -155,7 +151,7 @@ public final class Truck implements BoardElement, Runnable {
                 }
                 locLock.release();
 
-                Thread.sleep(WAIT_TIME);
+                Thread.sleep(game.getFrame());
                 preManagerNotification();
                 game.getManager().truckNotification(this, Manager.Notification.WAITING);
                 postManagerNotification();
@@ -197,7 +193,7 @@ public final class Truck implements BoardElement, Runnable {
     private void fixLastTravelTime() {
         long now = System.currentTimeMillis();
         long diff = now - lastTravelTime;
-        getManager().getScoreObject().changeScore(getBoard().getWaitCost() * (int)(diff / WAIT_TIME));
+        getManager().getScoreObject().changeScore(getBoard().getWaitCost() * (int)(diff / game.getFrame()));
         lastTravelTime = now;
     }
 

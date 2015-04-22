@@ -8,13 +8,13 @@ public class Vector {
 	private double x;
 	private double y;
 	
-	/** Constructor: a vector <0,0>. */
+	/** Constructor: a vector 0,0. */
 	public Vector() {
 		x = 0;
 		y = 0;
 	}
 	
-	/** Constructor: a vector <x,y>.  */
+	/** Constructor: a vector x,y.  */
 	public Vector(double x, double y) {
 		this.x = x;
 		this.y = y;
@@ -52,7 +52,7 @@ public class Vector {
 		return this;
 	}
 	
-	/** Invert both of this' components - change this vector to <1/x, 1/y> -- 
+	/** Invert both of this' components - change this vector to 1/x, 1/y -- 
 	 * and returns this Vector.
 	 * Precondition: the x and y components are not 0. */
 	public Vector invert() {
@@ -81,7 +81,7 @@ public class Vector {
 	}
 	
 	/** Return the cross product of a and b.
-	 * Because vectors are 2-d, the return is a vector of the form <0, 0, z>
+	 * Because vectors are 2-d, the return is a vector of the form 0, 0, z
 	 * So a 1-D vector. */
 	public static double cross(Vector a, Vector b) {
 		return a.x * b.y - b.x * a.y;
@@ -165,7 +165,7 @@ public class Vector {
 		return hashCode() == ob.hashCode();
 	}
 
-	/** Return a string representation of this vector: <x, y> . */
+	/** Return a string representation of this vector: x, y . */
 	@Override
 	public String toString() {
 		return "<" + x + "," + y + ">";
