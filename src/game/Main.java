@@ -45,7 +45,7 @@ public class Main {
 			
 			GameRunner gr = new GameRunner(userManagerClass, ! headless, true);
 			
-			if ((args[1].equals("-r") && ! headless) || (args[2].equals("-r") && headless)) {
+			if (args.length > 2 && ((args[1].equals("-r") && ! headless) || (args[2].equals("-r") && headless))) {
 				int n = -1;
 				try {
 					if (headless) n = Integer.parseInt(args[3]);
