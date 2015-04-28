@@ -583,7 +583,7 @@ public final class Board implements JSONString {
             final int numb_trucks = r.nextInt(MAX_TRUCKS - MIN_TRUCKS + 1) + MIN_TRUCKS;
             for (int i = 0; i < numb_trucks; i++) {
                 Truck t = new Truck(b.game, "TRUCK-" + (i+1), 
-                        Score.COLOR[r.nextInt(Score.COLOR.length)], b.getTruckDepot());
+                        Score.colorArr()[r.nextInt(Score.colorArr().length)], b.getTruckDepot());
                 b.trucks.add(t);
             }
 
@@ -595,7 +595,7 @@ public final class Board implements JSONString {
                 while(dest == start) {
                     dest = randomElement(b.getNodes(), r);
                 }
-                Color c = Score.COLOR[r.nextInt(Score.COLOR.length)];
+                Color c = Score.colorArr()[r.nextInt(Score.colorArr().length)];
                 Parcel p = new Parcel(b, start, dest, c);
                 b.parcels.add(p);
                 start.addParcel(p);

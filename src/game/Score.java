@@ -1,5 +1,6 @@
 package game;
 import java.awt.Color;
+import java.util.Arrays;
 
 /** Class Score monitors the score of a Game for a given Manager. <br>
  * The method that allows changing the value of the score is protected, so only
@@ -12,9 +13,9 @@ import java.awt.Color;
 public final class Score {
 
 	/** The Colors in the game. Colors of Trucks and Parcels are chosen from this Array.
-	 * Other colors are not allowed in the game, so setColor(Color c) methods mus
+	 * Other colors are not allowed in the game, so setColor(Color c) methods must
 	 * check for c being contained in COLOR before setting. */
-	public static final Color[] COLOR = {
+	private static final Color[] COLOR = {
 		new Color(198, 0, 0),	//Mid Red
 		new Color(198, 0, 144),	//Mid Pink
 		new Color(102, 0, 198),	//Mid Purple-Blue
@@ -29,6 +30,10 @@ public final class Score {
 		new Color(255, 178, 79),//Bright Orange
 		new Color(109, 43, 140)//Dark Purple
 	};	
+	
+	public static Color[] colorArr(){
+		return Arrays.copyOf(COLOR, COLOR.length);
+	}
 
 	/** Return a random Color from Score.Color. */
 	public static Color getRandomColor() {
