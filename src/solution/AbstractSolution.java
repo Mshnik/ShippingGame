@@ -1,6 +1,7 @@
 package solution;
 
 import java.util.*;
+
 import game.*;
 
 /** Abstract class AbstractSolution extends Manager.
@@ -80,6 +81,56 @@ public abstract class AbstractSolution extends Manager {
 		}
 		return new LinkedList<Node>(); //no path was found
 	}
+	
+	/** Find the shortest path from start to every other reachable node
+	 * 	
+	 * @param start The path start node. 
+	 * @return A map of destination to 
+	 * A linked list containing every node on the shortest path,
+	 * including the start and the end
+	 */
+	protected static Map<Node, List<Node>> dijkstra(Node start) {
+		
+		HashMap<Node, List<Node>> paths = new HashMap<>();
+		
+	  PQueue<Node> frontier = new HeapSolution<Node>();
+		HashMap<Node, NodeInfo> nodeInfo = new HashMap<Node, NodeInfo>();
+
+		frontier.add(start, 0);
+		nodeInfo.put(start, new NodeInfo());
+
+		while (!frontier.isEmpty()) {
+			Node current = frontier.poll();
+			paths.put(current, reconstructPath(current, nodeInfo));
+			
+			NodeInfo currentInfo = nodeInfo.get(current);
+			HashMap<Node,Integer> neighbors = current.getNeighbors();
+
+			for (Map.Entry<Node, Integer> entry : neighbors.entrySet()) {
+				Node neighbor = entry.getKey();
+				int edgeWeight = entry.getValue();
+				int newDistToNeighbor = currentInfo.distFromStart + edgeWeight;
+
+				NodeInfo neighborInfo = nodeInfo.get(neighbor);
+				boolean neverSeen = neighborInfo == null;
+				boolean needToUpdate = neighborInfo != null && newDistToNeighbor < neighborInfo.distFromStart;
+
+				if (neverSeen) {
+					neighborInfo = new NodeInfo();
+					nodeInfo.put(neighbor, neighborInfo);
+					frontier.add(neighbor, newDistToNeighbor);
+				} else if (needToUpdate) {
+					frontier.updatePriority(neighbor, newDistToNeighbor);
+				}
+
+				if (neverSeen || needToUpdate) {
+					neighborInfo.previous = current;
+					neighborInfo.distFromStart = newDistToNeighbor;
+				}
+			}
+		}
+		return paths;
+	}
 
 	/** Return the path from the start node to end.
 	 * Precondition: nodeInfo contains all the necessary information about
@@ -96,7 +147,7 @@ public abstract class AbstractSolution extends Manager {
 
 	/** Return the collective weight of the given path of nodes
 	 * by iterating along it and summing the weight of edges encountered. */
-	protected int pathLength(LinkedList<Node> path) {
+	protected int pathLength(List<Node> path) {
 		synchronized(path){
 			int s = 0;
 			Iterator<Node> one = path.iterator();
