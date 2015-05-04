@@ -41,15 +41,15 @@ def reprocess(fname):
     sCol = score.find(":")
     sFlo = float(score[sCol+1:].strip())
     with open(fname[:-4] + '_revised.txt', 'w') as f:
-        line.append('Correctness (90%%): %f%%\n' % cFlo)
-        line.append('Points (10%%): %f%%\n' % sFlo)
+        line.append('Correctness (80%%): %f%%\n' % cFlo)
+        line.append('Points (20%%): %f%%\n' % sFlo)
         if penalty < 0:
             line.append(' - 3 point printing penalty\n')
         if bonus > 0:
             line.append(' + 3 point super solution bonus\n')
-        line.append('Total: %f%%\n' % (cFlo*0.9 + sFlo*0.1 + penalty + bonus))
+        line.append('Total: %f%%\n' % (cFlo*0.8 + sFlo*0.2 + penalty + bonus))
         f.writelines(line)
-    return nameToGradesLine(fname, (cFlo*0.9 + sFlo*0.1 + penalty + bonus), line)
+    return nameToGradesLine(fname, (cFlo*0.8 + sFlo*0.2 + penalty + bonus), line)
 
 def nameToGradesLine(fname, grade, feedback):
     s = '"'
