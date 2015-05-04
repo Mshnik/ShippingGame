@@ -1,8 +1,7 @@
 package student;
 import game.PQueue;
+
 import java.util.*;
-
-
 
 /** Author: David Gries. */
 

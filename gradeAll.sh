@@ -68,3 +68,10 @@ for D in *; do
 done
 cd ..
 echo "Finished Automated Testing!";
+echo "Producing grades file";
+cp */*.txt .;
+cp ../reprocess.py .;
+python reprocess.py;
+rm reprocess.py;
+rm *feedback.txt
+cd ..;
