@@ -17,7 +17,7 @@ public class GameRunner {
 	private final String userManagerClass;
 
 	private GUI gui;
-	private static final long UPDATE_FRAME = 1;
+	private static final long UPDATE_FRAME = 100;
 
 	/** Extra time alloted before timeout, for calculation and stuff */
 	private static final double TIME_ALLOWANCE = 10000;
