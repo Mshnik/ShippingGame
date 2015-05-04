@@ -1,14 +1,16 @@
-/* Time spent on a7:  hh hours and mm minutes.
+/* Time spent on a7:  4 hours and 30 minutes.
 
- * Name:
- * Netid: 
- * What I thought about this assignment:
- *
- *
+ * Names: Shreya Sitaraman, Colin Budd
+ * Netids: ss2643, cmb434
+ * What I thought about this assignment: We expected this assignment to be easier than it actually was
+ * because we thought we understood Dijkstra's algorithm pretty well, but it turns out that understanding
+ * the algorithm and actually implementing it are two different beasts. We struggled a bit to figure out
+ * what was going on at first, but once we got the grasp of that, it became a bit easier.
  */
 
 
 package student;
+import game.PQueue;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -19,65 +21,55 @@ import game.Edge;
 import game.Node;
 
 /** This class contains Dijkstra's shortest-path algorithm and some other methods. */
+@SuppressWarnings("unused")
 public class Paths {
 
 
-    /** Return a list of the nodes on the shortest path from start to end,
-     * or the empty list if one does not exist. */
+    /** Return a list of the nodes on the shortest path from start to end, or
+     * the empty list (a list of size 0) if a path from start to end does not exist. */
     public static LinkedList<Node> dijkstra(Node start, Node end) {
-        /* TODO Implement Dijkstras's shortest-path algorithm presented
+        /*Implement Dijkstras's shortest-path algorithm presented
          in the slides titled "Final Algorithm" in the slides for lecture 19.
          In particular, a min-heap (as implemented in assignment A6) should be
          used for the frontier set. We provide a declaration of the frontier.
-         
+
          Maintaining information about shortest paths will require maintaining
          for each node in the settled and frontier sets the backpointer for
-         that node, as described in the handout, along with the length of the
+         that node (as described in the handout) along with the length of the
          shortest path (thus far, for nodes in the frontier set). For this
          purpose, we provide static class NodeInfo. We leave it to you to
          declare the HashMap variable for this and describe carefully what it
          means. 
-         
-         Note that the  */
-        
+
+         Note 1: Do not attempt to create a data structure to contain the
+             far-off set.
+         Note 2: Read the list of notes on pages 2..3 of the handout carefully.
+         */
+
         // The frontier set, as discussed in lecture
         MinHeap<Node> frontier= new MinHeap<Node>();
-
-        // Each node in the Settled and Frontier sets has an entry
-        // that gives its shortest distance from node start and the backpointer
-        // of the node on a shortest path from node start.
-        HashMap<Node, NodeInfo> nodeInfo= new HashMap<Node, NodeInfo>();
-
-        frontier.add(start, 0);
-        nodeInfo.put(start, new NodeInfo());
         
-        // invariant: As presented in notes for Lecture 19
-        while (!frontier.isEmpty()  &&  frontier.peek() != end) {
-            Node f= frontier.poll();
-
-            NodeInfo fInfo= nodeInfo.get(f);
-
-            HashSet<Edge> edges= f.getExits();
-            for (Edge edge : edges) {
-                Node w= edge.getOther(f);
-                NodeInfo wInfo= nodeInfo.get(w);
-                int wDistance= fInfo.distance + edge.length;
-                if (wInfo == null) {
-                    frontier.add(w, wDistance);
-                    nodeInfo.put(w, new NodeInfo(f, wDistance));
-                } else 
-                    if (wDistance < wInfo.distance) {
-                        frontier.updatePriority(w, wDistance);
-                        wInfo.distance= wDistance;
-                        wInfo.backPointer= f;
-                    }
-            }
+        HashMap<Node, NodeInfo> nodeInfo = new HashMap<Node, NodeInfo>();
+        nodeInfo.put(start, new NodeInfo(null,0));
+        frontier.add(start, 0);
+        while (!frontier.isEmpty() && frontier.peek()!=end){
+        	Node f = frontier.poll();
+        	for (Edge e : f.getExits()){
+        		if (!nodeInfo.containsKey(e.getOther(f))){
+        			frontier.add(e.getOther(f), nodeInfo.get(f).distance + e.length);
+        			nodeInfo.put(e.getOther(f), new NodeInfo(f, nodeInfo.get(f).distance + e.length));
+        		}
+        		else{
+        			Node n = e.getOther(f);
+        			int flength = Math.min(nodeInfo.get(n).distance, nodeInfo.get(f).distance + e.length);
+        			if (nodeInfo.get(n).distance > flength){
+        				nodeInfo.put(n, new NodeInfo(f, flength));
+        				frontier.updatePriority(n, flength);
+        			}	
+        		}
+        	}
         }
-        if (frontier.isEmpty()) {
-            return new LinkedList<Node>(); //no path was found
-        }
-        Node p= frontier.peek();
-        return buildPath(frontier.peek(), nodeInfo);
+        return buildPath(end, nodeInfo);
     }
 
     /** Return the path from the start node to end.
@@ -89,15 +81,16 @@ public class Paths {
         while (p != null) {
             path.addFirst(p);
             p= nodeInfo.get(p).backPointer;
+            
         }
         return path;
     }
 
     /** Return the sum of the weight of the edges on path p. */
-    public int pathLength(LinkedList<Node> path) {
+    public static int pathLength(LinkedList<Node> path) {
         synchronized(path){
             if (path.size() == 0) return 0;
-            
+
             Iterator<Node> iter= path.iterator();
             Node p= iter.next();  // First node on path
             int s= 0;
@@ -127,7 +120,7 @@ public class Paths {
 
         /** Constructor: an instance with a null previous node and distance 0. */
         private NodeInfo() {}
-        
+
         /** return a representation of this instance. */
         public String toString() {
             return "distance " + distance + ", bckptr " + backPointer;

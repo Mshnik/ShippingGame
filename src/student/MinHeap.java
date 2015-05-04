@@ -2,13 +2,17 @@ package student;
 import game.PQueue;
 import java.util.*;
 
+
+
+/** Author: David Gries. */
+
 /** An instance is a priority queue of elements of type E
  * implemented asa min-heap. */
 public class MinHeap<E> implements PQueue<E> {
 
     private int size; // number of elements in the priority queue (and heap)
 
-    /** heap invariant for b[0..size-1]:
+    /** Class invariant:
      *  b[0..size-1] is viewed as a min-heap, i.e.
      *  1. Each array element in b[0..size-1] contains a value of the heap.
      *  2. The children of each b[i] are b[2i+1] and b[2i+2].
@@ -76,6 +80,7 @@ public class MinHeap<E> implements PQueue<E> {
         if (map.containsKey(e)) {
             throw new IllegalArgumentException("e is already in priority queue");
         }
+        
         // TODO  First: Do add and bubbleUp.
         map.put(e, new EInfo(size, p));
         b.add(e);
@@ -125,14 +130,14 @@ public class MinHeap<E> implements PQueue<E> {
      *  Precondition: e is in the priority queue */
     public @Override void updatePriority(E e, double p) {
         // TODO  FOURTH: Do updatePriority.
-        EInfo thing= map.get(e);
-        assert thing != null;
-        if (p > thing.priority) {
-            thing.priority= p;
-            bubbleDown(thing.index);
+        EInfo einfo= map.get(e);
+        assert einfo != null;
+        if (p > einfo.priority) {
+            einfo.priority= p;
+            bubbleDown(einfo.index);
         } else {
-            thing.priority= p;
-            bubbleUp(thing.index);
+            einfo.priority= p;
+            bubbleUp(einfo.index);
         }
     }
 

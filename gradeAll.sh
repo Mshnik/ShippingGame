@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/bash
 if [ "$#" -ne 2 ] || [ ! -d "Submissions" ]; then
 	echo "Usage instructions:" 1>&2;
 	echo "Place this script in the root directory of your eclipse project" 1>&2;
@@ -34,7 +34,14 @@ for D in *; do
 		done
 		if [ -e "MyManager.java" ]; then
 			echo "TESTING ${D}...";
-			cp *.java ../../src/student/;
+			mkdir ../../src/student/TMP;
+			cp *.java ../../src/student/TMP/;
+			cd ../../src/student/TMP;
+			for f in *.java; do
+				iconv -f utf-8 -t utf-8 -c $f > ../$f;
+			done;
+			cd ..;
+			rm -rf TMP;
 			cd ../..;
 			make > /dev/null 2> .tmpErr;
 			if [ $? -ne 0 ]; then
