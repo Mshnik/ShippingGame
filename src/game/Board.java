@@ -524,6 +524,8 @@ public final class Board implements JSONString {
 
         private static final int PAYOFF_MIN = 1000;
         private static final int PAYOFF_MAX = 4000;
+        
+        private static final int NUM_RETRIES = 100000;
 
         private static final int ON_COLOR_MULTIPLIER_MIN = 2;
         private static final int ON_COLOR_MULTIPLIER_MAX = 4;
@@ -557,17 +559,21 @@ public final class Board implements JSONString {
                 Circle c = n.getCircle();
                 c.setX1(-Circle.DEFAULT_DIAMETER); 
                 c.setY1(-Circle.DEFAULT_DIAMETER);
+                int rt = 0;
                 while (c.getX1() == -Circle.DEFAULT_DIAMETER || 
                         c.getY1() == -Circle.DEFAULT_DIAMETER) {
+                	rt++;
                     //Try setting to a new location
                     c.setX1(r.nextInt(WIDTH + 1) + BUFFER);
                     c.setY1(r.nextInt(HEIGHT + 1) + BUFFER);
-                    //Check other existing nodes. If too close, re-randomize this node's location
-                    for (Node n2 : b.getNodes()) {
-                        if (n2.getCircle().getDistance(c) < Circle.BUFFER_RADUIS) {
-                            c.setX1(-Circle.DEFAULT_DIAMETER);
-                            c.setY1(-Circle.DEFAULT_DIAMETER);
-                            break;
+                    if (rt <= NUM_RETRIES){
+                        //Check other existing nodes. If too close, re-randomize this node's location
+                        for (Node n2 : b.getNodes()) {
+                            if (n2.getCircle().getDistance(c) < Circle.BUFFER_RADUIS) {
+                                c.setX1(-Circle.DEFAULT_DIAMETER);
+                                c.setY1(-Circle.DEFAULT_DIAMETER);
+                                break;
+                            }
                         }
                     }
                 }
