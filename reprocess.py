@@ -8,7 +8,7 @@ def main(args):
     writeTxt = bool(int(args[1]))
     with open('grades_revised.csv', 'w') as f:
         f.write('NetID,Grade,Add Comments,\n')
-        for file in glob.glob("*.txt"):
+        for file in glob.glob("*feedback.txt"):
             f.write(reprocess(file, writeTxt))
 
 def reprocess(fname, writeTxt):
@@ -42,15 +42,15 @@ def reprocess(fname, writeTxt):
     cFlo = float(correct[cCol+1:].strip())
     sCol = score.find(":")
     sFlo = float(score[sCol+1:].strip())
+    line.append('Correctness (80%%): %f%%\n' % cFlo)
+    line.append('Points (20%%): %f%%\n' % sFlo)
+    if penalty < 0:
+        line.append(' - 3 point printing penalty\n')
+    if bonus > 0:
+        line.append(' + 3 point super solution bonus\n')
+    line.append('Total: %f%%\n' % (cFlo*0.8 + sFlo*0.2 + penalty + bonus))
     if writeTxt:
         with open(fname[:-4] + '_revised.txt', 'w') as f:
-            line.append('Correctness (80%%): %f%%\n' % cFlo)
-            line.append('Points (20%%): %f%%\n' % sFlo)
-            if penalty < 0:
-                line.append(' - 3 point printing penalty\n')
-            if bonus > 0:
-                line.append(' + 3 point super solution bonus\n')
-            line.append('Total: %f%%\n' % (cFlo*0.8 + sFlo*0.2 + penalty + bonus))
             f.writelines(line)
     return nameToGradesLine(fname, (cFlo*0.8 + sFlo*0.2 + penalty + bonus), line)
 
