@@ -143,13 +143,16 @@ public class GameRunner {
 		try {
 			while (!g.isFinished()
 					&& System.currentTimeMillis() < maxFinishTime) {
-				Thread.sleep(UPDATE_FRAME);
+				synchronized(g.endCondition){
+					g.endCondition.wait(maxTime);
+				}
 			}
 			if (System.currentTimeMillis() < maxFinishTime) {
 				Thread.sleep(UPDATE_FRAME);
 				return new GameScore(g, g.getManager().getScore(),
 						GameStatus.SUCCESS, "Success :-)");
 			} else {
+				g.kill();
 				return new GameScore(g, g.getManager().getScore(),
 						GameStatus.TIMEOUT, "Game Timeout after " + maxTime
 								+ "ms");
@@ -163,6 +166,7 @@ public class GameRunner {
 					msg += " at " + g.throwable.getStackTrace()[i];
 				}
 			}
+			g.kill();
 			return new GameScore(g, g.getManager().getScore(),
 					GameStatus.ERROR, "Exception Thrown - " + msg);
 		}

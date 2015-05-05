@@ -40,6 +40,8 @@ public class Game {
 
 	protected Throwable throwable;	//The throwable that has been thrown and not caught by this game, if any
 	protected Thread monitoringThread;	//The thread that is monitoring this Game - null if none
+	
+	protected Object endCondition = new Object();
 
 	/** The default frame value. Other frame values can be used for testing,
 	 * but only games run with this frame value are fair for scoring.
@@ -167,6 +169,9 @@ public class Game {
 	protected void setFinished(boolean f) {
 		finished = f;
 		if (gui != null) gui.updateRunning();
+		synchronized(endCondition){
+			endCondition.notifyAll();
+		}
 	}
 
 	/** Return the board of this game.

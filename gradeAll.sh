@@ -11,6 +11,7 @@ if [ "$#" -ne 2 ] || [ ! -d "Submissions" ]; then
 	exit 1;
 fi
 echo "Now starting automatic testing..."
+rm scoreFile;
 cd Submissions;
 if [ -e "noCompiles.txt" ]; then
 	rm noCompiles.txt;

@@ -14,6 +14,8 @@ import gui.TextIO;
  *
  */
 public class Grader {
+	
+	private static final String SOLUTION = "solution.AdvancedShnikSolution";
 
 	/**
 	 * Percentage of score going to correctness (Getting all the parcels )
@@ -50,7 +52,13 @@ public class Grader {
 	 */
 	private static final List<Long> INSTRUCTOR_SCORE_RANDOM = new LinkedList<Long>();
 
-	private static final int NUM_RANDOMS = 20;
+	private static final int NUM_RANDOMS = 12;
+
+	private static final String INS_SCORE_FILE = "scoreFile";
+	
+	private static int[] insFiles;
+	
+	private static int[] insRandoms;
 
 	/** Use to do printing */
 	private static PrintStream stdout;
@@ -107,9 +115,11 @@ public class Grader {
 			netIDs = new String[1];
 			netIDs[0] = args[2];
 		}
+		populateInsScores();
+		long startTime = System.currentTimeMillis();
 		System.err.println("Grading "
-				+ (netIDs.length > 1 ? "group_of_" + netIDs[0] + "_" + netIDs[1]
-						: netIDs[0]));
+				 + (netIDs.length > 1 ? "group_of_" + netIDs[0] + "_" + netIDs[1]
+							: netIDs[0]));
 
 		// Make sure the solution directory exists
 		File gradingRoot = new File(GRADING_OUTPUT_DIRECTORY);
@@ -118,9 +128,9 @@ public class Grader {
 
 		final String header = "Hello, this is "
 				+ args[0]
-				+ "("
+				+ " ("
 				+ args[1]
-				+ ") grading your A6. Your A6 is graded in two steps.\n"
+				+ ") grading your A8. Your A8 is graded in two steps.\n"
 				+ "First, we run your manager on a set of pre-determined maps, to test the corner cases of\n"
 				+ "your code. Then we run it on a set of randomly generated maps, to test the regular behavior\n"
 				+ "of your code.\n"
@@ -133,7 +143,6 @@ public class Grader {
 				+ "depending on the severity of the error or timeout.\n"
 				+ "Now let's get shipping!\n"
 				+ "<=|===================================================================================================|=>";
-
 		Feedback feedback = runOn(Main.studentDirectory + "." + "MyManager");
 		String finishedFeedback = header + "\n" + feedback.f;
 
@@ -151,7 +160,80 @@ public class Grader {
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
+		long elapsedTime = System.currentTimeMillis() - startTime;
+		System.err.println("Grading "+ (netIDs.length > 1 ? "group_of_" + netIDs[0] + "_" + netIDs[1]
+				: netIDs[0]) + " took " + elapsedTime /1000.0 + " seconds");
 		System.exit(0);
+	}
+
+	private static void populateInsScores() {
+		File f = new File(INS_SCORE_FILE);
+		if (f.exists()){
+			readScores(f);
+		} else {
+			calculateAndWriteScores(f);
+		}
+		
+	}
+
+	private static void calculateAndWriteScores(File f) {
+		System.err.println("Instructor scores not up to date, populating now");
+		long startTime = System.currentTimeMillis();
+		GameRunner igr = new GameRunner(SOLUTION, SHOW_GUI, false);
+		String[] fileBoards = INSTRUCTOR_SCORE_FILE.toArray(
+				new String[INSTRUCTOR_SCORE_FILE.size()]);
+		Long[] rndBoards = INSTRUCTOR_SCORE_RANDOM.toArray(new Long[INSTRUCTOR_SCORE_RANDOM.size()]);
+		long[] randomBoards = new long[rndBoards.length];
+		for (int i = 0; i < rndBoards.length; i++) {
+			randomBoards[i] = rndBoards[i];
+		}
+		GameScore[] insFilesGs = igr.runFiles(fileBoards);
+		GameScore[] insRandomsGs = igr.runSeeds(randomBoards);
+		try (PrintWriter pw = new PrintWriter(f)) {
+			insFiles = new int[fileBoards.length];
+			int i = 0;
+			for (GameScore s : insFilesGs){
+				insFiles[i++] = s.score;
+				pw.println(s.score);
+			}
+			insRandoms = new int[rndBoards.length];
+			i = 0;
+			for (GameScore s : insRandomsGs){
+				insRandoms[i++] = s.score;
+				pw.println(s.score);
+			}
+		} catch (IOException e){
+			throw new RuntimeException(e);
+		}
+		long elapsedTime = System.currentTimeMillis() - startTime;
+		System.err.println("Populating instructor scores took " + elapsedTime/1000.0 + " seconds");
+	}
+
+	private static void readScores(File f) {
+		insFiles = new int[INSTRUCTOR_SCORE_FILE.size()];
+		insRandoms = new int[INSTRUCTOR_SCORE_RANDOM.size()];
+		try (FileReader fr = new FileReader(f);
+			BufferedReader br = new BufferedReader(fr)){
+			int[] cur = insFiles;
+			String line = br.readLine();
+			int i = 0;
+			while (line != null){
+				cur[i++] = Integer.parseInt(line);
+				if (cur == insFiles && i >= insFiles.length){
+					i = 0;
+					cur = insRandoms;
+				}
+				line = br.readLine();
+			}
+			if (i != insRandoms.length){
+				calculateAndWriteScores(f);
+				return;
+			}
+		} catch (Exception e) {
+			calculateAndWriteScores(f);
+			return;
+		}
+		
 	}
 
 	/** Feedback with string and associated grade. */
@@ -189,10 +271,10 @@ public class Grader {
 				+ fileBoards.length
 				+ ")\n"
 				+ "File.....................Completeness......Points...............InstructorPoints...Status";
-		GameScore[] insFiles = gr.runFiles(fileBoards);
+
 		for (int i = 0; i < fileScores.length; i++) {
 			double completenessScore = completenesScore(fileScores[i]);
-			double instructorScore = insFiles[i].score;
+			double instructorScore = insFiles[i];
 			double pointScore = adjustedScore(fileScores[i]);
 
 			totalCompletenesScore += completenessScore;
@@ -219,10 +301,9 @@ public class Grader {
 				+ randomBoards.length
 				+ ")\n"
 				+ "Seed.....................Completeness......Points...............InstructorPoints...Status";
-		GameScore[] insRandoms = gr.runSeeds(randomBoards);
 		for (int i = 0; i < randomScores.length; i++) {
 			double completenessScore = completenesScore(randomScores[i]);
-			double instructorScore = insRandoms[i].score;
+			double instructorScore = insRandoms[i];
 			double pointScore = adjustedScore(randomScores[i]);
 
 			totalCompletenesScore += completenessScore;
