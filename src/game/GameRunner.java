@@ -36,7 +36,7 @@ public class GameRunner {
 	 * otherwise
 	 */
 	private final boolean printOutput;
-	
+
 	/** True if gameRunners should print extra debugging output (time allotted) */
 	private static final boolean PRINT_DEBUG = false;
 
@@ -152,7 +152,7 @@ public class GameRunner {
 			} else {
 				return new GameScore(g, g.getManager().getScore(),
 						GameStatus.TIMEOUT, "Game Timeout after " + maxTime
-								+ "ms");
+						+ "ms");
 			}
 		} catch (InterruptedException e) {
 			String msg = "" + g.throwable;

@@ -23,10 +23,10 @@ public final class Parcel implements BoardElement {
 
 	/** The node on which this this parcel started. */
 	public final Node start;
-	
+
 	/** This parcel's current location. */
 	private Node location;
-	
+
 	/** The node where this parcel is to be delivered. */
 	public final Node destination;
 
@@ -34,7 +34,7 @@ public final class Parcel implements BoardElement {
 	private Circle circle; //The GUI Circle that represents this Parcel on the gui.
 
 	private Semaphore parcelLock; //A lock for this object, preventing it from
-	                              //being picked up by two trucks, etc.
+	//being picked up by two trucks, etc.
 
 	private Object userData; //Data (if any) stored by the user in this parcel
 	private Truck holder; //The truck (if any) that is carrying this Parcel. null if none
@@ -65,7 +65,7 @@ public final class Parcel implements BoardElement {
 		destination = d;
 		color = c; 
 		circle = new Circle(this, s.getCircle().getX1(), s.getCircle().getY1(),
-		        Circle.DEFAULT_DIAMETER/2, c, true);
+				Circle.DEFAULT_DIAMETER/2, c, true);
 
 		parcelLock = new Semaphore(1);
 	}
@@ -94,12 +94,12 @@ public final class Parcel implements BoardElement {
 	public Color getColor() {
 		return color;
 	}
-	
-    /** Return true - the color of Parcels is significant */
-    @Override
-    public boolean isColorSignificant(){
-    	return true;
-    }
+
+	/** Return true - the color of Parcels is significant */
+	@Override
+	public boolean isColorSignificant(){
+		return true;
+	}
 
 	/** Return the userData stored in this Node (may be null). */
 	@Override
@@ -202,7 +202,7 @@ public final class Parcel implements BoardElement {
 	public boolean isHeld() {
 		return holder != null;
 	}
-	
+
 	/** Return 1 if a truck is currently holding this Parcel, 0 otherwise */
 	@Override
 	public int trucksHere() {

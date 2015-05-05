@@ -43,11 +43,11 @@ public abstract class Manager implements Runnable{
 		 *  Sent every time the truck checks that it still has no travel directions
 		 *  - Every Truck.WAIT_TIME ms. */
 		WAITING,
-		
+
 		/** Notification sent whenever a truck's location field -- what Node the truck is 
 		 *  currently on -- changes. This occurs whenever a truck reaches a new node */
 		LOCATION_CHANGED,
-		
+
 		/** Notification sent whenever a truck arrives at a node that contains
 		 *  at least one parcel. A PARCEL_AT_NODE notification is fired after a
 		 *  LOCATION_CHANGED notification */
@@ -61,7 +61,7 @@ public abstract class Manager implements Runnable{
 	 * @see Manager.Notification The notification enum for types of messages
 	 */
 	public abstract void truckNotification(Truck t, Notification message);
-	
+
 	/** Return the score object - default to prevent access in subclasses. */
 	final Score getScoreObject() {
 		return score;
@@ -71,12 +71,12 @@ public abstract class Manager implements Runnable{
 	public final int getScore() {
 		return score.value();
 	}
-	
+
 	/** Return the current value of the score. */
 	public final int getScoreValue() {
 		return getScore();
 	}
-	
+
 	/** Return the Game to which this Manager belongs. */
 	public final Game getGame() {
 		return game;
@@ -86,12 +86,12 @@ public abstract class Manager implements Runnable{
 	public final Board getBoard() {
 		return game.getBoard();
 	}
-	
+
 	/** Return the Nodes in this Game. */
 	public final HashSet<Node> getNodes() {
 		return getBoard().getNodes();
 	}
-	
+
 	/** Return the Edges in this Game, */
 	public final HashSet<Edge> getEdges() {
 		return getBoard().getEdges();
@@ -112,7 +112,7 @@ public abstract class Manager implements Runnable{
 	public final void setGame(Game g) {
 		game = g;
 	}
-	
+
 	/** Set the Thread on which this manager is being run. */
 	final void setThread(Thread t) {
 		t.setName("MANAGER-THREAD");

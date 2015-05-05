@@ -10,26 +10,26 @@ public interface PQueue<E> {
 	 * Thus, the list is delimited by '['  and ']' and ", " (i.e. a
 	 * comma and a space char) separate adjacent items. */
 	String toString();
-	
+
 	/** Return the number of elements in the priority queue. */
 	int size();
 
-    /** Return true iff the priority queue is empty. */
-    boolean isEmpty();
-    
-    /** Add e with priority p to the priority queue.
-     *  Throw an illegalArgumentException if e is already in the queue. */ 
-    void add(E e, double priority) throws IllegalArgumentException;
+	/** Return true iff the priority queue is empty. */
+	boolean isEmpty();
 
-    /** Return the element of the priority queue with lowest priority, without
-     *  changing the priority queue.
-     *  Precondition: the priority queue is not empty. */
-    E peek();
+	/** Add e with priority p to the priority queue.
+	 *  Throw an illegalArgumentException if e is already in the queue. */ 
+	void add(E e, double priority) throws IllegalArgumentException;
 
-    /** Remove and return the element of the priority queue with lowest priority.
+	/** Return the element of the priority queue with lowest priority, without
+	 *  changing the priority queue.
+	 *  Precondition: the priority queue is not empty. */
+	E peek();
+
+	/** Remove and return the element of the priority queue with lowest priority.
 	 *  Precondition: the priority queue is not empty. */
 	E poll();
-	
+
 	/** Change the priority of element e to p.
 	 *  Precondition: e is in the priority queue */
 	void updatePriority(E e, double p);

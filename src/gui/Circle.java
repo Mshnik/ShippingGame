@@ -56,7 +56,7 @@ public class Circle extends JPanel {
 	}
 
 	/** Constructor: an instance at (x, y) of diameter d and colored c
-     * that represents r and is filled iff filled.
+	 * that represents r and is filled iff filled.
 	 * @param x - x coordinate of center
 	 * @param y - y coordinate of center
 	 * @param d - the diameter of the circle
@@ -164,10 +164,10 @@ public class Circle extends JPanel {
 		Rectangle oldBounds = getBounds();
 		if (represents instanceof Node) {
 			setBounds(oldBounds.x, oldBounds.y - TEXT_HEIGHT,
-			        oldBounds.width + TEXT_WIDTH, oldBounds.height + TEXT_HEIGHT);
+					oldBounds.width + TEXT_WIDTH, oldBounds.height + TEXT_HEIGHT);
 		} else if (represents instanceof Truck) {
 			setBounds(oldBounds.x, oldBounds.y, oldBounds.width + TEXT_WIDTH,
-			        oldBounds.height + TEXT_HEIGHT);
+					oldBounds.height + TEXT_HEIGHT);
 		} 
 		//No extra fix necessary for parcel.
 	}
@@ -193,7 +193,7 @@ public class Circle extends JPanel {
 	public double getDistance(Circle c) {
 		return Math.sqrt( (Math.pow(x1-c.getX1(), 2) + Math.pow(y1 - c.getY1(), 2) ) );
 	}
-	
+
 	/** Return true iff the this circle has the same center as c */
 	public boolean locationEquals(Circle c) {
 		return x1 == c.x1 && y1 == c.y1;
@@ -208,7 +208,7 @@ public class Circle extends JPanel {
 	@Override
 	public String toString() {
 		return "("+ (getX1()-getDiameter()/2) + "," + (getY1()-getDiameter()/2) + 
-		        ") , d=" + getDiameter() + " " + represents.getMappedName();
+				") , d=" + getDiameter() + " " + represents.getMappedName();
 	}
 
 	/**Draw the Circle when the component is painted. */
@@ -225,12 +225,12 @@ public class Circle extends JPanel {
 			heightPlus = TEXT_HEIGHT;
 
 		Ellipse2D.Double circle2d = new Ellipse2D.Double(PANEL_BUFFER/2, 
-		        PANEL_BUFFER/2 + heightPlus, getDiameter(), getDiameter());
+				PANEL_BUFFER/2 + heightPlus, getDiameter(), getDiameter());
 		g2d.setColor(getColor());
 		if (filled) g2d.fill(circle2d);
 		g2d.draw(circle2d);
 		g2d.drawString(represents.getMappedName(), represents.getRelativeX() + PANEL_BUFFER,
-		        represents.getRelativeY() + PANEL_BUFFER);
+				represents.getRelativeY() + PANEL_BUFFER);
 
 		if (represents instanceof Node) {
 			g2d.setColor(Color.BLACK);
@@ -238,7 +238,7 @@ public class Circle extends JPanel {
 
 			if (! n.getParcels().isEmpty()) {
 				g2d.drawString(n.getParcels().size() + "", diameter/2 + 2,
-				        diameter/2 + PANEL_BUFFER + heightPlus);
+						diameter/2 + PANEL_BUFFER + heightPlus);
 			}
 		}
 

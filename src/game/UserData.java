@@ -17,8 +17,8 @@ public interface UserData {
 
 	/** Return the object the User has stored in this. */
 	public Object getUserData();
-	
+
 	/** Change the stored object ot ob. */
 	public void setUserData(Object ob);
-	
+
 }

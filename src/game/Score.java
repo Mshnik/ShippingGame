@@ -30,7 +30,7 @@ public final class Score {
 		new Color(255, 178, 79),//Bright Orange
 		new Color(109, 43, 140)//Dark Purple
 	};	
-	
+
 	public static Color[] colorArr(){
 		return Arrays.copyOf(COLOR, COLOR.length);
 	}
@@ -102,7 +102,7 @@ public final class Score {
 	}
 
 	private int score; //The score maintained by this score object
-	
+
 	/** The manager for which this Score object keeps track. */
 	public final Manager manager;
 

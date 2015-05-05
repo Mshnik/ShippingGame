@@ -45,7 +45,7 @@ public class Game {
 	 * but only games run with this frame value are fair for scoring.
 	 */
 	private static final int SCORE_FRAME_RATE = 1;
-	
+
 	/** Default frame value for GUI games. Good speed for testing and watching
 	 * progression
 	 */
@@ -253,15 +253,15 @@ public class Game {
 		int[] pArr = new int[3];
 		Set<Parcel> parcels = getBoard().getParcels();
 		try{
-		synchronized(parcels) {
-			for (Parcel p : parcels) {
-				if (p.isHeld())
-					pArr[1]++;
-				else
-					pArr[0]++;
+			synchronized(parcels) {
+				for (Parcel p : parcels) {
+					if (p.isHeld())
+						pArr[1]++;
+					else
+						pArr[0]++;
+				}
 			}
-		}
-		pArr[2] = getBoard().initialParcelCount - pArr[0] - pArr[1];
+			pArr[2] = getBoard().initialParcelCount - pArr[0] - pArr[1];
 		} catch(NullPointerException e){} //SCREW IT - TOO COMPLICATED, CAN'T BE FIXED
 		return pArr;
 	}

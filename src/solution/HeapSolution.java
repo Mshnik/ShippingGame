@@ -6,7 +6,7 @@ import java.util.*;
 public class HeapSolution<T> extends ArrayList<T> implements PQueue<T> {
 
 	private static final long serialVersionUID = 1L;
-	
+
 	// Maps items in the heap to an entry that contains their index and priority.
 	private HashMap<T, ItemInfo> itemInfoMap;
 
@@ -21,11 +21,11 @@ public class HeapSolution<T> extends ArrayList<T> implements PQueue<T> {
 		if (isEmpty()) return "[]";
 		String s = "[";
 		for (T t : this) {
-		    s += t.toString() + ":" + itemInfoMap.get(t).priority + ", ";
+			s += t.toString() + ":" + itemInfoMap.get(t).priority + ", ";
 		}
 		return s.substring(0, s.length()-2) +"]";
 	}
-	
+
 	@Override
 	/** Remove and return the min value in this heap.
 	 * Precondiiton: The heap is not empty. */
@@ -37,14 +37,14 @@ public class HeapSolution<T> extends ArrayList<T> implements PQueue<T> {
 		bubbleDown(0);
 		return rtnVal;
 	}
-	
+
 	@Override
-    /** Return the min value in this heap.
-     * Precondiiton: The heap is not empty. */
-    public T peek() {
-        T rtnVal= super.get(0);
-        return rtnVal;
-    }
+	/** Return the min value in this heap.
+	 * Precondiiton: The heap is not empty. */
+	public T peek() {
+		T rtnVal= super.get(0);
+		return rtnVal;
+	}
 
 	@Override
 	/** Add item with priority p to this heap. */
@@ -87,7 +87,7 @@ public class HeapSolution<T> extends ArrayList<T> implements PQueue<T> {
 	/** Bubble the element at index down until it reaches its correct position in the
 	 * heap.
 	 * Precondition: the heap satisfies all heap properties except that item
-     * get[index] may be larger than a child. */
+	 * get[index] may be larger than a child. */
 	private void bubbleDown(int index) {
 		int hiPriChild = leftChildIndex(index);
 		if (hiPriChild >= size()) return;
@@ -111,7 +111,7 @@ public class HeapSolution<T> extends ArrayList<T> implements PQueue<T> {
 		setAt(a, super.get(b));
 		setAt(b, temp);
 	}
-	
+
 	/** Set the item at index to item, and remap item to index in the indices map. */
 	private void setAt(int index, T item) {
 		super.set(index, item);
@@ -122,7 +122,7 @@ public class HeapSolution<T> extends ArrayList<T> implements PQueue<T> {
 	private int leftChildIndex(int i) {
 		return 2*i + 1;
 	}
-	
+
 	/** Return the index of the right child of the item at index i. */
 	private int rightChildIndex(int i) {
 		return 2*i + 2;
@@ -132,12 +132,12 @@ public class HeapSolution<T> extends ArrayList<T> implements PQueue<T> {
 	private int parentIndex(int i) {
 		return (i - 1)/2;
 	}
-	
+
 	/** An instance is an item in the heap, with an index and a priority. */
 	private static class ItemInfo {
 		private double priority;
 		private int index;
-		
+
 		/** Constructor: an instance with priority p at index i. */
 		private ItemInfo(double p, int i) {
 			priority = p;

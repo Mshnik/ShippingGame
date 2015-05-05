@@ -12,15 +12,15 @@ import game.*;
 public class NoConcurrencySolution extends AbstractSolution {
 
 	private boolean preprocessingDone = false;
-	
+
 	@Override
 	public void run() {
-		
+
 		ArrayList<Truck> trucks = getTrucks();
 		for(Truck t : trucks){
 			t.setUserData(new LinkedList<Parcel>()); //make the userdata for a truck the queue of parcels
 		}
-		
+
 		//Rotate through, assign each parcel to a truck by adding it to the end of its queue
 		int i = 0;
 		for(Parcel p : getParcels()){
@@ -28,7 +28,7 @@ public class NoConcurrencySolution extends AbstractSolution {
 			q.add(p);
 			i++;
 		}
-		
+
 		preprocessingDone = true;
 	}
 
@@ -38,7 +38,7 @@ public class NoConcurrencySolution extends AbstractSolution {
 
 		//Only take waiting for notifications
 		if(message != Notification.WAITING) return;
-		
+
 		LinkedList<Parcel> queue = (LinkedList<Parcel>) t.getUserData();
 		if(queue.isEmpty() && t.getLoad() == null) t.setTravelPath(dijkstra(t.getLocation(), getBoard().getTruckDepot()));
 		else if(t.getLoad() != null){
@@ -49,16 +49,16 @@ public class NoConcurrencySolution extends AbstractSolution {
 				t.setTravelPath(dijkstra(t.getLocation(), t.getLoad().destination));
 			}
 		}else{
-		    Parcel p = queue.peek();
-		    if(t.getLocation().isParcelHere(p)){
-		    	t.pickupLoad(p);
-		    	queue.poll();
-		    	truckNotification(t, Notification.WAITING);
-		    } else{
-		    	t.setTravelPath(dijkstra(t.getLocation(), p.getLocation()));
-		    }
+			Parcel p = queue.peek();
+			if(t.getLocation().isParcelHere(p)){
+				t.pickupLoad(p);
+				queue.poll();
+				truckNotification(t, Notification.WAITING);
+			} else{
+				t.setTravelPath(dijkstra(t.getLocation(), p.getLocation()));
+			}
 		}
-		
+
 	}
 
 }

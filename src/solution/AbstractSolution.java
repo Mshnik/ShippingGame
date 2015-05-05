@@ -41,7 +41,7 @@ public abstract class AbstractSolution extends Manager {
 	 * if no path exists. 
 	 */
 	protected static LinkedList<Node> dijkstra(Node start, Node end) {
-	    PQueue<Node> frontier = new HeapSolution<Node>();
+		PQueue<Node> frontier = new HeapSolution<Node>();
 		HashMap<Node, NodeInfo> nodeInfo = new HashMap<Node, NodeInfo>();
 
 		frontier.add(start, 0);
@@ -81,7 +81,7 @@ public abstract class AbstractSolution extends Manager {
 		}
 		return new LinkedList<Node>(); //no path was found
 	}
-	
+
 	/** Find the shortest path from start to every other reachable node
 	 * 	
 	 * @param start The path start node. 
@@ -90,10 +90,10 @@ public abstract class AbstractSolution extends Manager {
 	 * including the start and the end
 	 */
 	protected static Map<Node, List<Node>> dijkstra(Node start) {
-		
+
 		HashMap<Node, List<Node>> paths = new HashMap<>();
-		
-	  PQueue<Node> frontier = new HeapSolution<Node>();
+
+		PQueue<Node> frontier = new HeapSolution<Node>();
 		HashMap<Node, NodeInfo> nodeInfo = new HashMap<Node, NodeInfo>();
 
 		frontier.add(start, 0);
@@ -102,7 +102,7 @@ public abstract class AbstractSolution extends Manager {
 		while (!frontier.isEmpty()) {
 			Node current = frontier.poll();
 			paths.put(current, reconstructPath(current, nodeInfo));
-			
+
 			NodeInfo currentInfo = nodeInfo.get(current);
 			HashMap<Node,Integer> neighbors = current.getNeighbors();
 

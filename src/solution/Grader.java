@@ -118,21 +118,21 @@ public class Grader {
 
 		final String header = "Hello, this is "
 				+ args[0]
-				+ "("
-				+ args[1]
-				+ ") grading your A6. Your A6 is graded in two steps.\n"
-				+ "First, we run your manager on a set of pre-determined maps, to test the corner cases of\n"
-				+ "your code. Then we run it on a set of randomly generated maps, to test the regular behavior\n"
-				+ "of your code.\n"
-				+ "For a given map, "
-				+ (CORRECTNESS * 100)
-				+ "% of the points are for correctness - was your solution\n"
-				+ "able to pick up and deliver every parcel? The rest of the points are for your score - full credit for\n"
-				+ "achieving a score at least equal to the instructor's. If your code causes an uncaught error or a timeout\n"
-				+ "(runs for much too long on a given map) you may receive some amount partial credit on that map, \n"
-				+ "depending on the severity of the error or timeout.\n"
-				+ "Now let's get shipping!\n"
-				+ "<=|===================================================================================================|=>";
+						+ "("
+						+ args[1]
+								+ ") grading your A6. Your A6 is graded in two steps.\n"
+								+ "First, we run your manager on a set of pre-determined maps, to test the corner cases of\n"
+								+ "your code. Then we run it on a set of randomly generated maps, to test the regular behavior\n"
+								+ "of your code.\n"
+								+ "For a given map, "
+								+ (CORRECTNESS * 100)
+								+ "% of the points are for correctness - was your solution\n"
+								+ "able to pick up and deliver every parcel? The rest of the points are for your score - full credit for\n"
+								+ "achieving a score at least equal to the instructor's. If your code causes an uncaught error or a timeout\n"
+								+ "(runs for much too long on a given map) you may receive some amount partial credit on that map, \n"
+								+ "depending on the severity of the error or timeout.\n"
+								+ "Now let's get shipping!\n"
+								+ "<=|===================================================================================================|=>";
 
 		Feedback feedback = runOn(Main.studentDirectory + "." + "MyManager");
 		String finishedFeedback = header + "\n" + feedback.f;
@@ -203,15 +203,15 @@ public class Grader {
 			s += "\n"
 					+ String.format("%20s", fileScores[i].game.getFile()
 							.getName())
-					+ "\t"
-					+ String.format("%6.3f", completenessScore)
-					+ "\t\t\t"
-					+ String.format("%6.3f", pointScore)
-					+ "  ("
-					+ String.format("%3.2f",
-							(pointScore / instructorScore) * 100) + "%)\t"
-					+ "\t" + String.format("%9.0f", instructorScore) + "\t\t"
-					+ fileScores[i].message;
+							+ "\t"
+							+ String.format("%6.3f", completenessScore)
+							+ "\t\t\t"
+							+ String.format("%6.3f", pointScore)
+							+ "  ("
+							+ String.format("%3.2f",
+									(pointScore / instructorScore) * 100) + "%)\t"
+									+ "\t" + String.format("%9.0f", instructorScore) + "\t\t"
+									+ fileScores[i].message;
 		}
 
 		// From seed maps
@@ -239,8 +239,8 @@ public class Grader {
 					+ "  ("
 					+ String.format("%3.2f",
 							(pointScore / instructorScore) * 100) + "%)\t"
-					+ "\t" + String.format("%9.0f", instructorScore) + "\t\t"
-					+ randomScores[i].message;
+							+ "\t" + String.format("%9.0f", instructorScore) + "\t\t"
+							+ randomScores[i].message;
 		}
 
 		// Add finishing stats.
@@ -264,9 +264,9 @@ public class Grader {
 				+ "In-Game Score: "
 				+ String.format("%11s", (int) totalPointsScore + " of "
 						+ (int) totalInstructorPoints)
-				+ " ("
-				+ String.format("%3.1f", totalPointsScore
-						/ totalInstructorPoints * 100) + "%)";
+						+ " ("
+						+ String.format("%3.1f", totalPointsScore
+								/ totalInstructorPoints * 100) + "%)";
 		if (totalPointsScore > totalInstructorPoints) {
 			f.grade += 3;
 			s += "\n3 point bonus! - Congratulations on beating the Instructor solution!";
@@ -277,8 +277,8 @@ public class Grader {
 				+ "%) :"
 				+ String.format("%4.2f",
 						(totalCompletenesScore * 100.0 / totalTests))
-				+ "\nTotal Points (" + (SCORE * 100) + "%) :\t   "
-				+ String.format("%4.2f", weightedPointsScore / SCORE);
+						+ "\nTotal Points (" + (SCORE * 100) + "%) :\t   "
+						+ String.format("%4.2f", weightedPointsScore / SCORE);
 		if (printingFlag) {
 			s += "\n - 3 point printing pentalty";
 		}
@@ -323,42 +323,42 @@ public class Grader {
 	/** Return an adjusted score for gs based on its return message */
 	private static double adjustedScore(GameScore gs) {
 		switch (gs.status) {
-		case ERROR:
-			// For error case, depends on type of error.
-			// More preventable and more studied errors are more harshly
-			// punished.
-			if (gs.game.getThrownThrowable() != null) {
-				Class<?> errClass = gs.game.getThrownThrowable().getClass();
+			case ERROR:
+				// For error case, depends on type of error.
+				// More preventable and more studied errors are more harshly
+				// punished.
+				if (gs.game.getThrownThrowable() != null) {
+					Class<?> errClass = gs.game.getThrownThrowable().getClass();
 
-				// Heavy punishment exceptions - either preventable or
-				// they shouldn't have been messing with thread interrupting
-				if (errClass.equals(NullPointerException.class))
-					return gs.score * HEAVY_PENALTY;
-				if (errClass.equals(ArrayIndexOutOfBoundsException.class))
-					return gs.score * HEAVY_PENALTY;
-				if (errClass.equals(InterruptedException.class))
-					return gs.score * HEAVY_PENALTY;
+					// Heavy punishment exceptions - either preventable or
+					// they shouldn't have been messing with thread interrupting
+					if (errClass.equals(NullPointerException.class))
+						return gs.score * HEAVY_PENALTY;
+					if (errClass.equals(ArrayIndexOutOfBoundsException.class))
+						return gs.score * HEAVY_PENALTY;
+					if (errClass.equals(InterruptedException.class))
+						return gs.score * HEAVY_PENALTY;
 
-				if (errClass.equals(ClassCastException.class))
-					return gs.score * MED_PENALTY;
-				if (errClass.equals(ConcurrentModificationException.class))
-					return gs.score * MED_PENALTY;
-			}
-			// Unusual error - penalize less heavily. Have to penalize all
-			// errors to prevent abuse
-			return gs.score * LIGHT_PENALTY;
+					if (errClass.equals(ClassCastException.class))
+						return gs.score * MED_PENALTY;
+					if (errClass.equals(ConcurrentModificationException.class))
+						return gs.score * MED_PENALTY;
+				}
+				// Unusual error - penalize less heavily. Have to penalize all
+				// errors to prevent abuse
+				return gs.score * LIGHT_PENALTY;
 
-		case SUCCESS:
-			// No adjustment for successful case
-			return gs.score;
+			case SUCCESS:
+				// No adjustment for successful case
+				return gs.score;
 
-		case TIMEOUT:
-			// Slight adjustment for timeout-ing
-			return gs.score * TIMEOUT_PENALTY;
+			case TIMEOUT:
+				// Slight adjustment for timeout-ing
+				return gs.score * TIMEOUT_PENALTY;
 
-		default:
-			// Hopefully unreachable case
-			return gs.score;
+			default:
+				// Hopefully unreachable case
+				return gs.score;
 		}
 	}
 

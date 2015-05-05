@@ -11,8 +11,8 @@ public class DraggableCircle extends Circle {
 	private Point clickPoint; //The point the user clicked within the circle before dragging began
 	private int maxX;   //Boundary for dragging on the x
 	private int maxY;   //Boundary for dragging on the y
-	
-	
+
+
 	/** Constructor: an instance at (x, y) of diameter d that represents r.
 	 * @param r - the game piece that this circle is drawn for
 	 * @param x - the starting x coordinate (center point)
@@ -21,9 +21,9 @@ public class DraggableCircle extends Circle {
 	 */
 	public DraggableCircle(final BoardElement r, int x, int y, int d) {
 		super(r, x, y, d);
-		
+
 		MouseListener clickListener = new MouseListener(){
-			
+
 			/** When clicked, store the initial point at which this is clicked. */
 			@Override
 			public void mousePressed(MouseEvent e) {
@@ -31,7 +31,7 @@ public class DraggableCircle extends Circle {
 				maxY = r.getBoard().game.getGUI().getDrawingPanel().getHeight();
 				clickPoint = e.getPoint();
 			}
-			
+
 			@Override
 			public void mouseClicked(MouseEvent e) {}
 
@@ -44,7 +44,7 @@ public class DraggableCircle extends Circle {
 			@Override
 			public void mouseExited(MouseEvent e) {}	
 		};
-		
+
 		MouseMotionListener motionListener = new MouseMotionListener(){
 
 			/** When this is dragged, perform the translation from the point
@@ -60,9 +60,9 @@ public class DraggableCircle extends Circle {
 
 			@Override
 			public void mouseMoved(MouseEvent e) {}
-			
+
 		};
-		
+
 		addMouseListener(clickListener);
 		addMouseMotionListener(motionListener);
 	}

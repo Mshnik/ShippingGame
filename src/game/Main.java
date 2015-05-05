@@ -10,7 +10,7 @@ public class Main {
 
 	/** Student directory */
 	public static final String studentDirectory = "student";
-	
+
 	/** Read args for a string of a ClassName of the Manager to create, then create
 	 * an instance of that manager class, create the game and the threads, and start the game.
 	 * @param args - a 1x... array containing the name of the class of the user wants as the Manager
@@ -22,16 +22,16 @@ public class Main {
 		//Add initial elements to fibCalc
 		fibCalc.add(0);
 		fibCalc.add(1);
-		
+
 		if (args == null || args.length < 1)
 			args = new String[]{"MyManager"};
 
 		String userManagerClass = studentDirectory + "." +args[0];
-		
+
 		if (args[0].startsWith("<s>")) {
 			userManagerClass = "solution."+args[0].substring(args[0].indexOf('>') + 1);
 		}
-		
+
 		//Check if running in gamerunner mode.
 		//just one argument - not gamerunner mode (default gui mode. No headless option).
 		//multiple - gamerunner mode (may or may not be headless).
@@ -42,9 +42,9 @@ public class Main {
 			}
 			boolean headless = false;
 			if (argsList.contains("-h")) headless = true;
-			
+
 			GameRunner gr = new GameRunner(userManagerClass, ! headless, true);
-			
+
 			if (args.length > 2 && ((args[1].equals("-r") && ! headless) || (args[2].equals("-r") && headless))) {
 				int n = -1;
 				try {
@@ -95,13 +95,13 @@ public class Main {
 	 * @throws IllegalArgumentException - If the given class is not a subclass of Manager.
 	 */
 	public static Object createUserManager(String userManagerClass)
-	        throws ClassNotFoundException, InstantiationException, IllegalAccessException,
-	        IllegalArgumentException{
+			throws ClassNotFoundException, InstantiationException, IllegalAccessException,
+			IllegalArgumentException{
 		@SuppressWarnings("rawtypes")
 		Class c= Class.forName(userManagerClass);
 		if (!Manager.class.isAssignableFrom(c))
 			throw new IllegalArgumentException("Class " + userManagerClass + 
-			        " Does not Extend Manager Class");
+					" Does not Extend Manager Class");
 
 		return c.newInstance();//OK because default constructor is only constructor that should be used.
 	}
