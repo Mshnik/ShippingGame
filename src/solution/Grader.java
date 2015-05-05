@@ -15,7 +15,7 @@ import gui.TextIO;
  */
 public class Grader {
 	
-	private static final String SOLUTION = "solution.AdvancedShnikSolution";
+	private static final String SOLUTION = "solution.SuperShnikSolution";
 
 	/**
 	 * Percentage of score going to correctness (Getting all the parcels )

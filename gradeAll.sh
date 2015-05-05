@@ -11,7 +11,9 @@ if [ "$#" -ne 2 ] || [ ! -d "Submissions" ]; then
 	exit 1;
 fi
 echo "Now starting automatic testing..."
-rm scoreFile;
+if [ -e "scoreFile" ]; then
+	rm scoreFile;
+fi
 cd Submissions;
 if [ -e "noCompiles.txt" ]; then
 	rm noCompiles.txt;
@@ -67,12 +69,12 @@ for D in *; do
 		cd ..;
 	fi
 done
-cd ..
 echo "Finished Automated Testing!";
 echo "Producing grades file";
 cp */*.txt .;
 cp ../reprocess.py .;
-python reprocess.py;
+python reprocess.py 0;
 rm reprocess.py;
 rm *feedback.txt
 cd ..;
+rm scoreFile;
