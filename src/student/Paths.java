@@ -29,7 +29,7 @@ public class Paths {
          in the slides titled "Final Algorithm" in the slides for lecture 19.
          In particular, a min-heap (as implemented in assignment A6) should be
          used for the frontier set. We provide a declaration of the frontier.
-         
+
          Maintaining information about shortest paths will require maintaining
          for each node in the settled and frontier sets the backpointer for
          that node, as described in the handout, along with the length of the
@@ -37,9 +37,12 @@ public class Paths {
          purpose, we provide static class NodeInfo. We leave it to you to
          declare the HashMap variable for this and describe carefully what it
          means. 
-         
-         Note that the  */
-        
+
+         Note 1: Do not attempt to create a data structure to contain the
+             far-off set.
+         Note 2: Read the list of notes on pages 2..3 of the handout carefully.
+         */
+
         // The frontier set, as discussed in lecture
         MinHeap<Node> frontier= new MinHeap<Node>();
 
@@ -50,34 +53,34 @@ public class Paths {
 
         frontier.add(start, 0);
         nodeInfo.put(start, new NodeInfo());
-        
-        // invariant: As presented in notes for Lecture 19
-        while (!frontier.isEmpty()  &&  frontier.peek() != end) {
-            Node f= frontier.poll();
 
+        // invariant: As presented in notes for Lecture 19
+        while (!frontier.isEmpty()) {
+            Node f= frontier.poll();
+            if (f == end ) {  // if shortest path for node end is found
+                return buildPath(f, nodeInfo);
+            }
             NodeInfo fInfo= nodeInfo.get(f);
 
             HashSet<Edge> edges= f.getExits();
             for (Edge edge : edges) {
                 Node w= edge.getOther(f);
                 NodeInfo wInfo= nodeInfo.get(w);
-                int wDistance= fInfo.distance + edge.length;
-                if (wInfo == null) {
-                    frontier.add(w, wDistance);
-                    nodeInfo.put(w, new NodeInfo(f, wDistance));
-                } else 
-                    if (wDistance < wInfo.distance) {
-                        frontier.updatePriority(w, wDistance);
-                        wInfo.distance= wDistance;
-                        wInfo.backPointer= f;
-                    }
+                int distanceToW= fInfo.distance + edge.length;
+                if (wInfo == null) {  // if w is in the farout set
+                    frontier.add(w, distanceToW);
+                    nodeInfo.put(w, new NodeInfo(f, distanceToW));
+                }
+                else if (distanceToW < wInfo.distance) {
+                    frontier.updatePriority(w, distanceToW);
+                    wInfo.distance= distanceToW;
+                    wInfo.backPointer= f;
+                }
             }
         }
-        if (frontier.isEmpty()) {
-            return new LinkedList<Node>(); //no path was found
-        }
-        Node p= frontier.peek();
-        return buildPath(frontier.peek(), nodeInfo);
+
+        return new LinkedList<Node>(); // no path found
+
     }
 
     /** Return the path from the start node to end.
@@ -94,10 +97,10 @@ public class Paths {
     }
 
     /** Return the sum of the weight of the edges on path p. */
-    public int pathLength(LinkedList<Node> path) {
+    public static int pathLength(LinkedList<Node> path) {
         synchronized(path){
             if (path.size() == 0) return 0;
-            
+
             Iterator<Node> iter= path.iterator();
             Node p= iter.next();  // First node on path
             int s= 0;
@@ -127,7 +130,7 @@ public class Paths {
 
         /** Constructor: an instance with a null previous node and distance 0. */
         private NodeInfo() {}
-        
+
         /** return a representation of this instance. */
         public String toString() {
             return "distance " + distance + ", bckptr " + backPointer;

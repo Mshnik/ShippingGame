@@ -42,13 +42,15 @@ public class Grader {
 	 * HashMap of board JSON files to run each student's code on -> instructor's
 	 * score
 	 */
-	private static final HashMap<String, Integer> INSTRUCTOR_SCORE_FILE = new HashMap<String, Integer>();
+	private static final List<String> INSTRUCTOR_SCORE_FILE = new LinkedList<String>();
 
 	/**
 	 * HashMap of random seed to run each student's code on -> instructor's
 	 * score
 	 */
-	private static final HashMap<Long, Integer> INSTRUCTOR_SCORE_RANDOM = new HashMap<Long, Integer>();
+	private static final List<Long> INSTRUCTOR_SCORE_RANDOM = new LinkedList<Long>();
+
+	private static final int NUM_RANDOMS = 15;
 
 	/** Use to do printing */
 	private static PrintStream stdout;
@@ -61,17 +63,13 @@ public class Grader {
 		INSTRUCTOR_SCORE_FILE.clear();
 		INSTRUCTOR_SCORE_RANDOM.clear();
 
-		INSTRUCTOR_SCORE_FILE.put("TestBoard1", 1756);
-		INSTRUCTOR_SCORE_FILE.put("TestBoard2", 71508);
-		INSTRUCTOR_SCORE_FILE.put("TestBoard3", 1133);
-
-		INSTRUCTOR_SCORE_RANDOM.put(new Long(2345724), 346038);
-		INSTRUCTOR_SCORE_RANDOM.put(new Long(542675), 400324);
-		INSTRUCTOR_SCORE_RANDOM.put(new Long(653836), 372729);
-		INSTRUCTOR_SCORE_RANDOM.put(new Long(971235), 639364);
-		INSTRUCTOR_SCORE_RANDOM.put(new Long(345353413), 267453);
-		INSTRUCTOR_SCORE_RANDOM.put(new Long(6761234), 966813);
-		INSTRUCTOR_SCORE_RANDOM.put(new Long(1290734269), 351324);
+		INSTRUCTOR_SCORE_FILE.add("TestBoard1");
+		INSTRUCTOR_SCORE_FILE.add("TestBoard2");
+		INSTRUCTOR_SCORE_FILE.add("TestBoard3");
+		Random r = new Random(20152110);
+		for (int i = 0; i < NUM_RANDOMS; i++){
+			INSTRUCTOR_SCORE_RANDOM.add(r.nextLong());
+		}
 	}
 
 	/**
@@ -110,7 +108,7 @@ public class Grader {
 			netIDs[0] = args[2];
 		}
 		System.err.println("Grading "
-				+ (netIDs.length > 1 ? "group_of" + netIDs[0] + netIDs[1]
+				+ (netIDs.length > 1 ? "group_of_" + netIDs[0] + "_" + netIDs[1]
 						: netIDs[0]));
 
 		// Make sure the solution directory exists
@@ -168,10 +166,9 @@ public class Grader {
 	 */
 	private static Feedback runOn(String managerClassname) {
 		GameRunner gr = new GameRunner(managerClassname, SHOW_GUI, false);
-		String[] fileBoards = INSTRUCTOR_SCORE_FILE.keySet().toArray(
-				new String[0]);
-		Long[] rndBoards = INSTRUCTOR_SCORE_RANDOM.keySet()
-				.toArray(new Long[0]);
+		String[] fileBoards = INSTRUCTOR_SCORE_FILE.toArray(
+				new String[INSTRUCTOR_SCORE_FILE.size()]);
+		Long[] rndBoards = INSTRUCTOR_SCORE_RANDOM.toArray(new Long[INSTRUCTOR_SCORE_RANDOM.size()]);
 		long[] randomBoards = new long[rndBoards.length];
 		for (int i = 0; i < rndBoards.length; i++) {
 			randomBoards[i] = rndBoards[i];
@@ -192,9 +189,10 @@ public class Grader {
 				+ fileBoards.length
 				+ ")\n"
 				+ "File.....................Completeness......Points...............InstructorPoints...Status";
+		GameScore[] insFiles = gr.runFiles(fileBoards);
 		for (int i = 0; i < fileScores.length; i++) {
 			double completenessScore = completenesScore(fileScores[i]);
-			double instructorScore = INSTRUCTOR_SCORE_FILE.get(fileBoards[i]);
+			double instructorScore = insFiles[i].score;
 			double pointScore = adjustedScore(fileScores[i]);
 
 			totalCompletenesScore += completenessScore;
@@ -221,10 +219,10 @@ public class Grader {
 				+ randomBoards.length
 				+ ")\n"
 				+ "Seed.....................Completeness......Points...............InstructorPoints...Status";
+		GameScore[] insRandoms = gr.runSeeds(randomBoards);
 		for (int i = 0; i < randomScores.length; i++) {
 			double completenessScore = completenesScore(randomScores[i]);
-			double instructorScore = INSTRUCTOR_SCORE_RANDOM
-					.get(randomBoards[i]);
+			double instructorScore = insRandoms[i].score;
 			double pointScore = adjustedScore(randomScores[i]);
 
 			totalCompletenesScore += completenessScore;
