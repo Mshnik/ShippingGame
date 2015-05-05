@@ -50,7 +50,7 @@ public class Grader {
 	 */
 	private static final List<Long> INSTRUCTOR_SCORE_RANDOM = new LinkedList<Long>();
 
-	private static final int NUM_RANDOMS = 15;
+	private static final int NUM_RANDOMS = 20;
 
 	/** Use to do printing */
 	private static PrintStream stdout;
