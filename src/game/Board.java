@@ -498,8 +498,6 @@ public final class Board implements JSONString {
 		private static final int MIN_NODES = 5;
 		private static final int MAX_NODES = 100;
 
-		private static final int MAX_NODE_RELOCATION_ATTEMPTS = 1000;
-
 		private static final double AVERAGE_DEGREE = 2.5;
 		private static final int MIN_EDGE_LENGTH = 5;
 		private static final int MAX_EDGE_LENGTH = 60;
@@ -560,7 +558,6 @@ public final class Board implements JSONString {
 				c.setX1(-Circle.DEFAULT_DIAMETER); 
 				c.setY1(-Circle.DEFAULT_DIAMETER);
 
-				int attempts = 0;
 				while (c.getX1() == -Circle.DEFAULT_DIAMETER || 
 						c.getY1() == -Circle.DEFAULT_DIAMETER) {
 					//Try setting to a new location
@@ -568,15 +565,12 @@ public final class Board implements JSONString {
 					c.setY1(r.nextInt(HEIGHT + 1) + BUFFER);
 					//Check other existing nodes. If too close & not over max attempts, 
 					//re-randomize this node's location
-					if(attempts < MAX_NODE_RELOCATION_ATTEMPTS){
 						for (Node n2 : b.getNodes()) {
 							if (n2.getCircle().getDistance(c) < Circle.BUFFER_RADUIS) {
-								attempts++;
 								c.setX1(-Circle.DEFAULT_DIAMETER);
 								c.setY1(-Circle.DEFAULT_DIAMETER);
 								break;
 							}
-						}
 					}
 				}
 				n.x = n.getCircle().getX1();

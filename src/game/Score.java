@@ -15,7 +15,7 @@ public final class Score {
 	/** The Colors in the game. Colors of Trucks and Parcels are chosen from this Array.
 	 * Other colors are not allowed in the game, so setColor(Color c) methods must
 	 * check for c being contained in COLOR before setting. */
-	private static final Color[] COLOR = {
+	public static final Color[] COLOR = {
 		new Color(198, 0, 0),	//Mid Red
 		new Color(198, 0, 144),	//Mid Pink
 		new Color(102, 0, 198),	//Mid Purple-Blue
