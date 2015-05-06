@@ -372,10 +372,10 @@ public class Grader {
 	}
 
 	/** Portion of completenss score that is parcels */
-	private static final double COMPLETENESS_PARCELS = 1;
+	private static final double COMPLETENESS_PARCELS = 0.95;
 
 	/** Portion of completeness score that is trucks getting home */
-	private static final double COMPLETENESS_TRUCKS = 0;
+	private static final double COMPLETENESS_TRUCKS = 1 - COMPLETENESS_PARCELS;
 
 	/**
 	 * Returns a completeness score for the given gameScore - out of 1 for full
