@@ -52,7 +52,7 @@ def reprocess(fname, writeTxt):
     if writeTxt:
         with open(fname[:-4] + '_revised.txt', 'w') as f:
             f.writelines(line)
-    return nameToGradesLine(fname, (cFlo*0.8 + sFlo*0.2 + penalty + bonus), line)
+    return nameToGradesLine(fname, max(0,(cFlo*0.8 + sFlo*0.2 + penalty + bonus)), line)
 
 def nameToGradesLine(fname, grade, feedback):
     s = '"'
