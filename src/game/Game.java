@@ -296,6 +296,17 @@ public class Game {
 	public void kill() {
 		halt(false);
 	}
+	
+	public void forceKill(){
+		if (!finished) {
+			setRunning(false);	
+			setFinished(true);
+		}
+		for (Truck t : board.getTrucks()) {
+			t.forceQuit();
+		}
+		manager.forceQuit();
+	}
 
 	/** End this game correctly when the last parcel is delivered. */
 	protected void finish() {
@@ -381,6 +392,9 @@ public class Game {
 		@Override
 		public void uncaughtException(Thread t, Throwable e) {
 			if (monitoringThread != null) {
+				if (e instanceof ThreadDeath){
+					return;
+				}
 				throwable = e;
 				monitoringThread.interrupt();
 			} else {

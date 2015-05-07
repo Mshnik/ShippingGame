@@ -124,5 +124,11 @@ public abstract class Manager implements Runnable{
 	final void gameOver() {
 		if (thread != null) thread.interrupt();
 	}
+	
+	
+	@SuppressWarnings("deprecation")
+	final void forceQuit(){
+		thread.stop();
+	}
 
 }

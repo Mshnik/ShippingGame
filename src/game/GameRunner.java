@@ -152,7 +152,7 @@ public class GameRunner {
 				return new GameScore(g, g.getManager().getScore(),
 						GameStatus.SUCCESS, "Success :-)");
 			} else {
-				g.kill();
+				g.forceKill();
 				return new GameScore(g, g.getManager().getScore(),
 						GameStatus.TIMEOUT, "Game Timeout after " + maxTime
 								+ "ms");
@@ -166,7 +166,7 @@ public class GameRunner {
 					msg += " at " + g.throwable.getStackTrace()[i];
 				}
 			}
-			g.kill();
+			g.forceKill();
 			return new GameScore(g, g.getManager().getScore(),
 					GameStatus.ERROR, "Exception Thrown - " + msg);
 		}

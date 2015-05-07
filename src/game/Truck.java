@@ -731,6 +731,11 @@ public final class Truck implements BoardElement, Runnable {
         if (thread != null) thread.interrupt(); 
         alive = false;
     }
+    
+    @SuppressWarnings("deprecation")
+	protected void forceQuit(){
+    	thread.stop();
+    }
 
     /** Return a JSON String of this truck. This is just the basic truck
      * info pertaining to map creation - location and load not included.
